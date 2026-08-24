@@ -12,6 +12,7 @@ import (
 	adoscanner "github.com/shiftctl/shiftctl/internal/scanner/azuredevops"
 	bbscanner "github.com/shiftctl/shiftctl/internal/scanner/bitbucket"
 	githubscanner "github.com/shiftctl/shiftctl/internal/scanner/github"
+	glscanner "github.com/shiftctl/shiftctl/internal/scanner/gitlab"
 )
 
 // ProgressFunc is called after each repository is scanned, with the 1-based
@@ -80,6 +81,14 @@ func scanSource(ctx context.Context, platform, credential string, progress Progr
 		if err != nil {
 			return nil, fmt.Errorf("initialising Bitbucket scanner: %w", err)
 		}
+		facts, err := scanner.Scan(ctx, progress)
+		if err != nil {
+			return nil, fmt.Errorf("scanning repositories: %w", err)
+		}
+		return facts, nil
+
+	case "gitlab":
+		scanner := glscanner.NewScanner(credential)
 		facts, err := scanner.Scan(ctx, progress)
 		if err != nil {
 			return nil, fmt.Errorf("scanning repositories: %w", err)

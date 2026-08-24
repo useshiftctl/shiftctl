@@ -16,6 +16,8 @@ import (
 	"github.com/shiftctl/shiftctl/internal/plan"
 )
 
+var retryFailed bool
+
 var executeCmd = &cobra.Command{
 	Use:   "execute <migration-name>",
 	Short: "Execute the approved stage",
@@ -34,6 +36,8 @@ running this command again resumes from where it stopped. Items that were
 mid-flight during a crash are re-verified against the live destination before
 being counted as done or re-run.
 
+Use --retry-failed to re-attempt any items that failed in a previous run.
+
 The destination credential is requested here if it has not been stored yet —
 it is never required before execution actually begins.`,
 	Args: cobra.ExactArgs(1),
@@ -42,6 +46,7 @@ it is never required before execution actually begins.`,
 
 func init() {
 	rootCmd.AddCommand(executeCmd)
+	executeCmd.Flags().BoolVar(&retryFailed, "retry-failed", false, "Re-attempt items that failed in a previous run")
 }
 
 func runExecute(_ *cobra.Command, args []string) error {
@@ -127,6 +132,7 @@ func runExecute(_ *cobra.Command, args []string) error {
 		DestCredential:   dstCred,
 		Dest:             dest,
 		DestNamespace:    destUsername,
+		RetryFailed:      retryFailed,
 		ProgressFn:       makeProgressFn(stage),
 		RecoveryFn:       printRecoveryReport,
 	}

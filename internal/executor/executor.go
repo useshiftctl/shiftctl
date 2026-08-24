@@ -38,6 +38,9 @@ type Options struct {
 	// DestNamespace is the namespace (username/group) to create repos under.
 	// Resolved from the first ValidateCredential call.
 	DestNamespace string
+	// RetryFailed resets any ItemFailed items back to pending before execution
+	// begins, so they are attempted again in this run.
+	RetryFailed bool
 	// ProgressFn is called after each item completes (success or failure).
 	// stageProgress is a snapshot at that point in time.
 	ProgressFn func(result RepoResult, progress *StageProgress)
@@ -74,6 +77,13 @@ func Run(
 	// ── Crash recovery: move any executing → uncertain ────────────────────────
 	if err := MarkUncertain(prog); err != nil {
 		return nil, fmt.Errorf("marking uncertain: %w", err)
+	}
+
+	// ── Retry failed: reset failed items to pending if requested ─────────────
+	if opts.RetryFailed {
+		if err := ResetFailedToPending(prog); err != nil {
+			return nil, fmt.Errorf("resetting failed items: %w", err)
+		}
 	}
 
 	// ── Report uncertain items to the caller ──────────────────────────────────

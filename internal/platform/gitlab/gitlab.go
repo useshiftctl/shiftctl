@@ -2,7 +2,8 @@ package gitlab
 
 import (
 	"context"
-	"fmt"
+
+	glscanner "github.com/shiftctl/shiftctl/internal/scanner/gitlab"
 )
 
 type platform struct{}
@@ -12,7 +13,7 @@ func New() *platform { return &platform{} }
 
 func (p *platform) ID() string          { return "gitlab" }
 func (p *platform) DisplayName() string { return "GitLab" }
-func (p *platform) IsImplemented() bool { return false }
+func (p *platform) IsImplemented() bool { return true }
 
 func (p *platform) CredentialInstructions() string {
 	return `To generate a GitLab personal access token:
@@ -29,9 +30,12 @@ func (p *platform) CredentialInstructions() string {
 }
 
 func (p *platform) CredentialPrompt() string {
-	return "Paste your GitLab personal access token"
+	return "GitLab personal access token (glpat-...)"
 }
 
-func (p *platform) ValidateCredential(_ context.Context, _ string) (string, error) {
-	return "", fmt.Errorf("GitLab scanner not yet implemented")
+// ValidateCredential calls the GitLab API to confirm the token is valid and
+// returns the authenticated username.
+func (p *platform) ValidateCredential(ctx context.Context, credential string) (string, error) {
+	scanner := glscanner.NewScanner(credential)
+	return scanner.ValidateAndGetUsername(ctx)
 }

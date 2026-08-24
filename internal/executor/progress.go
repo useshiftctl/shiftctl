@@ -171,6 +171,25 @@ func MarkUncertain(p *StageProgress) error {
 	return nil
 }
 
+// ResetFailedToPending resets all ItemFailed items back to ItemPending so they
+// will be retried on the next execution run. Used by the --retry-failed flag.
+func ResetFailedToPending(p *StageProgress) error {
+	changed := false
+	for i := range p.Items {
+		if p.Items[i].Status == ItemFailed {
+			p.Items[i].Status = ItemPending
+			p.Items[i].Error = ""
+			p.Items[i].StartedAt = nil
+			p.Items[i].DoneAt = nil
+			changed = true
+		}
+	}
+	if changed {
+		return SaveProgress(p)
+	}
+	return nil
+}
+
 // UncertainItems returns all items currently in the uncertain state.
 func UncertainItems(p *StageProgress) []ItemProgress {
 	var out []ItemProgress
