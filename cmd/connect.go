@@ -12,6 +12,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/shiftctl/shiftctl/internal/credentials"
+	"github.com/shiftctl/shiftctl/internal/destination"
 	"github.com/shiftctl/shiftctl/internal/migration"
 	"github.com/shiftctl/shiftctl/internal/platform"
 )
@@ -72,11 +73,15 @@ func runConnect(_ *cobra.Command, _ []string) error {
 		huh.NewGroup(
 			huh.NewInput().
 				Title("What are you migrating to?").
-				Description("Name of the destination platform (e.g. \"GitLab\", \"Bitbucket\").").
+				Description("Supported destinations: GitHub, GitLab").
 				Placeholder("e.g. GitLab").
 				Validate(func(s string) error {
-					if strings.TrimSpace(s) == "" {
+					s = strings.TrimSpace(s)
+					if s == "" {
 						return fmt.Errorf("destination name cannot be empty")
+					}
+					if destination.ForName(s) == nil {
+						return fmt.Errorf("%q is not a supported destination — choose GitHub or GitLab", s)
 					}
 					return nil
 				}).
