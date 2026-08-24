@@ -165,7 +165,7 @@ func selectPlatform(target *string) error {
 	for i, p := range platforms {
 		label := p.DisplayName()
 		if !p.IsImplemented() {
-			label += dim.Render(" (coming soon)")
+			label += " (coming soon)"
 		}
 		opts[i] = huh.NewOption(label, p.ID())
 	}
