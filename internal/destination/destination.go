@@ -74,6 +74,10 @@ func ForName(name string) Destination {
 		return GitLab()
 	case strings.Contains(lower, "github"):
 		return GitHub()
+	case strings.Contains(lower, "bitbucket"):
+		return Bitbucket()
+	case strings.Contains(lower, "azure") || strings.Contains(lower, "azuredevops") || lower == "ado":
+		return AzureDevOps()
 	default:
 		return nil
 	}
@@ -87,4 +91,14 @@ func GitLab() Destination {
 // GitHub returns the GitHub Destination implementation.
 func GitHub() Destination {
 	return newGitHub()
+}
+
+// Bitbucket returns the Bitbucket Cloud Destination implementation.
+func Bitbucket() Destination {
+	return newBitbucket()
+}
+
+// AzureDevOps returns the Azure DevOps Destination implementation.
+func AzureDevOps() Destination {
+	return newAzureDevOps()
 }

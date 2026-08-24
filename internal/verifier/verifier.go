@@ -144,14 +144,20 @@ func checkGitReachable(ctx context.Context, remoteURL string) error {
 	return nil
 }
 
-// destPushURL builds an authenticated git URL for the destination. Currently
-// only GitLab is implemented — extend this switch as destinations are added.
+// destPushURL builds an authenticated git URL for the destination.
 func destPushURL(dest destination.Destination, credential, namespace, repoName string) string {
 	switch dest.ID() {
 	case "gitlab":
 		return fmt.Sprintf("https://oauth2:%s@gitlab.com/%s/%s.git", credential, namespace, repoName)
 	case "github":
 		return fmt.Sprintf("https://%s@github.com/%s/%s.git", credential, namespace, repoName)
+	case "bitbucket":
+		// credential is "username:app_password" — embed as-is.
+		return fmt.Sprintf("https://%s@bitbucket.org/%s/%s.git", credential, namespace, repoName)
+	case "azuredevops":
+		// credential is "org:pat"; use empty username + PAT for basic auth.
+		org, pat, _ := strings.Cut(credential, ":")
+		return fmt.Sprintf("https://%s:%s@dev.azure.com/%s/%s/_git/%s", org, pat, org, namespace, repoName)
 	default:
 		return fmt.Sprintf("https://%s@%s/%s/%s.git", credential, dest.ID(), namespace, repoName)
 	}
@@ -163,6 +169,11 @@ func destWebURL(dest destination.Destination, namespace, repoName string) string
 		return fmt.Sprintf("https://gitlab.com/%s/%s", namespace, repoName)
 	case "github":
 		return fmt.Sprintf("https://github.com/%s/%s", namespace, repoName)
+	case "bitbucket":
+		return fmt.Sprintf("https://bitbucket.org/%s/%s", namespace, repoName)
+	case "azuredevops":
+		// namespace is the project name; org is not stored here, use a generic URL.
+		return fmt.Sprintf("https://dev.azure.com/%s/_git/%s", namespace, repoName)
 	default:
 		return fmt.Sprintf("https://%s/%s/%s", dest.ID(), namespace, repoName)
 	}

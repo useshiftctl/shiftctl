@@ -73,7 +73,7 @@ func runConnect(_ *cobra.Command, _ []string) error {
 		huh.NewGroup(
 			huh.NewInput().
 				Title("What are you migrating to?").
-				Description("Supported destinations: GitHub, GitLab").
+				Description("Supported destinations: GitHub, GitLab, Bitbucket, Azure DevOps").
 				Placeholder("e.g. GitLab").
 				Validate(func(s string) error {
 					s = strings.TrimSpace(s)
@@ -81,7 +81,7 @@ func runConnect(_ *cobra.Command, _ []string) error {
 						return fmt.Errorf("destination name cannot be empty")
 					}
 					if destination.ForName(s) == nil {
-						return fmt.Errorf("%q is not a supported destination — choose GitHub or GitLab", s)
+						return fmt.Errorf("%q is not a supported destination — choose GitHub, GitLab, Bitbucket, or Azure DevOps", s)
 					}
 					return nil
 				}).
