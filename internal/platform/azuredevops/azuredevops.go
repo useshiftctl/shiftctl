@@ -2,7 +2,8 @@ package azuredevops
 
 import (
 	"context"
-	"fmt"
+
+	adoscanner "github.com/shiftctl/shiftctl/internal/scanner/azuredevops"
 )
 
 type platform struct{}
@@ -12,7 +13,7 @@ func New() *platform { return &platform{} }
 
 func (p *platform) ID() string          { return "azuredevops" }
 func (p *platform) DisplayName() string { return "Azure DevOps" }
-func (p *platform) IsImplemented() bool { return false }
+func (p *platform) IsImplemented() bool { return true }
 
 func (p *platform) CredentialInstructions() string {
 	return `To generate an Azure DevOps personal access token:
@@ -24,14 +25,23 @@ func (p *platform) CredentialInstructions() string {
   4. Under Scopes, select:
        Code: Read
        Build: Read
-       Release: Read
-  5. Click "Create" and copy the result`
+       Project and Team: Read
+  5. Click "Create" and copy the result
+
+  When prompted, enter your credential as:  organization:personal_access_token
+  (the organisation name from your Azure DevOps URL: dev.azure.com/{organisation})`
 }
 
 func (p *platform) CredentialPrompt() string {
-	return "Paste your Azure DevOps personal access token"
+	return "Azure DevOps credential (organization:personal_access_token)"
 }
 
-func (p *platform) ValidateCredential(_ context.Context, _ string) (string, error) {
-	return "", fmt.Errorf("Azure DevOps scanner not yet implemented")
+// ValidateCredential accepts "org:pat", calls the Azure DevOps API to confirm
+// the credential is valid, and returns the authenticated display name.
+func (p *platform) ValidateCredential(ctx context.Context, credential string) (string, error) {
+	scanner, err := adoscanner.NewScanner(credential)
+	if err != nil {
+		return "", err
+	}
+	return scanner.ValidateAndGetUsername(ctx)
 }

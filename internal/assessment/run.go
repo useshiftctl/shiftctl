@@ -9,6 +9,7 @@ import (
 
 	"github.com/shiftctl/shiftctl/internal/ai"
 	"github.com/shiftctl/shiftctl/internal/migration"
+	adoscanner "github.com/shiftctl/shiftctl/internal/scanner/azuredevops"
 	bbscanner "github.com/shiftctl/shiftctl/internal/scanner/bitbucket"
 	githubscanner "github.com/shiftctl/shiftctl/internal/scanner/github"
 )
@@ -78,6 +79,17 @@ func scanSource(ctx context.Context, platform, credential string, progress Progr
 		scanner, err := bbscanner.NewScanner(credential)
 		if err != nil {
 			return nil, fmt.Errorf("initialising Bitbucket scanner: %w", err)
+		}
+		facts, err := scanner.Scan(ctx, progress)
+		if err != nil {
+			return nil, fmt.Errorf("scanning repositories: %w", err)
+		}
+		return facts, nil
+
+	case "azuredevops":
+		scanner, err := adoscanner.NewScanner(credential)
+		if err != nil {
+			return nil, fmt.Errorf("initialising Azure DevOps scanner: %w", err)
 		}
 		facts, err := scanner.Scan(ctx, progress)
 		if err != nil {
