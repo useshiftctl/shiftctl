@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/charmbracelet/huh"
 	"github.com/spf13/cobra"
 
 	"github.com/shiftctl/shiftctl/internal/assessment"
+	"github.com/shiftctl/shiftctl/internal/execstate"
 	"github.com/shiftctl/shiftctl/internal/migration"
 	"github.com/shiftctl/shiftctl/internal/plan"
 )
@@ -51,6 +53,36 @@ func runPlan(_ *cobra.Command, args []string) error {
 			"assessment exists but has no analysis for %q\n"+
 				"This can happen if 'shiftctl assess' was interrupted after scanning but before the AI step.\n"+
 				"Run 'shiftctl assess %s' again to complete it.", name, name)
+	}
+
+	// ── Warn if plan already exists and execution has started ────────────────
+	if existing, err := plan.Load(name); err == nil {
+		exec, execErr := execstate.LoadOrInit(name, existing)
+		if execErr == nil {
+			for _, s := range exec.Stages {
+				if s.Status != execstate.StatusPending {
+					fmt.Printf("\n  %s  Warning: execution for this migration has already started.\n", cross)
+					fmt.Println("  Regenerating the plan will reset stage statuses if the stage count changes.")
+					fmt.Println("  Completed work is not lost, but you may need to re-approve.")
+					fmt.Println()
+
+					var proceed bool
+					if err := huh.NewForm(
+						huh.NewGroup(
+							huh.NewConfirm().
+								Title("Regenerate the plan anyway?").
+								Affirmative("Yes, regenerate").
+								Negative("No, keep existing plan").
+								Value(&proceed),
+						),
+					).Run(); err != nil || !proceed {
+						fmt.Println("\n  Plan regeneration cancelled.")
+						return nil
+					}
+					break
+				}
+			}
+		}
 	}
 
 	// ── Build plan ────────────────────────────────────────────────────────────
