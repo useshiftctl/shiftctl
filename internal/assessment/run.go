@@ -44,7 +44,7 @@ func Run(ctx context.Context, rec *migration.Record, token, apiKey string, progr
 
 	// ── Phase 3: AI analysis ─────────────────────────────────────────────────
 	client := ai.NewClient(apiKey)
-	result, err := ai.AnalyzeRepos(ctx, client, facts)
+	result, err := ai.AnalyzeRepos(ctx, client, rec.SourcePlatform, facts)
 	if err != nil {
 		return nil, fmt.Errorf("AI analysis: %w", err)
 	}

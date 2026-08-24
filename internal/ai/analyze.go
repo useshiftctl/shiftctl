@@ -8,7 +8,12 @@ import (
 	githubscanner "github.com/shiftctl/shiftctl/internal/scanner/github"
 )
 
-const systemPrompt = `You are analyzing a GitHub repository migration. You have been given structured facts about each repository — no raw file contents are included. Based solely on these structured facts, assess the migration risk for each repository.
+// buildSystemPrompt returns a system prompt tailored to the source platform so
+// the model reasons correctly about platform-specific conventions (e.g. ADO
+// project/repo naming, GitLab namespace paths, Bitbucket workspace slugs).
+func buildSystemPrompt(sourcePlatform string) string {
+	platformName := platformDisplayName(sourcePlatform)
+	return fmt.Sprintf(`You are analyzing a %s repository migration. You have been given structured facts about each repository — no raw file contents are included. Based solely on these structured facts, assess the migration risk for each repository.
 
 For each repository assess:
 - risk_level: "low" (isolated, few dependencies, no production-critical signals), "medium" (has CI/CD complexity, webhooks, or depends on other repos in this set), or "high" (production-critical systems such as auth, payments, or primary databases; complex webhook integrations; or strict branch protection indicating high-stakes systems)
@@ -19,7 +24,24 @@ For each repository assess:
 
 known_unknowns: items you detected the presence of but cannot fully assess from the facts alone. Examples: a webhook pointing to a bare IP address (can't verify what service), a repo with no dependency files despite having CI (unclear what it deploys), or an archived repo with active deploy keys (unclear if still in use). Surface these as items worth checking manually, not as risks.
 
-IMPORTANT: Reason only from the facts provided. Do not speculate beyond what the structured data shows. When confident, be specific. When uncertain, say so via best_guess and explain what would resolve the uncertainty in your evidence field.`
+IMPORTANT: Reason only from the facts provided. Do not speculate beyond what the structured data shows. When confident, be specific. When uncertain, say so via best_guess and explain what would resolve the uncertainty in your evidence field.`, platformName)
+}
+
+// platformDisplayName maps a canonical platform ID to its human-readable name.
+func platformDisplayName(id string) string {
+	switch id {
+	case "github":
+		return "GitHub"
+	case "gitlab":
+		return "GitLab"
+	case "bitbucket":
+		return "Bitbucket Cloud"
+	case "azuredevops":
+		return "Azure DevOps"
+	default:
+		return id
+	}
+}
 
 // toolInputSchema is the JSON Schema for the record_assessment tool. Using
 // forced tool use guarantees a structured JSON response from the model.
@@ -65,7 +87,7 @@ var toolInputSchema = map[string]interface{}{
 // Facts are marshalled to JSON as the user message. The model is forced to
 // respond via the record_assessment tool, guaranteeing a structured response
 // that can be parsed directly into AnalysisResult.
-func AnalyzeRepos(ctx context.Context, client *Client, facts []githubscanner.RepoFact) (*AnalysisResult, error) {
+func AnalyzeRepos(ctx context.Context, client *Client, sourcePlatform string, facts []githubscanner.RepoFact) (*AnalysisResult, error) {
 	factsJSON, err := json.MarshalIndent(facts, "", "  ")
 	if err != nil {
 		return nil, fmt.Errorf("marshalling repo facts: %w", err)
@@ -79,7 +101,7 @@ func AnalyzeRepos(ctx context.Context, client *Client, facts []githubscanner.Rep
 	req := anthropicRequest{
 		Model:     model,
 		MaxTokens: 8096,
-		System:    systemPrompt,
+		System:    buildSystemPrompt(sourcePlatform),
 		Tools: []anthropicTool{
 			{
 				Name:        "record_assessment",
