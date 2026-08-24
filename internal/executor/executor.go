@@ -29,7 +29,10 @@ type RecoveryReport struct {
 
 // Options controls execution behaviour.
 type Options struct {
-	// SourceCredential is the read-access token for the source platform (GitHub).
+	// SourcePlatform is the canonical ID of the source platform
+	// (e.g. "github", "gitlab", "bitbucket", "azuredevops").
+	SourcePlatform string
+	// SourceCredential is the read-access token for the source platform.
 	SourceCredential string
 	// DestCredential is the write-access token for the destination platform.
 	DestCredential string
@@ -151,7 +154,7 @@ func executeOne(
 	}
 
 	// ── Step 2: git clone --mirror source, then push to destination ──────────
-	cloneURL := githubCloneURL(fullName, opts.SourceCredential)
+	cloneURL := sourceCloneURL(opts.SourcePlatform, fullName, opts.SourceCredential)
 	if err := mirrorPush(ctx, cloneURL, action.PushURL); err != nil {
 		msg := fmt.Sprintf("git mirror push: %v", err)
 		_ = MarkFailed(prog, fullName, msg)
@@ -252,8 +255,33 @@ func CheckGitAvailable() error {
 
 // — Small helpers ─────────────────────────────────────────────────────────────
 
-func githubCloneURL(fullName, token string) string {
-	return fmt.Sprintf("https://%s@github.com/%s.git", token, fullName)
+// sourceCloneURL builds an authenticated git clone URL for the given source
+// platform. fullName is "owner/repo" for GitHub/GitLab/Bitbucket, and
+// "project/repo" for Azure DevOps.
+func sourceCloneURL(platform, fullName, credential string) string {
+	switch platform {
+	case "github":
+		return fmt.Sprintf("https://%s@github.com/%s.git", credential, fullName)
+	case "gitlab":
+		return fmt.Sprintf("https://oauth2:%s@gitlab.com/%s.git", credential, fullName)
+	case "bitbucket":
+		// Bitbucket credential is "username:app_password".
+		// Basic auth is already in that form, so embed directly.
+		return fmt.Sprintf("https://%s@bitbucket.org/%s.git", credential, fullName)
+	case "azuredevops":
+		// Credential is "org:pat". ADO clone URL: https://org@dev.azure.com/org/project/_git/repo
+		org, _, _ := strings.Cut(credential, ":")
+		// fullName is "project/repo"
+		parts := strings.SplitN(fullName, "/", 2)
+		if len(parts) == 2 {
+			return fmt.Sprintf("https://%s@dev.azure.com/%s/%s/_git/%s",
+				credential, org, parts[0], parts[1])
+		}
+		return fmt.Sprintf("https://%s@dev.azure.com/%s/_git/%s", credential, org, fullName)
+	default:
+		// Best-effort fallback.
+		return fmt.Sprintf("https://%s@%s/%s.git", credential, platform, fullName)
+	}
 }
 
 func trimOutput(b []byte) string {

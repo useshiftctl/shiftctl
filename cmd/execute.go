@@ -128,6 +128,7 @@ func runExecute(_ *cobra.Command, args []string) error {
 
 	// ── Run ───────────────────────────────────────────────────────────────────
 	opts := executor.Options{
+		SourcePlatform:   rec.SourcePlatform,
 		SourceCredential: srcCred,
 		DestCredential:   dstCred,
 		Dest:             dest,
