@@ -9,6 +9,7 @@ import (
 
 	"github.com/shiftctl/shiftctl/internal/ai"
 	"github.com/shiftctl/shiftctl/internal/migration"
+	bbscanner "github.com/shiftctl/shiftctl/internal/scanner/bitbucket"
 	githubscanner "github.com/shiftctl/shiftctl/internal/scanner/github"
 )
 
@@ -25,18 +26,13 @@ type ProgressFunc func(current, total int, fullName string)
 //
 // The token is the source platform credential; apiKey is ANTHROPIC_API_KEY.
 func Run(ctx context.Context, rec *migration.Record, token, apiKey string, progress ProgressFunc) (*State, error) {
-	if rec.SourcePlatform != "github" {
-		return nil, fmt.Errorf("assessment is currently only supported for GitHub sources (got %q)", rec.SourcePlatform)
-	}
-
 	// ── Phase 1: scan ────────────────────────────────────────────────────────
-	scanner := githubscanner.NewScanner(token)
-	facts, err := scanner.Scan(ctx, progress)
+	facts, err := scanSource(ctx, rec.SourcePlatform, token, progress)
 	if err != nil {
-		return nil, fmt.Errorf("scanning repositories: %w", err)
+		return nil, err
 	}
 	if len(facts) == 0 {
-		return nil, fmt.Errorf("no repositories found — check that your token has the 'repo' scope")
+		return nil, fmt.Errorf("no repositories found — check that your credential has the required read scopes")
 	}
 
 	// ── Phase 2: persist facts (checkpoint before AI call) ───────────────────
@@ -65,6 +61,33 @@ func Run(ctx context.Context, rec *migration.Record, token, apiKey string, progr
 	}
 
 	return Load(rec.Name)
+}
+
+// scanSource dispatches to the correct scanner based on the source platform ID.
+func scanSource(ctx context.Context, platform, credential string, progress ProgressFunc) ([]githubscanner.RepoFact, error) {
+	switch platform {
+	case "github":
+		scanner := githubscanner.NewScanner(credential)
+		facts, err := scanner.Scan(ctx, progress)
+		if err != nil {
+			return nil, fmt.Errorf("scanning repositories: %w", err)
+		}
+		return facts, nil
+
+	case "bitbucket":
+		scanner, err := bbscanner.NewScanner(credential)
+		if err != nil {
+			return nil, fmt.Errorf("initialising Bitbucket scanner: %w", err)
+		}
+		facts, err := scanner.Scan(ctx, progress)
+		if err != nil {
+			return nil, fmt.Errorf("scanning repositories: %w", err)
+		}
+		return facts, nil
+
+	default:
+		return nil, fmt.Errorf("assessment is not yet supported for %q sources", platform)
+	}
 }
 
 // RiskSummary returns counts of low/medium/high risk and known unknowns from
