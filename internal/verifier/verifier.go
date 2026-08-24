@@ -150,6 +150,8 @@ func destPushURL(dest destination.Destination, credential, namespace, repoName s
 	switch dest.ID() {
 	case "gitlab":
 		return fmt.Sprintf("https://oauth2:%s@gitlab.com/%s/%s.git", credential, namespace, repoName)
+	case "github":
+		return fmt.Sprintf("https://%s@github.com/%s/%s.git", credential, namespace, repoName)
 	default:
 		return fmt.Sprintf("https://%s@%s/%s/%s.git", credential, dest.ID(), namespace, repoName)
 	}
@@ -159,6 +161,8 @@ func destWebURL(dest destination.Destination, namespace, repoName string) string
 	switch dest.ID() {
 	case "gitlab":
 		return fmt.Sprintf("https://gitlab.com/%s/%s", namespace, repoName)
+	case "github":
+		return fmt.Sprintf("https://github.com/%s/%s", namespace, repoName)
 	default:
 		return fmt.Sprintf("https://%s/%s/%s", dest.ID(), namespace, repoName)
 	}

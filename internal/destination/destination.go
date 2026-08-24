@@ -72,13 +72,19 @@ func ForName(name string) Destination {
 	switch {
 	case strings.Contains(lower, "gitlab"):
 		return GitLab()
+	case strings.Contains(lower, "github"):
+		return GitHub()
 	default:
 		return nil
 	}
 }
 
-// GitLab returns the GitLab Destination implementation. Defined in register.go
-// to mirror the source-platform pattern.
+// GitLab returns the GitLab Destination implementation.
 func GitLab() Destination {
 	return newGitLab()
+}
+
+// GitHub returns the GitHub Destination implementation.
+func GitHub() Destination {
+	return newGitHub()
 }
