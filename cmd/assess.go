@@ -14,6 +14,8 @@ import (
 	"github.com/shiftctl/shiftctl/internal/migration"
 )
 
+var assessYes bool
+
 var assessCmd = &cobra.Command{
 	Use:   "assess <migration-name>",
 	Short: "Scan source repositories and assess migration risk",
@@ -35,6 +37,7 @@ Nothing is sent to Anthropic without showing you exactly what first.`,
 
 func init() {
 	rootCmd.AddCommand(assessCmd)
+	assessCmd.Flags().BoolVarP(&assessYes, "yes", "y", false, "Skip the confirmation prompt and proceed immediately")
 }
 
 func runAssess(_ *cobra.Command, args []string) error {
@@ -71,25 +74,27 @@ Get an API key at: https://console.anthropic.com/`)
 	// ── "Confirm What's Shared" ───────────────────────────────────────────────
 	printConfirmWhatShared(rec, apiKey)
 
-	var proceed bool
-	if err := huh.NewForm(
-		huh.NewGroup(
-			huh.NewConfirm().
-				Title("Proceed with assessment?").
-				Affirmative("Yes, start scanning").
-				Negative("No, cancel").
-				Value(&proceed),
-		),
-	).Run(); err != nil {
-		if err == huh.ErrUserAborted {
+	if !assessYes {
+		var proceed bool
+		if err := huh.NewForm(
+			huh.NewGroup(
+				huh.NewConfirm().
+					Title("Proceed with assessment?").
+					Affirmative("Yes, start scanning").
+					Negative("No, cancel").
+					Value(&proceed),
+			),
+		).Run(); err != nil {
+			if err == huh.ErrUserAborted {
+				fmt.Println("\nAssessment cancelled.")
+				return nil
+			}
+			return err
+		}
+		if !proceed {
 			fmt.Println("\nAssessment cancelled.")
 			return nil
 		}
-		return err
-	}
-	if !proceed {
-		fmt.Println("\nAssessment cancelled.")
-		return nil
 	}
 
 	fmt.Println()

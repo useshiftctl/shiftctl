@@ -14,6 +14,8 @@ import (
 	"github.com/shiftctl/shiftctl/internal/plan"
 )
 
+var decommissionYes bool
+
 var decommissionCmd = &cobra.Command{
 	Use:   "decommission <migration-name>",
 	Short: "Complete a fully verified migration",
@@ -36,6 +38,7 @@ run if any stage is still pending, executing, or verifying.`,
 
 func init() {
 	rootCmd.AddCommand(decommissionCmd)
+	decommissionCmd.Flags().BoolVarP(&decommissionYes, "yes", "y", false, "Skip the confirmation prompt")
 }
 
 func runDecommission(_ *cobra.Command, args []string) error {
@@ -67,25 +70,27 @@ func runDecommission(_ *cobra.Command, args []string) error {
 	printDecommissionPreview(rec, exec)
 
 	// ── Confirmation prompt ───────────────────────────────────────────────────
-	var confirmed bool
-	if err := huh.NewForm(
-		huh.NewGroup(
-			huh.NewConfirm().
-				Title(fmt.Sprintf("Complete migration %q and remove credentials?", name)).
-				Affirmative("Yes, complete and clean up").
-				Negative("No, not yet").
-				Value(&confirmed),
-		),
-	).Run(); err != nil {
-		if err == huh.ErrUserAborted {
+	if !decommissionYes {
+		var confirmed bool
+		if err := huh.NewForm(
+			huh.NewGroup(
+				huh.NewConfirm().
+					Title(fmt.Sprintf("Complete migration %q and remove credentials?", name)).
+					Affirmative("Yes, complete and clean up").
+					Negative("No, not yet").
+					Value(&confirmed),
+			),
+		).Run(); err != nil {
+			if err == huh.ErrUserAborted {
+				fmt.Println("\n  Decommission cancelled — nothing changed.")
+				return nil
+			}
+			return err
+		}
+		if !confirmed {
 			fmt.Println("\n  Decommission cancelled — nothing changed.")
 			return nil
 		}
-		return err
-	}
-	if !confirmed {
-		fmt.Println("\n  Decommission cancelled — nothing changed.")
-		return nil
 	}
 
 	// ── Remove credentials ────────────────────────────────────────────────────
