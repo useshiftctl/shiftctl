@@ -110,6 +110,9 @@ func runVerify(_ *cobra.Command, args []string) error {
 		return fmt.Errorf("verification error: %w", err)
 	}
 
+	// ── Persist results for browser companion ─────────────────────────────────
+	_ = verifier.SaveReport(name, report)
+
 	// ── Results ───────────────────────────────────────────────────────────────
 	passed, failed := report.Summary()
 	printVerifySummary(report, name)

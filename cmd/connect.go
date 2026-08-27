@@ -3,6 +3,8 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"net"
+	"net/http"
 	"os"
 	"strings"
 	"time"
@@ -15,6 +17,7 @@ import (
 	"github.com/shiftctl/shiftctl/internal/destination"
 	"github.com/shiftctl/shiftctl/internal/migration"
 	"github.com/shiftctl/shiftctl/internal/platform"
+	"github.com/shiftctl/shiftctl/internal/server"
 )
 
 var connectCmd = &cobra.Command{
@@ -159,7 +162,20 @@ func runConnect(_ *cobra.Command, _ []string) error {
 
 	// ── Success ───────────────────────────────────────────────────────────────
 	printConnectSuccess(rec, username)
-	return nil
+
+	// ── Open browser companion ─────────────────────────────────────────────────
+	l, err := net.Listen("tcp", "127.0.0.1:4242")
+	if err != nil {
+		// Port in use — just tell them to run serve manually.
+		fmt.Printf("  Run %s to open the browser companion.\n\n", bold.Render("shiftctl serve "+name))
+		return nil
+	}
+	url := "http://127.0.0.1:4242"
+	fmt.Printf("  Opening companion at %s\n", url)
+	fmt.Println(dim.Render("  Press Ctrl+C to stop."))
+	fmt.Println()
+	openBrowser(url)
+	return http.Serve(l, server.New(name))
 }
 
 // selectPlatform renders an interactive platform selector and writes the
