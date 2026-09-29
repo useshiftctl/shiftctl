@@ -378,6 +378,14 @@
     color: #667185; line-height: 1.45; margin: 0;
   }
 
+  .setup-update-token-btn {
+    background: none; border: none; padding: 0; margin-top: 6px;
+    font-family: 'Inter', sans-serif; font-size: 12px; color: #667185;
+    cursor: pointer; text-decoration: underline; text-underline-offset: 2px;
+    align-self: flex-start;
+  }
+  .setup-update-token-btn:hover { color: #344054; }
+
   /* Context input (card 3) */
   .setup-input-label {
     display: block; font-family: 'Inter', sans-serif; font-size: 14px;
@@ -912,6 +920,13 @@ function renderFirstRun() {
           <p style="font-family:'Inter',sans-serif;font-size:12px;color:#98a2b3;margin:0;">Destination access is only needed when Stage 1 execution is approved.</p>
         </div>
 
+        <div class="setup-card" style="display:flex;flex-direction:column;gap:8px;">
+          <p style="font-family:'Inter',sans-serif;font-size:14px;font-weight:600;color:#344054;margin:0;">3. Anything I should know? <span style="font-weight:400;color:#98a2b3;">(optional)</span></p>
+          <label style="font-family:'Inter',sans-serif;font-size:12px;color:#667185;">Your note — kept visually distinct from shiftctl's own responses</label>
+          <input class="setup-input" id="fr-context" placeholder="Skip the marketing-team repos, needs to be done by end of Q3"
+            value="${escHtml((window._frState && window._frState.context) || '')}" />
+        </div>
+
         <div id="fr-error" style="display:none;font-family:'Inter',sans-serif;font-size:13px;color:#d42620;padding:10px 14px;background:#fff5f5;border:1px solid #fca5a5;border-radius:8px;"></div>
 
         <button class="hifi-btn-primary" id="fr-submit" style="align-self:flex-end;" disabled>Connect &amp; Continue</button>
@@ -970,6 +985,9 @@ function renderFirstRun() {
 
   dstSelect.onchange = () => { window._frState.dst = dstSelect.value; updateSubmit(); };
 
+  const ctxInputFr = document.getElementById('fr-context');
+  if (ctxInputFr) ctxInputFr.addEventListener('input', () => { window._frState.context = ctxInputFr.value; });
+
   // Validate source credential when the user stops typing (debounced).
   let credTimer = null;
   credInput.addEventListener('input', () => {
@@ -1010,6 +1028,7 @@ function renderFirstRun() {
         source_platform: srcSelect.value,
         source_credential: credInput.value.trim(),
         destination_name: dstSelect.value,
+        context: (document.getElementById('fr-context') || {}).value || '',
       });
       const data = await res.json();
       if (!res.ok) throw { data };
@@ -1055,6 +1074,15 @@ function renderSetup() {
                 <span class="badge-pill badge-green">Connected</span>
               </div>
               <p class="setup-card-sub">Every repo this token can access will be scanned. To limit scope, use a fine-grained token scoped to specific repos.</p>
+              <button class="setup-update-token-btn" id="btn-update-src-token">Update token</button>
+              <div id="reconnect-src-wrap" style="display:none;flex-direction:column;gap:8px;margin-top:8px;">
+                <input type="password" id="reconnect-src-input" placeholder="Paste new token…"
+                  style="width:100%;border:1px solid #e4e7ec;border-radius:8px;padding:10px 14px;font-family:'Inter',sans-serif;font-size:13px;color:#344054;box-sizing:border-box;" />
+                <div style="display:flex;gap:8px;align-items:center;">
+                  <button class="hifi-btn-primary" id="btn-save-src-token" style="padding:8px 16px;font-size:13px;">Save</button>
+                  <span id="reconnect-src-status" style="font-family:'Inter',sans-serif;font-size:12px;color:#667185;"></span>
+                </div>
+              </div>
             </div>
 
             <!-- Card 2: Destination -->
@@ -1064,6 +1092,15 @@ function renderSetup() {
                 <span class="badge-pill badge-gray">Access not required yet</span>
               </div>
               <p class="setup-card-sub">You'll be asked for write access only when Stage 1 execution is approved.</p>
+              <button class="setup-update-token-btn" id="btn-update-dst-token">Update token</button>
+              <div id="reconnect-dst-wrap" style="display:none;flex-direction:column;gap:8px;margin-top:8px;">
+                <input type="password" id="reconnect-dst-input" placeholder="Paste new token…"
+                  style="width:100%;border:1px solid #e4e7ec;border-radius:8px;padding:10px 14px;font-family:'Inter',sans-serif;font-size:13px;color:#344054;box-sizing:border-box;" />
+                <div style="display:flex;gap:8px;align-items:center;">
+                  <button class="hifi-btn-primary" id="btn-save-dst-token" style="padding:8px 16px;font-size:13px;">Save</button>
+                  <span id="reconnect-dst-status" style="font-family:'Inter',sans-serif;font-size:12px;color:#667185;"></span>
+                </div>
+              </div>
             </div>
 
             <!-- Card 3: Context -->
@@ -1122,6 +1159,46 @@ function renderSetup() {
     openModal('modal-disconnect');
   };
   document.getElementById('btn-to-confirm').onclick = () => { clientScreen = 'confirm-shared'; render(); };
+
+  let ctxTimer = null;
+  const ctxInput = document.getElementById('ctx-input');
+  if (ctxInput) {
+    ctxInput.addEventListener('input', () => {
+      clearTimeout(ctxTimer);
+      ctxTimer = setTimeout(() => {
+        postJSON('/api/context', { context: ctxInput.value }).catch(() => {});
+      }, 800);
+    });
+  }
+
+  function setupReconnectCard(role, btnId, wrapId, inputId, statusId) {
+    const btn   = document.getElementById(btnId);
+    const wrap  = document.getElementById(wrapId);
+    const inp   = document.getElementById(inputId);
+    const stat  = document.getElementById(statusId);
+    const saveId = role === 'source' ? 'btn-save-src-token' : 'btn-save-dst-token';
+    if (!btn || !wrap || !inp || !stat) return;
+    btn.onclick = () => { wrap.style.display = wrap.style.display === 'none' ? 'flex' : 'none'; };
+    document.getElementById(saveId).onclick = async () => {
+      const cred = inp.value.trim();
+      if (!cred) return;
+      stat.style.color = '#667185'; stat.textContent = 'Saving…';
+      try {
+        const res = await postJSON('/api/reconnect', { role, credential: cred });
+        const data = await res.json();
+        if (res.ok) {
+          stat.style.color = '#0f973d';
+          stat.textContent = `✓ Authenticated as ${data.username}`;
+          inp.value = '';
+          setTimeout(() => { wrap.style.display = 'none'; stat.textContent = ''; }, 2000);
+        } else {
+          stat.style.color = '#d42620'; stat.textContent = data.error || 'Failed';
+        }
+      } catch(e) { stat.style.color = '#d42620'; stat.textContent = e.message || 'Error'; }
+    };
+  }
+  setupReconnectCard('source',      'btn-update-src-token', 'reconnect-src-wrap', 'reconnect-src-input', 'reconnect-src-status');
+  setupReconnectCard('destination',  'btn-update-dst-token', 'reconnect-dst-wrap', 'reconnect-dst-input', 'reconnect-dst-status');
 
   let filterTimer = null;
   const filterInput = document.getElementById('filter-input');
@@ -1746,7 +1823,18 @@ function renderExecution() {
     <p class="exec-side-title">If you pause</p>
     <p class="exec-side-body">Completed items stay live, they are not rolled back. In-progress items finish their current step, then stop. Not-started items are untouched.</p>
     <p class="exec-side-note">This stage was already approved, you're watching execution, not approving it again.</p>
-    ${executeError && !executeError.includes('destination_credential_required') ? `<p style="color:#d42620;font-size:13px;margin:8px 0 0;font-family:Inter,sans-serif;">${escHtml(executeError)}</p>` : ''}
+    ${executeError && !executeError.includes('destination_credential_required') ? `
+      <p style="color:#d42620;font-size:13px;margin:8px 0 0;font-family:Inter,sans-serif;">${escHtml(executeError)}</p>
+      <div id="reconnect-exec-wrap" style="display:none;flex-direction:column;gap:8px;margin-top:8px;">
+        <input type="password" id="reconnect-exec-input" placeholder="Paste new destination token…"
+          style="width:100%;border:1px solid #e4e7ec;border-radius:8px;padding:10px 14px;font-family:'Inter',sans-serif;font-size:13px;color:#344054;box-sizing:border-box;" />
+        <div style="display:flex;gap:8px;align-items:center;">
+          <button class="hifi-btn-primary" id="btn-save-exec-token" style="padding:8px 16px;font-size:13px;">Save</button>
+          <span id="reconnect-exec-status" style="font-family:'Inter',sans-serif;font-size:12px;"></span>
+        </div>
+      </div>
+      <button class="setup-update-token-btn" id="btn-update-exec-token" style="margin-top:6px;">Update destination token</button>
+    ` : ''}
     <div id="exec-cred-form" style="display:none;flex-direction:column;gap:10px;margin-top:12px;">
       <p class="exec-side-title" id="exec-cred-prompt" style="margin:0;"></p>
       <p class="exec-side-body" id="exec-cred-instructions" style="white-space:pre-line;"></p>
@@ -1786,6 +1874,36 @@ function renderExecution() {
 
   const startExecBtn = document.getElementById('btn-start-exec');
   if (startExecBtn) startExecBtn.onclick = () => startExecution(startExecBtn);
+
+  // Reconnect (update destination token) after execution error
+  const updateExecTokenBtn = document.getElementById('btn-update-exec-token');
+  const reconnectExecWrap  = document.getElementById('reconnect-exec-wrap');
+  if (updateExecTokenBtn && reconnectExecWrap) {
+    updateExecTokenBtn.onclick = () => {
+      reconnectExecWrap.style.display = reconnectExecWrap.style.display === 'none' ? 'flex' : 'none';
+    };
+    const saveExecTokenBtn = document.getElementById('btn-save-exec-token');
+    const reconnectExecStatus = document.getElementById('reconnect-exec-status');
+    if (saveExecTokenBtn) {
+      saveExecTokenBtn.onclick = async () => {
+        const inp = document.getElementById('reconnect-exec-input');
+        if (!inp || !inp.value.trim()) return;
+        reconnectExecStatus.style.color = '#667185'; reconnectExecStatus.textContent = 'Saving…';
+        try {
+          const res = await postJSON('/api/reconnect', { role: 'destination', credential: inp.value.trim() });
+          const data = await res.json();
+          if (res.ok) {
+            reconnectExecStatus.style.color = '#0f973d';
+            reconnectExecStatus.textContent = `✓ ${data.username}`;
+            inp.value = '';
+            setTimeout(() => { reconnectExecWrap.style.display = 'none'; fetchState(); }, 1200);
+          } else {
+            reconnectExecStatus.style.color = '#d42620'; reconnectExecStatus.textContent = data.error || 'Failed';
+          }
+        } catch(e) { reconnectExecStatus.style.color = '#d42620'; reconnectExecStatus.textContent = e.message; }
+      };
+    }
+  }
 
   // Destination credential save button
   const saveCredBtn = document.getElementById('btn-save-dest-cred');

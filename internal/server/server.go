@@ -90,6 +90,8 @@ func New(name string) *Server {
 	mux.HandleFunc("/api/verify", s.handleVerify)
 	mux.HandleFunc("/api/connect", s.handleConnect)
 	mux.HandleFunc("/api/connect/validate-source", s.handleValidateSource)
+	mux.HandleFunc("/api/context", s.handleContext)
+	mux.HandleFunc("/api/reconnect", s.handleReconnect)
 	mux.HandleFunc("/api/platforms", s.handlePlatforms)
 	mux.Handle("/", static)
 
@@ -1003,6 +1005,98 @@ func (s *Server) handleVerify(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, map[string]any{"ok": true})
 }
 
+// ── /api/context ──────────────────────────────────────────────────────────────
+
+func (s *Server) handleContext(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	var body struct {
+		Context string `json:"context"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		writeJSONStatus(w, http.StatusBadRequest, map[string]any{"error": "bad request"})
+		return
+	}
+	rec, err := migration.Load(s.name)
+	if err != nil {
+		writeJSONStatus(w, http.StatusBadRequest, map[string]any{"error": "migration not found"})
+		return
+	}
+	rec.Context = body.Context
+	if err := migration.Save(rec); err != nil {
+		writeJSONStatus(w, http.StatusInternalServerError, map[string]any{"error": err.Error()})
+		return
+	}
+	writeJSON(w, map[string]any{"ok": true})
+}
+
+// ── /api/reconnect ────────────────────────────────────────────────────────────
+
+func (s *Server) handleReconnect(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	var body struct {
+		Role       string `json:"role"`       // "source" or "destination"
+		Credential string `json:"credential"` // new token
+	}
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		writeJSONStatus(w, http.StatusBadRequest, map[string]any{"error": "bad request"})
+		return
+	}
+	if body.Role != "source" && body.Role != "destination" {
+		writeJSONStatus(w, http.StatusBadRequest, map[string]any{"error": "role must be \"source\" or \"destination\""})
+		return
+	}
+	if body.Credential == "" {
+		writeJSONStatus(w, http.StatusBadRequest, map[string]any{"error": "credential is required"})
+		return
+	}
+
+	rec, err := migration.Load(s.name)
+	if err != nil {
+		writeJSONStatus(w, http.StatusBadRequest, map[string]any{"error": "migration not found"})
+		return
+	}
+
+	ctx := context.Background()
+	var username string
+
+	if body.Role == "source" {
+		src := platform.ByID(rec.SourcePlatform)
+		if src == nil {
+			writeJSONStatus(w, http.StatusBadRequest, map[string]any{"error": "unknown source platform: " + rec.SourcePlatform})
+			return
+		}
+		username, err = src.ValidateCredential(ctx, body.Credential)
+		if err != nil {
+			writeJSONStatus(w, http.StatusBadRequest, map[string]any{"error": "credential invalid: " + err.Error()})
+			return
+		}
+	} else {
+		dest := destination.ForName(rec.DestinationName)
+		if dest == nil {
+			writeJSONStatus(w, http.StatusBadRequest, map[string]any{"error": "unknown destination: " + rec.DestinationName})
+			return
+		}
+		username, err = dest.ValidateCredential(ctx, body.Credential)
+		if err != nil {
+			writeJSONStatus(w, http.StatusBadRequest, map[string]any{"error": "credential invalid: " + err.Error()})
+			return
+		}
+	}
+
+	if err := credentials.Set(s.name, body.Role, body.Credential); err != nil {
+		writeJSONStatus(w, http.StatusInternalServerError, map[string]any{"error": "could not store credential: " + err.Error()})
+		return
+	}
+
+	writeJSON(w, map[string]any{"ok": true, "username": username})
+}
+
 // ── /api/platforms ────────────────────────────────────────────────────────────
 
 // handlePlatforms returns the list of supported source platforms and
@@ -1085,6 +1179,7 @@ func (s *Server) handleConnect(w http.ResponseWriter, r *http.Request) {
 		SourcePlatform   string `json:"source_platform"`
 		SourceCredential string `json:"source_credential"`
 		DestinationName  string `json:"destination_name"`
+		Context          string `json:"context"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		writeJSONStatus(w, http.StatusBadRequest, map[string]any{"error": "bad request"})
@@ -1126,6 +1221,7 @@ func (s *Server) handleConnect(w http.ResponseWriter, r *http.Request) {
 		Name:            s.name,
 		SourcePlatform:  body.SourcePlatform,
 		DestinationName: body.DestinationName,
+		Context:         body.Context,
 		CreatedAt:       time.Now().UTC(),
 		Status:          migration.StatusSetup,
 	}
