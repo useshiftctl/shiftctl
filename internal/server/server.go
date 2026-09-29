@@ -43,6 +43,8 @@ type CombinedState struct {
 	AssessError    string                  `json:"assess_error,omitempty"`
 	ExecuteRunning bool                    `json:"execute_running,omitempty"`
 	ExecuteError   string                  `json:"execute_error,omitempty"`
+	VerifyRunning  bool                    `json:"verify_running,omitempty"`
+	VerifyError    string                  `json:"verify_error,omitempty"`
 }
 
 // Server handles HTTP for the browser companion.
@@ -55,6 +57,9 @@ type Server struct {
 	executeMu      sync.Mutex
 	executeRunning bool
 	executeError   string
+	verifyMu       sync.Mutex
+	verifyRunning  bool
+	verifyError    string
 }
 
 // New creates a Server for the given migration name.
@@ -77,6 +82,7 @@ func New(name string) *Server {
 	mux.HandleFunc("/api/execute", s.handleExecute)
 	mux.HandleFunc("/api/destination-credential", s.handleDestinationCredential)
 	mux.HandleFunc("/api/filter", s.handleFilter)
+	mux.HandleFunc("/api/verify", s.handleVerify)
 	mux.Handle("/", static)
 
 	s.mux = mux
@@ -112,6 +118,11 @@ func (s *Server) buildState() (*CombinedState, error) {
 	st.ExecuteRunning = s.executeRunning
 	st.ExecuteError = s.executeError
 	s.executeMu.Unlock()
+
+	s.verifyMu.Lock()
+	st.VerifyRunning = s.verifyRunning
+	st.VerifyError = s.verifyError
+	s.verifyMu.Unlock()
 
 	rec, err := migration.Load(s.name)
 	if err != nil {
@@ -843,6 +854,134 @@ func (s *Server) handleDestinationCredential(w http.ResponseWriter, r *http.Requ
 	}
 
 	writeJSON(w, map[string]any{"ok": true, "username": username})
+}
+
+// ── /api/verify ───────────────────────────────────────────────────────────────
+
+func (s *Server) handleVerify(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	s.verifyMu.Lock()
+	if s.verifyRunning {
+		s.verifyMu.Unlock()
+		writeJSONStatus(w, http.StatusConflict, map[string]any{"error": "verification already running"})
+		return
+	}
+	s.verifyMu.Unlock()
+
+	p, err := plan.Load(s.name)
+	if err != nil {
+		writeJSONStatus(w, http.StatusBadRequest, map[string]any{"error": "plan not found"})
+		return
+	}
+
+	exec, err := execstate.Load(s.name)
+	if err != nil {
+		writeJSONStatus(w, http.StatusBadRequest, map[string]any{"error": "execution state not found"})
+		return
+	}
+
+	// Find the stage in verifying state.
+	var activeStage *plan.Stage
+	var activeStageNum int
+	for _, ss := range exec.Stages {
+		if ss.Status == execstate.StatusVerifying {
+			for j := range p.Stages {
+				if p.Stages[j].Number == ss.Number {
+					stageCopy := p.Stages[j]
+					activeStage = &stageCopy
+					activeStageNum = ss.Number
+					break
+				}
+			}
+			break
+		}
+	}
+	if activeStage == nil {
+		writeJSONStatus(w, http.StatusBadRequest, map[string]any{"error": "no stage in verifying state"})
+		return
+	}
+
+	if err := executor.CheckGitAvailable(); err != nil {
+		writeJSONStatus(w, http.StatusBadRequest, map[string]any{"error": err.Error()})
+		return
+	}
+
+	rec, err := migration.Load(s.name)
+	if err != nil {
+		writeJSONStatus(w, http.StatusBadRequest, map[string]any{"error": "migration not found: " + err.Error()})
+		return
+	}
+
+	dest := destination.ForName(rec.DestinationName)
+	if dest == nil {
+		writeJSONStatus(w, http.StatusBadRequest, map[string]any{"error": "unknown destination: " + rec.DestinationName})
+		return
+	}
+
+	dstCred, err := credentials.Get(s.name, "destination")
+	if err != nil {
+		writeJSONStatus(w, http.StatusBadRequest, map[string]any{"error": "destination credential not found: " + err.Error()})
+		return
+	}
+
+	ctx := context.Background()
+	username, err := dest.ValidateCredential(ctx, dstCred)
+	if err != nil {
+		writeJSONStatus(w, http.StatusBadRequest, map[string]any{"error": "destination credential invalid: " + err.Error()})
+		return
+	}
+
+	prog, err := executor.LoadProgress(s.name, activeStageNum)
+	if err != nil {
+		writeJSONStatus(w, http.StatusBadRequest, map[string]any{"error": fmt.Sprintf("no execution progress for stage %d: %v", activeStageNum, err)})
+		return
+	}
+
+	stageCopy := *activeStage
+	stageNum := activeStageNum
+
+	s.verifyMu.Lock()
+	s.verifyRunning = true
+	s.verifyError = ""
+	s.verifyMu.Unlock()
+
+	go func() {
+		defer func() {
+			s.verifyMu.Lock()
+			s.verifyRunning = false
+			s.verifyMu.Unlock()
+		}()
+
+		opts := verifier.Options{
+			DestCredential: dstCred,
+			Dest:           dest,
+			DestNamespace:  username,
+		}
+
+		report, err := verifier.Run(ctx, stageCopy, prog, opts)
+		if err != nil {
+			s.verifyMu.Lock()
+			s.verifyError = err.Error()
+			s.verifyMu.Unlock()
+			return
+		}
+
+		// Always save the report so the UI can display results.
+		_ = verifier.SaveReport(s.name, report)
+
+		// Transition stage to verified regardless of individual item failures —
+		// failures are surfaced as informational anomalies in the UI.
+		execState, loadErr := execstate.Load(s.name)
+		if loadErr == nil {
+			_ = execstate.Transition(execState, stageNum, execstate.StatusVerified)
+		}
+	}()
+
+	writeJSON(w, map[string]any{"ok": true})
 }
 
 func writeJSON(w http.ResponseWriter, v any) {

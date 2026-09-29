@@ -1689,11 +1689,21 @@ function renderVerifying() {
   const nextStage = activeStage + 1;
   const isLastStage = activeStage === totalStages;
 
+  const verifyRunning = !!serverState.verify_running;
+  const verifyError = serverState.verify_error || '';
+  const hasResults = vr && vr.items && vr.items.length > 0;
+
   let verified = 0, flagged = 0, total = 0;
   let itemsHtml = '';
 
-  if (!vr || !vr.items || vr.items.length === 0) {
-    itemsHtml = `<p style="font-family:'Inter',sans-serif;font-size:12px;color:#98a2b3;line-height:1.45;margin:0;">Verification in progress…</p>`;
+  if (!hasResults) {
+    if (verifyRunning) {
+      itemsHtml = `<p style="font-family:'Inter',sans-serif;font-size:12px;color:#98a2b3;line-height:1.45;margin:0;">Verification in progress…</p>`;
+    } else if (verifyError) {
+      itemsHtml = `<p style="font-family:'Inter',sans-serif;font-size:13px;color:#d42620;line-height:1.45;margin:0;">${escHtml(verifyError)}</p>`;
+    } else {
+      itemsHtml = `<p style="font-family:'Inter',sans-serif;font-size:12px;color:#98a2b3;line-height:1.45;margin:0;">Ready to verify — click Run Verification to check all migrated repos against the destination.</p>`;
+    }
   } else {
     total = vr.items.length;
     vr.items.forEach(item => { if (item.ok) verified++; else flagged++; });
@@ -1733,9 +1743,23 @@ function renderVerifying() {
     }).join('');
   }
 
-  const canContinue = vr && vr.items && vr.items.length > 0;
-  const footerCount = vr ? `${verified} of ${total} verified - ${flagged} flagged (informational)` : 'Loading…';
-  const ctaLabel = isLastStage ? 'Approve Decommission' : `Start Stage ${nextStage}`;
+  let footerCount, btnLabel, btnDisabled, btnIsVerify;
+  if (hasResults) {
+    footerCount = `${verified} of ${total} verified - ${flagged} flagged (informational)`;
+    btnLabel = isLastStage ? 'Approve Decommission' : `Start Stage ${nextStage}`;
+    btnDisabled = false;
+    btnIsVerify = false;
+  } else if (verifyRunning) {
+    footerCount = 'Verifying…';
+    btnLabel = 'Verifying…';
+    btnDisabled = true;
+    btnIsVerify = false;
+  } else {
+    footerCount = verifyError ? 'Verification failed' : 'Not yet verified';
+    btnLabel = verifyError ? 'Re-run Verification' : 'Run Verification';
+    btnDisabled = false;
+    btnIsVerify = true;
+  }
 
   setBody(`
     <div class="hifi-page">
@@ -1746,13 +1770,19 @@ function renderVerifying() {
       </div>
       <div class="hifi-footer">
         <span style="font-family:'Inter',sans-serif;font-size:12px;color:#98a2b3;line-height:1.45;">${footerCount}</span>
-        <button class="hifi-btn-primary" id="btn-post-verify" ${canContinue ? '' : 'disabled'}>${ctaLabel}</button>
+        <button class="hifi-btn-primary" id="btn-post-verify" ${btnDisabled ? 'disabled' : ''}>${btnLabel}</button>
       </div>
     </div>
   `);
 
   const postVerifyBtn = document.getElementById('btn-post-verify');
-  if (postVerifyBtn) postVerifyBtn.onclick = () => fetchState();
+  if (postVerifyBtn && !btnDisabled) {
+    if (btnIsVerify) {
+      postVerifyBtn.onclick = () => startVerification(postVerifyBtn);
+    } else {
+      postVerifyBtn.onclick = () => fetchState();
+    }
+  }
 }
 
 // ── Screen: decommission ─────────────────────────────────────────────────────
@@ -2118,6 +2148,18 @@ async function startExecution(btn) {
         errEl.textContent = e.message || 'Failed to start execution';
       }
     }
+  }
+}
+
+async function startVerification(btn) {
+  if (btn) { btn.disabled = true; btn.textContent = 'Starting…'; }
+  try {
+    await postJSON('/api/verify', {});
+    clientScreen = null;
+    render();
+  } catch(e) {
+    if (btn) { btn.disabled = false; btn.textContent = 'Run Verification'; }
+    alert((e.data && e.data.error) || e.message || 'Failed to start verification');
   }
 }
 
