@@ -113,10 +113,16 @@ func runConnect(_ *cobra.Command, _ []string) error {
 	if err := huh.NewForm(
 		huh.NewGroup(
 			huh.NewInput().
-				Title("Name this migration").
-				Description("Used as an identifier in commands and local file paths.\nSpaces become hyphens; only letters, digits, hyphens, and underscores allowed.").
+				Title("Migration name").
+				Description(`Short identifier used in commands, e.g. "github-to-gitlab". No spaces — use hyphens.`).
 				Placeholder("e.g. github-to-gitlab-2026").
 				Validate(func(s string) error {
+					if strings.Contains(s, " ") {
+						return fmt.Errorf("migration name cannot contain spaces — use hyphens instead")
+					}
+					if len(s) > 40 {
+						return fmt.Errorf("migration name must be 40 characters or fewer")
+					}
 					return migration.ValidateName(s)
 				}).
 				Value(&rawName),
@@ -305,7 +311,8 @@ func printConnectSuccess(rec *migration.Record, username string) {
 	fmt.Println(dim.Render("    shiftctl disconnect --purge"))
 	fmt.Println(rule)
 	fmt.Println()
-	fmt.Printf("  Run %s to start the assessment.\n", bold.Render("shiftctl assess "+rec.Name))
+	fmt.Printf("  Run %s to open the browser companion.\n", bold.Render("shiftctl serve "+rec.Name))
+	fmt.Println(dim.Render("  The companion will guide you through assessment, planning, and execution."))
 	fmt.Println()
 }
 

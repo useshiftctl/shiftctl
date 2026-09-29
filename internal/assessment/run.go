@@ -6,6 +6,7 @@ package assessment
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/shiftctl/shiftctl/internal/ai"
 	"github.com/shiftctl/shiftctl/internal/migration"
@@ -26,8 +27,10 @@ type ProgressFunc func(current, total int, fullName string)
 //  4. Persist the analysis results to disk.
 //  5. Advance the migration status to "planning".
 //
-// The token is the source platform credential; apiKey is ANTHROPIC_API_KEY.
-func Run(ctx context.Context, rec *migration.Record, token, apiKey string, progress ProgressFunc) (*State, error) {
+// The token is the source platform credential; apiKey is ANTHROPIC_API_KEY;
+// workspaceID is ANTHROPIC_WORKSPACE_ID (empty string for standard keys).
+// repoFilter is an optional list of "owner/repo" names to include; nil means all.
+func Run(ctx context.Context, rec *migration.Record, token, apiKey, workspaceID string, repoFilter []string, progress ProgressFunc) (*State, error) {
 	// ── Phase 1: scan ────────────────────────────────────────────────────────
 	facts, err := scanSource(ctx, rec.SourcePlatform, token, progress)
 	if err != nil {
@@ -37,13 +40,31 @@ func Run(ctx context.Context, rec *migration.Record, token, apiKey string, progr
 		return nil, fmt.Errorf("no repositories found — check that your credential has the required read scopes")
 	}
 
+	// ── Phase 1b: apply repo filter ──────────────────────────────────────────
+	if len(repoFilter) > 0 {
+		allowSet := make(map[string]bool, len(repoFilter))
+		for _, r := range repoFilter {
+			allowSet[strings.ToLower(strings.TrimSpace(r))] = true
+		}
+		filtered := facts[:0]
+		for _, f := range facts {
+			if allowSet[strings.ToLower(f.FullName)] {
+				filtered = append(filtered, f)
+			}
+		}
+		facts = filtered
+		if len(facts) == 0 {
+			return nil, fmt.Errorf("no repositories matched the filter — check your repo names are in 'owner/repo' format")
+		}
+	}
+
 	// ── Phase 2: persist facts (checkpoint before AI call) ───────────────────
 	if err := SaveFacts(rec.Name, facts); err != nil {
 		return nil, fmt.Errorf("saving scan results: %w", err)
 	}
 
 	// ── Phase 3: AI analysis ─────────────────────────────────────────────────
-	client := ai.NewClient(apiKey)
+	client := ai.NewClient(apiKey, workspaceID)
 	result, err := ai.AnalyzeRepos(ctx, client, rec.SourcePlatform, facts)
 	if err != nil {
 		return nil, fmt.Errorf("AI analysis: %w", err)

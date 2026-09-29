@@ -14,6 +14,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -25,16 +26,19 @@ const (
 
 // Client holds an authenticated Anthropic API connection.
 type Client struct {
-	apiKey     string
-	httpClient *http.Client
+	apiKey      string
+	workspaceID string // optional; required for identity-linked API keys
+	httpClient  *http.Client
 }
 
 // NewClient returns a Client configured with the given API key. The key is
 // read from ANTHROPIC_API_KEY by the caller; this package does not read env
-// vars so the isolation is explicit.
-func NewClient(apiKey string) *Client {
+// vars so the isolation is explicit. workspaceID is optional and only needed
+// for identity-linked API keys (set via ANTHROPIC_WORKSPACE_ID).
+func NewClient(apiKey, workspaceID string) *Client {
 	return &Client{
-		apiKey: apiKey,
+		apiKey:      apiKey,
+		workspaceID: workspaceID,
 		httpClient: &http.Client{
 			// Analysis calls can take longer than a typical HTTP request —
 			// large repo sets produce large prompts and long completions.
@@ -47,6 +51,12 @@ func NewClient(apiKey string) *Client {
 // the raw response. It is unexported; callers use the higher-level functions
 // in analyze.go.
 func (c *Client) complete(ctx context.Context, req anthropicRequest) (*anthropicResponse, error) {
+	if strings.HasPrefix(c.apiKey, "wrkspc_") {
+		return nil, fmt.Errorf("ANTHROPIC_API_KEY is set to a workspace ID, not an API key.\n\n" +
+			"  Your API key starts with 'sk-ant-...' — find it at https://console.anthropic.com/\n" +
+			"  Your workspace ID (wrkspc_...) goes in ANTHROPIC_WORKSPACE_ID instead")
+	}
+
 	body, err := json.Marshal(req)
 	if err != nil {
 		return nil, fmt.Errorf("marshalling request: %w", err)
@@ -60,6 +70,9 @@ func (c *Client) complete(ctx context.Context, req anthropicRequest) (*anthropic
 	httpReq.Header.Set("anthropic-version", anthropicVersion)
 	httpReq.Header.Set("content-type", "application/json")
 	httpReq.Header.Set("user-agent", "shiftctl/0.1.0")
+	if c.workspaceID != "" {
+		httpReq.Header.Set("anthropic-workspace-id", c.workspaceID)
+	}
 
 	resp, err := c.httpClient.Do(httpReq)
 	if err != nil {
@@ -85,7 +98,13 @@ func (c *Client) complete(ctx context.Context, req anthropicRequest) (*anthropic
 		// Try to extract the error message from the response body.
 		var errResp anthropicResponse
 		if json.Unmarshal(respBody, &errResp) == nil && errResp.Error != nil {
-			return nil, fmt.Errorf("Anthropic API error (%d): %s", resp.StatusCode, errResp.Error.Message)
+			msg := errResp.Error.Message
+			if strings.Contains(msg, "anthropic-workspace-id") {
+				return nil, fmt.Errorf("your API key is an identity-linked key, which requires a workspace ID.\n\n" +
+					"  Option 1 (recommended): use a standard API key from https://console.anthropic.com/\n" +
+					"  Option 2: set ANTHROPIC_WORKSPACE_ID=<your-workspace-id> before running shiftctl assess")
+			}
+			return nil, fmt.Errorf("Anthropic API error (%d): %s", resp.StatusCode, msg)
 		}
 		return nil, fmt.Errorf("Anthropic API returned %d: %s", resp.StatusCode, truncateBody(respBody))
 	}

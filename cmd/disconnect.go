@@ -2,7 +2,11 @@ package cmd
 
 import (
 	"fmt"
+	"net"
 	"os"
+	"os/exec"
+	"runtime"
+	"strings"
 
 	"github.com/charmbracelet/huh"
 	"github.com/spf13/cobra"
@@ -87,6 +91,9 @@ func runPurge(names []string) error {
 		}
 	}
 
+	// Stop the companion server if it's running.
+	stopCompanionServer()
+
 	// Remove the ~/.shiftctl/ directory.
 	fmt.Print("  Removing local migration data...")
 	dir, err := migration.ShiftctlDir()
@@ -108,6 +115,47 @@ func runPurge(names []string) error {
 	}
 	fmt.Println()
 	return nil
+}
+
+// stopCompanionServer kills any process listening on port 4242 so the user
+// can immediately run shiftctl connect after disconnecting without hitting
+// "address already in use".
+func stopCompanionServer() {
+	const port = "4242"
+
+	// Quick check — if nothing is listening, do nothing.
+	conn, err := net.DialTimeout("tcp", "127.0.0.1:"+port, 0)
+	if err != nil {
+		return // nothing running
+	}
+	conn.Close()
+
+	fmt.Print("  Stopping companion server...")
+
+	var cmd *exec.Cmd
+	switch runtime.GOOS {
+	case "darwin", "linux":
+		// lsof prints the PIDs, xargs kill -9 terminates them.
+		out, err := exec.Command("lsof", "-ti", ":"+port).Output()
+		if err != nil || len(strings.TrimSpace(string(out))) == 0 {
+			fmt.Println(" (not found)")
+			return
+		}
+		pids := strings.TrimSpace(string(out))
+		cmd = exec.Command("kill", append([]string{"-9"}, strings.Fields(pids)...)...)
+	case "windows":
+		cmd = exec.Command("cmd", "/C",
+			"for /f \"tokens=5\" %a in ('netstat -aon ^| findstr :"+port+"') do taskkill /F /PID %a")
+	default:
+		fmt.Println(" (unsupported OS)")
+		return
+	}
+
+	if err := cmd.Run(); err != nil {
+		fmt.Printf(" %s\n", cross)
+	} else {
+		fmt.Printf(" %s\n", check)
+	}
 }
 
 func printPurgeWarning(names []string) {

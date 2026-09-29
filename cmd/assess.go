@@ -58,10 +58,13 @@ shiftctl assess requires an Anthropic API key.
 Set it in your current session:
   export ANTHROPIC_API_KEY=sk-ant-...
 
-Or add it to your shell profile (~/.zshrc or ~/.bashrc) to persist it:
+Or add it to your shell profile to persist it across sessions:
   echo 'export ANTHROPIC_API_KEY=sk-ant-...' >> ~/.zshrc
+  source ~/.zshrc
 
-Get an API key at: https://console.anthropic.com/`)
+Get an API key at: https://console.anthropic.com/
+
+Once your key is set, re-run: shiftctl assess `+name)
 		return fmt.Errorf("ANTHROPIC_API_KEY is not set")
 	}
 
@@ -114,8 +117,10 @@ Get an API key at: https://console.anthropic.com/`)
 	fmt.Printf("  Scanning repositories accessible to %s...\n\n",
 		platformDisplayName(rec.SourcePlatform))
 
+	workspaceID := os.Getenv("ANTHROPIC_WORKSPACE_ID")
+
 	ctx := context.Background()
-	state, err := assessment.Run(ctx, rec, token, apiKey, progress)
+	state, err := assessment.Run(ctx, rec, token, apiKey, workspaceID, nil, progress)
 	if err != nil {
 		fmt.Printf("\n  %s  Assessment failed: %v\n", cross, err)
 		return err
