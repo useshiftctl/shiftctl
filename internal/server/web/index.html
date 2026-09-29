@@ -815,8 +815,11 @@ function updateTopBar() {
       const hasAnalysis = !!(assess && assess.analysis);
       const facts = assess ? assess.facts : null;
       const repoCount = assess ? assess.repo_count : 0;
+      const _scanned = serverState.assess_scanned || 0;
+      const _total = serverState.assess_total || 0;
       if (hasAnalysis) { badgeClass = 'badge-dodger'; label = 'Scan complete'; }
-      else if (facts && facts.length > 0) { badgeClass = 'badge-lightblue'; label = `Scanning ${facts.length} of ${repoCount || '?'} repositories`; }
+      else if (facts && facts.length > 0) { badgeClass = 'badge-lightblue'; label = `Analysing ${facts.length} repos…`; }
+      else if (_scanned > 0) { badgeClass = 'badge-lightblue'; label = `Scanning ${_scanned} of ${_total || '?'} repositories`; }
       else { badgeClass = 'badge-lightblue'; label = 'Scanning…'; }
       break;
     }
@@ -861,39 +864,169 @@ function setBody(html) {
 
 // ── Screen: first-run ────────────────────────────────────────────────────────
 function renderFirstRun() {
+  // Load platform list on first render, then re-render with options populated.
+  if (!window._frPlatforms) {
+    fetch('/api/platforms').then(r => r.json()).then(data => {
+      window._frPlatforms = data;
+      render();
+    }).catch(() => {});
+  }
+
+  const platforms = window._frPlatforms || { sources: [], destinations: [] };
+  const srcOptions = platforms.sources.map(p =>
+    `<option value="${escHtml(p.id)}">${escHtml(p.display_name)}</option>`
+  ).join('');
+  const dstOptions = platforms.destinations.map(p =>
+    `<option value="${escHtml(p.id)}">${escHtml(p.display_name)}</option>`
+  ).join('');
+
   setBody(`
     <div class="layout centered">
-      <div style="max-width:520px;width:100%;">
-        <div class="card-dark">
-          <h2>shiftctl — runs entirely on your machine</h2>
-          <div class="cmd-line">
-            <span class="cmd">shiftctl connect</span>
-            <span class="sep">|</span>
-            <span class="desc">Start a new migration</span>
-          </div>
-          <div class="cmd-line">
-            <span class="cmd">shiftctl assess &lt;name&gt;</span>
-            <span class="sep">|</span>
-            <span class="desc">Scan your source repositories</span>
-          </div>
-          <div class="cmd-line">
-            <span class="cmd">shiftctl plan &lt;name&gt;</span>
-            <span class="sep">|</span>
-            <span class="desc">Generate a staged migration plan</span>
-          </div>
-          <div class="cmd-line">
-            <span class="cmd">shiftctl --help</span>
-            <span class="sep">|</span>
-            <span class="desc">See all commands</span>
+      <div style="max-width:480px;width:100%;display:flex;flex-direction:column;gap:16px;">
+        <div>
+          <p style="font-family:'Inter',sans-serif;font-size:24px;font-weight:700;color:#344054;margin:0 0 4px;">Set up migration</p>
+          <p style="font-family:'Inter',sans-serif;font-size:13px;color:#667185;margin:0;">Migration: <strong>${escHtml(serverState.migration_name || '')}</strong></p>
+        </div>
+
+        <div class="setup-card" style="display:flex;flex-direction:column;gap:12px;">
+          <p style="font-family:'Inter',sans-serif;font-size:14px;font-weight:600;color:#344054;margin:0;">1. Source platform</p>
+          <select id="fr-src-platform" style="width:100%;border:1px solid #e4e7ec;border-radius:8px;padding:10px 14px;font-family:'Inter',sans-serif;font-size:13px;color:#344054;background:#fff;">
+            <option value="">Select source…</option>
+            ${srcOptions}
+          </select>
+          <div id="fr-src-cred-wrap" style="display:none;flex-direction:column;gap:8px;">
+            <label id="fr-src-cred-label" style="font-family:'Inter',sans-serif;font-size:12px;color:#667185;">Access token</label>
+            <p id="fr-src-cred-instructions" style="font-family:'Inter',sans-serif;font-size:11px;color:#98a2b3;white-space:pre-line;margin:0;"></p>
+            <input type="password" id="fr-src-cred" placeholder="Paste token here…"
+              style="width:100%;border:1px solid #e4e7ec;border-radius:8px;padding:10px 14px;font-family:'Inter',sans-serif;font-size:13px;color:#344054;box-sizing:border-box;" />
+            <div id="fr-src-status" style="font-family:'Inter',sans-serif;font-size:12px;min-height:18px;"></div>
           </div>
         </div>
-        <p style="text-align:center;margin-top:20px;font-size:13px;color:var(--text-secondary);">
-          No migration named <strong>${serverState.migration_name || '(unknown)'}</strong> found yet.<br>
-          Run <code style="font-family:var(--mono);">shiftctl connect</code> in your terminal to get started.
-        </p>
+
+        <div class="setup-card" style="display:flex;flex-direction:column;gap:12px;">
+          <p style="font-family:'Inter',sans-serif;font-size:14px;font-weight:600;color:#344054;margin:0;">2. Destination platform</p>
+          <select id="fr-dst-platform" style="width:100%;border:1px solid #e4e7ec;border-radius:8px;padding:10px 14px;font-family:'Inter',sans-serif;font-size:13px;color:#344054;background:#fff;">
+            <option value="">Select destination…</option>
+            ${dstOptions}
+          </select>
+          <p style="font-family:'Inter',sans-serif;font-size:12px;color:#98a2b3;margin:0;">Destination access is only needed when Stage 1 execution is approved.</p>
+        </div>
+
+        <div id="fr-error" style="display:none;font-family:'Inter',sans-serif;font-size:13px;color:#d42620;padding:10px 14px;background:#fff5f5;border:1px solid #fca5a5;border-radius:8px;"></div>
+
+        <button class="hifi-btn-primary" id="fr-submit" style="align-self:flex-end;" disabled>Connect &amp; Continue</button>
       </div>
     </div>
   `);
+
+  const srcSelect = document.getElementById('fr-src-platform');
+  const dstSelect = document.getElementById('fr-dst-platform');
+  const credWrap   = document.getElementById('fr-src-cred-wrap');
+  const credLabel  = document.getElementById('fr-src-cred-label');
+  const credInstr  = document.getElementById('fr-src-cred-instructions');
+  const credInput  = document.getElementById('fr-src-cred');
+  const srcStatus  = document.getElementById('fr-src-status');
+  const errBanner  = document.getElementById('fr-error');
+  const submitBtn  = document.getElementById('fr-submit');
+
+  // Preserve selections across re-renders caused by polling.
+  if (window._frState) {
+    srcSelect.value = window._frState.src || '';
+    dstSelect.value = window._frState.dst || '';
+    if (window._frState.src) {
+      credWrap.style.display = 'flex';
+      const p = (platforms.sources || []).find(p => p.id === window._frState.src);
+      if (p) { credLabel.textContent = p.cred_prompt; credInstr.textContent = p.cred_instructions; }
+      credInput.value = window._frState.cred || '';
+      if (window._frState.username) {
+        srcStatus.style.color = '#0f973d';
+        srcStatus.textContent = `✓ Authenticated as ${window._frState.username}`;
+      }
+    }
+  } else {
+    window._frState = {};
+  }
+
+  function updateSubmit() {
+    const ready = srcSelect.value && dstSelect.value && credInput.value.trim() && window._frState.username;
+    submitBtn.disabled = !ready;
+  }
+
+  srcSelect.onchange = () => {
+    window._frState.src = srcSelect.value;
+    window._frState.username = null;
+    window._frState.cred = '';
+    srcStatus.textContent = '';
+    credInput.value = '';
+    if (srcSelect.value) {
+      credWrap.style.display = 'flex';
+      const p = (platforms.sources || []).find(p => p.id === srcSelect.value);
+      if (p) { credLabel.textContent = p.cred_prompt; credInstr.textContent = p.cred_instructions; }
+    } else {
+      credWrap.style.display = 'none';
+    }
+    updateSubmit();
+  };
+
+  dstSelect.onchange = () => { window._frState.dst = dstSelect.value; updateSubmit(); };
+
+  // Validate source credential when the user stops typing (debounced).
+  let credTimer = null;
+  credInput.addEventListener('input', () => {
+    window._frState.cred = credInput.value;
+    window._frState.username = null;
+    srcStatus.style.color = '#98a2b3';
+    srcStatus.textContent = 'Validating…';
+    updateSubmit();
+    clearTimeout(credTimer);
+    const val = credInput.value.trim();
+    if (!val || !srcSelect.value) { srcStatus.textContent = ''; return; }
+    credTimer = setTimeout(async () => {
+      try {
+        const res = await postJSON('/api/connect/validate-source', {
+          source_platform: srcSelect.value,
+          source_credential: val,
+        });
+        const data = await res.json();
+        if (res.ok) {
+          window._frState.username = data.username;
+          srcStatus.style.color = '#0f973d';
+          srcStatus.textContent = `✓ Authenticated as ${data.username}`;
+        } else {
+          srcStatus.style.color = '#d42620';
+          srcStatus.textContent = data.error || 'Invalid credential';
+        }
+      } catch { srcStatus.style.color = '#d42620'; srcStatus.textContent = 'Validation failed'; }
+      updateSubmit();
+    }, 700);
+  });
+
+  submitBtn.onclick = async () => {
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Connecting…';
+    errBanner.style.display = 'none';
+    try {
+      const res = await postJSON('/api/connect', {
+        source_platform: srcSelect.value,
+        source_credential: credInput.value.trim(),
+        destination_name: dstSelect.value,
+      });
+      const data = await res.json();
+      if (!res.ok) throw { data };
+      window._frPlatforms = null;
+      window._frState = null;
+      clientScreen = null;
+      fetchState();
+    } catch(e) {
+      const msg = (e.data && e.data.error) || e.message || 'Connection failed';
+      errBanner.textContent = msg;
+      errBanner.style.display = 'block';
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Connect & Continue';
+    }
+  };
+
+  updateSubmit();
 }
 
 // ── Screen: setup ────────────────────────────────────────────────────────────
@@ -1041,11 +1174,13 @@ function renderAssessment() {
   const repoCount = assess ? assess.repo_count : 0;
   const hasAnalysis = !!(assess && assess.analysis);
   const scanning = !hasAnalysis && facts && facts.length > 0 && !serverState.assess_error;
+  const scanned = serverState.assess_scanned || 0;
+  const assessTotal = serverState.assess_total || 0;
   const knownUnknowns = assess && assess.analysis ? (assess.analysis.known_unknowns || []) : [];
 
   let repoCards = '';
   if (items.length === 0) {
-    repoCards = `<p class="assess-side-body" style="padding:16px 0;">${serverState.assess_running ? 'Scanning repositories…' : 'No repositories found yet. Click Start Assessment to begin.'}</p>`;
+    repoCards = `<p class="assess-side-body" style="padding:16px 0;">${serverState.assess_running ? (scanned > 0 ? `Scanning repositories… ${scanned} of ${assessTotal || '?'} done.` : 'Scanning repositories…') : 'No repositories found yet. Click Start Assessment to begin.'}</p>`;
   } else {
     repoCards = items.map((item, idx) => {
       const name = item.full_name || item.name || '';
@@ -1118,7 +1253,9 @@ function renderAssessment() {
               : hasAnalysis
                 ? 'Analysis complete. Review the findings and flag any items that look wrong before continuing to planning.'
                 : serverState.assess_running
-                  ? 'Assessment starting — scanning your repositories now.'
+                  ? (scanned > 0
+                    ? `Scanning repositories… ${scanned} of ${assessTotal || '?'} done.`
+                    : 'Assessment starting — scanning your repositories now.')
                   : 'Assessment not started yet.'
             }</p>
             ${serverState.assess_error ? `<p style="color:#d42620;font-size:13px;margin:0;font-family:Inter,sans-serif;">${escHtml(serverState.assess_error)}</p>` : ''}

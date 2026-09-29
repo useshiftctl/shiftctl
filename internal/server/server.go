@@ -20,6 +20,7 @@ import (
 	"github.com/shiftctl/shiftctl/internal/executor"
 	"github.com/shiftctl/shiftctl/internal/migration"
 	"github.com/shiftctl/shiftctl/internal/plan"
+	"github.com/shiftctl/shiftctl/internal/platform"
 	"github.com/shiftctl/shiftctl/internal/verifier"
 )
 
@@ -41,6 +42,8 @@ type CombinedState struct {
 	RepoFilter     []string                `json:"repo_filter,omitempty"`
 	AssessRunning  bool                    `json:"assess_running,omitempty"`
 	AssessError    string                  `json:"assess_error,omitempty"`
+	AssessScanned  int                     `json:"assess_scanned,omitempty"`
+	AssessTotal    int                     `json:"assess_total,omitempty"`
 	ExecuteRunning bool                    `json:"execute_running,omitempty"`
 	ExecuteError   string                  `json:"execute_error,omitempty"`
 	VerifyRunning  bool                    `json:"verify_running,omitempty"`
@@ -54,6 +57,8 @@ type Server struct {
 	assessMu       sync.Mutex
 	assessRunning  bool
 	assessError    string
+	assessScanned  int
+	assessTotal    int
 	executeMu      sync.Mutex
 	executeRunning bool
 	executeError   string
@@ -83,6 +88,9 @@ func New(name string) *Server {
 	mux.HandleFunc("/api/destination-credential", s.handleDestinationCredential)
 	mux.HandleFunc("/api/filter", s.handleFilter)
 	mux.HandleFunc("/api/verify", s.handleVerify)
+	mux.HandleFunc("/api/connect", s.handleConnect)
+	mux.HandleFunc("/api/connect/validate-source", s.handleValidateSource)
+	mux.HandleFunc("/api/platforms", s.handlePlatforms)
 	mux.Handle("/", static)
 
 	s.mux = mux
@@ -112,6 +120,8 @@ func (s *Server) buildState() (*CombinedState, error) {
 	s.assessMu.Lock()
 	st.AssessRunning = s.assessRunning
 	st.AssessError = s.assessError
+	st.AssessScanned = s.assessScanned
+	st.AssessTotal = s.assessTotal
 	s.assessMu.Unlock()
 
 	s.executeMu.Lock()
@@ -612,9 +622,18 @@ func (s *Server) handleAssess(w http.ResponseWriter, r *http.Request) {
 	}
 	s.assessRunning = true
 	s.assessError = ""
+	s.assessScanned = 0
+	s.assessTotal = 0
 	s.assessMu.Unlock()
 
 	repoFilter := loadFilter(s.name)
+
+	progress := func(current, total int, _ string) {
+		s.assessMu.Lock()
+		s.assessScanned = current
+		s.assessTotal = total
+		s.assessMu.Unlock()
+	}
 
 	go func() {
 		defer func() {
@@ -622,7 +641,7 @@ func (s *Server) handleAssess(w http.ResponseWriter, r *http.Request) {
 			s.assessRunning = false
 			s.assessMu.Unlock()
 		}()
-		_, err := assessment.Run(context.Background(), rec, token, apiKey, workspaceID, repoFilter, nil)
+		_, err := assessment.Run(context.Background(), rec, token, apiKey, workspaceID, repoFilter, progress)
 		if err != nil {
 			s.assessMu.Lock()
 			s.assessError = err.Error()
@@ -982,6 +1001,145 @@ func (s *Server) handleVerify(w http.ResponseWriter, r *http.Request) {
 	}()
 
 	writeJSON(w, map[string]any{"ok": true})
+}
+
+// ── /api/platforms ────────────────────────────────────────────────────────────
+
+// handlePlatforms returns the list of supported source platforms and
+// destinations so the connect form can populate its dropdowns without
+// hardcoding them in the frontend.
+func (s *Server) handlePlatforms(w http.ResponseWriter, r *http.Request) {
+	type platformInfo struct {
+		ID           string `json:"id"`
+		DisplayName  string `json:"display_name"`
+		CredPrompt   string `json:"cred_prompt"`
+		CredInstructions string `json:"cred_instructions"`
+	}
+	var sources []platformInfo
+	for _, p := range platform.All() {
+		if p.IsImplemented() {
+			sources = append(sources, platformInfo{
+				ID:           p.ID(),
+				DisplayName:  p.DisplayName(),
+				CredPrompt:   p.CredentialPrompt(),
+				CredInstructions: p.CredentialInstructions(),
+			})
+		}
+	}
+	var dests []platformInfo
+	for _, d := range []destination.Destination{
+		destination.GitHub(),
+		destination.GitLab(),
+		destination.Bitbucket(),
+		destination.AzureDevOps(),
+	} {
+		dests = append(dests, platformInfo{
+			ID:           d.ID(),
+			DisplayName:  d.DisplayName(),
+			CredPrompt:   d.CredentialPrompt(),
+			CredInstructions: d.CredentialInstructions(),
+		})
+	}
+	writeJSON(w, map[string]any{"sources": sources, "destinations": dests})
+}
+
+// ── /api/connect/validate-source ─────────────────────────────────────────────
+
+// handleValidateSource validates a source platform credential without creating
+// any migration data. Used by the first-run connect form to give live feedback.
+func (s *Server) handleValidateSource(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	var body struct {
+		SourcePlatform   string `json:"source_platform"`
+		SourceCredential string `json:"source_credential"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		writeJSONStatus(w, http.StatusBadRequest, map[string]any{"error": "bad request"})
+		return
+	}
+	src := platform.ByID(body.SourcePlatform)
+	if src == nil {
+		writeJSONStatus(w, http.StatusBadRequest, map[string]any{"error": "unknown platform: " + body.SourcePlatform})
+		return
+	}
+	username, err := src.ValidateCredential(context.Background(), body.SourceCredential)
+	if err != nil {
+		writeJSONStatus(w, http.StatusBadRequest, map[string]any{"error": err.Error()})
+		return
+	}
+	writeJSON(w, map[string]any{"ok": true, "username": username})
+}
+
+// ── /api/connect ──────────────────────────────────────────────────────────────
+
+func (s *Server) handleConnect(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var body struct {
+		SourcePlatform   string `json:"source_platform"`
+		SourceCredential string `json:"source_credential"`
+		DestinationName  string `json:"destination_name"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		writeJSONStatus(w, http.StatusBadRequest, map[string]any{"error": "bad request"})
+		return
+	}
+
+	if body.SourcePlatform == "" || body.SourceCredential == "" || body.DestinationName == "" {
+		writeJSONStatus(w, http.StatusBadRequest, map[string]any{"error": "source_platform, source_credential, and destination_name are required"})
+		return
+	}
+
+	// Guard: don't overwrite an existing migration.
+	if exists, _ := migration.Exists(s.name); exists {
+		writeJSONStatus(w, http.StatusConflict, map[string]any{"error": "migration already exists — disconnect first"})
+		return
+	}
+
+	src := platform.ByID(body.SourcePlatform)
+	if src == nil {
+		writeJSONStatus(w, http.StatusBadRequest, map[string]any{"error": "unknown source platform: " + body.SourcePlatform})
+		return
+	}
+	if destination.ForName(body.DestinationName) == nil {
+		writeJSONStatus(w, http.StatusBadRequest, map[string]any{"error": "unknown destination: " + body.DestinationName})
+		return
+	}
+
+	ctx := context.Background()
+	username, err := src.ValidateCredential(ctx, body.SourceCredential)
+	if err != nil {
+		writeJSONStatus(w, http.StatusBadRequest, map[string]any{
+			"error": "credential validation failed: " + err.Error(),
+			"field": "source_credential",
+		})
+		return
+	}
+
+	rec := &migration.Record{
+		Name:            s.name,
+		SourcePlatform:  body.SourcePlatform,
+		DestinationName: body.DestinationName,
+		CreatedAt:       time.Now().UTC(),
+		Status:          migration.StatusSetup,
+	}
+	if err := migration.Save(rec); err != nil {
+		writeJSONStatus(w, http.StatusInternalServerError, map[string]any{"error": "could not save migration: " + err.Error()})
+		return
+	}
+
+	if err := credentials.Set(s.name, "source", body.SourceCredential); err != nil {
+		writeJSONStatus(w, http.StatusInternalServerError, map[string]any{"error": "could not store credential: " + err.Error()})
+		return
+	}
+
+	writeJSON(w, map[string]any{"ok": true, "username": username})
 }
 
 func writeJSON(w http.ResponseWriter, v any) {
