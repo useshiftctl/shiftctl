@@ -29,7 +29,7 @@
   /* ── Top Bar ── */
   .topbar {
     height: 64px;
-    border-bottom: 1px solid #d6d6d6;
+    border-bottom: 1px solid #e4e7ec;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -40,9 +40,9 @@
     z-index: 10;
     flex-shrink: 0;
   }
-  .topbar-brand-group { display: flex; align-items: center; gap: 14px; }
-  .topbar-brand { font-weight: 700; font-size: 16px; letter-spacing: -0.3px; color: #111; }
-  .topbar-migration { font-size: 13px; color: #a6a6a6; font-weight: 400; }
+  .topbar-brand-group { display: flex; align-items: center; gap: 16px; }
+  .topbar-brand { font-weight: 600; font-size: 18px; letter-spacing: -0.3px; color: #344054; }
+  .topbar-migration { font-size: 12px; color: #98a2b3; font-weight: 400; }
   /* legacy — kept for other screens not yet rebuilt */
   .topbar-title { font-size: 14px; color: var(--text-secondary); }
   .topbar-status { display: flex; justify-content: flex-end; }
@@ -50,7 +50,7 @@
   /* ── Filled pill badges (Rayna UI) ── */
   .badge-pill {
     display: inline-flex; align-items: center; justify-content: center;
-    border-radius: 999px; padding: 4px 10px;
+    border-radius: 999px; padding: 4px 6px;
     font-size: 12px; font-weight: 500; color: #fff;
     white-space: nowrap; line-height: 1.45; letter-spacing: -0.06px;
   }
@@ -64,6 +64,8 @@
   .badge-orange     { background: #f3a218; color: #171717; }
   .badge-outline-gray { background: transparent; border: 1px solid #454545; color: #454545; }
   .badge-neutral { background: #e6e6e6; border: 1px solid #808080; color: #4d4d4d; font-size: 11px; font-weight: 500; }
+  .badge-gray-muted { background: #e8e8e8; color: #a6a6a6; }
+  .badge-dodger     { background: #4a9fed; }
   /* legacy bordered pill — kept for unrebuilt screens */
   .status-pill {
     display: inline-flex; align-items: center; gap: 6px;
@@ -249,8 +251,8 @@
   }
   .hifi-modal-content { display: flex; flex-direction: column; gap: 12px; }
   .hifi-modal-title {
-    font-family: 'Inter', sans-serif; font-size: 18px; font-weight: 600;
-    color: #334054; line-height: normal; margin: 0;
+    font-family: 'Inter', sans-serif; font-size: 20px; font-weight: 600;
+    color: #334054; letter-spacing: -0.4px; line-height: 1.2; margin: 0;
   }
   .hifi-modal-body-group { display: flex; flex-direction: column; gap: 12px; }
   .hifi-modal-body {
@@ -378,8 +380,8 @@
 
   /* Context input (card 3) */
   .setup-input-label {
-    display: block; font-family: 'Inter', sans-serif; font-size: 12px;
-    font-weight: 400; color: #667185; line-height: 1.45; margin-bottom: 10px;
+    display: block; font-family: 'Inter', sans-serif; font-size: 14px;
+    font-weight: 400; color: #575757; line-height: 1.45; margin-bottom: 10px;
   }
   .setup-input {
     width: 100%; font-family: 'Inter', sans-serif; font-size: 14px;
@@ -393,7 +395,7 @@
   /* Migration name value (card 4) */
   .setup-migration-val {
     font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 600;
-    color: #344054; line-height: 1.48; margin-top: 6px;
+    color: #475367; line-height: 1.48; margin-top: 6px;
   }
 
   /* Side panel */
@@ -417,7 +419,7 @@
 
   /* Hi-Fi footer */
   .hifi-footer {
-    height: 72px; border-top: 1px solid #d6d6d6;
+    height: 72px; border-top: 1px solid #e4e7ec;
     display: flex; align-items: center; justify-content: space-between;
     padding: 0 32px; flex-shrink: 0; background: #fff;
   }
@@ -451,16 +453,16 @@
     white-space: nowrap;
   }
   .confirm-sub {
-    font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 400;
+    font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 400;
     color: #667185; line-height: 1.45; margin: 0;
   }
   .confirm-cards-row {
-    display: grid; grid-template-columns: 450px 450px; gap: 39px;
+    display: grid; grid-template-columns: 450px 450px; gap: 68px;
     padding: 0 50px; margin-top: 48px; justify-content: center;
   }
   .confirm-card {
     border: 1px solid #e4e7ec; border-radius: 8px; padding: 18px 20px;
-    display: flex; flex-direction: column; gap: 6px; height: 240px;
+    display: flex; flex-direction: column; gap: 6px; height: 216px;
     align-items: flex-start; justify-content: center; text-align: left;
   }
   .confirm-card-1 { background: #f9fafb; }
@@ -470,7 +472,7 @@
     color: #344054; line-height: 1.48; margin: 0;
   }
   .confirm-card-body {
-    font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 400;
+    font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 400;
     color: #667185; line-height: 1.45; margin: 0;
   }
   .confirm-footer-right { justify-content: flex-end; }
@@ -482,7 +484,12 @@
   .assess-legend-item { display: flex; gap: 6px; align-items: center; }
   .assess-legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
   .assess-legend-text { font-family: 'Inter', sans-serif; font-size: 12px; color: #98a2b3; }
+  @keyframes assessCardIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
   .assess-card { border: 1px solid #e4e7ec; border-radius: 8px; padding: 16px 20px; display: flex; flex-direction: column; gap: 6px; background: #fff; flex-shrink: 0; }
+  .assess-card-new { animation: assessCardIn 0.3s ease both; }
   .assess-card-header { display: flex; align-items: center; justify-content: space-between; }
   .assess-card-name { font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 600; color: #344054; line-height: 1.48; }
   .assess-card-badges { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
@@ -500,23 +507,23 @@
   .hifi-btn-disabled { font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 600; color: #a6a6a6; background: #d6d6d6; border: none; border-radius: 8px; padding: 12px 20px; cursor: not-allowed; line-height: 1.48; white-space: nowrap; }
   /* ── Planning screen ──────────────────────────────────────────────────── */
   .plan-body { flex: 1; display: flex; gap: 20px; padding: 28px 32px; overflow: hidden; background: #fff; min-height: 0; }
-  .plan-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; padding-right: 4px; }
+  .plan-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 32px; overflow-y: auto; padding-right: 4px; }
   .plan-h1 { font-family: 'Inter', sans-serif; font-size: 24px; font-weight: 700; color: #344054; letter-spacing: -0.48px; line-height: 1.2; flex-shrink: 0; margin: 0; }
   .plan-subtitle { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 400; color: #667185; line-height: 1.45; flex-shrink: 0; margin: 0; }
   .plan-legend { display: flex; gap: 20px; align-items: center; flex-shrink: 0; }
   .plan-legend-item { display: flex; gap: 6px; align-items: center; }
   .plan-legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
   .plan-legend-text { font-family: 'Inter', sans-serif; font-size: 12px; color: #98a2b3; }
-  .plan-stage-card { border: 1px solid #e4e7ec; border-radius: 8px; padding: 16px 20px; display: flex; flex-direction: column; gap: 8px; background: #fff; flex-shrink: 0; }
+  .plan-stage-card { border: 1px solid #e4e7ec; border-radius: 8px; padding: 16px 20px; display: flex; flex-direction: column; gap: 16px; background: #fff; flex-shrink: 0; }
   .plan-stage-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
   .plan-stage-title { font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 600; color: #344054; line-height: 1.48; }
-  .plan-stage-summary { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600; color: #344054; background: #f0f2f5; border-radius: 999px; padding: 3px 10px; white-space: nowrap; flex-shrink: 0; }
-  .plan-stage-reason { font-family: 'Inter', sans-serif; font-size: 12px; color: #667185; line-height: 1.45; margin: 0; }
+  .plan-stage-summary { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 500; color: #454545; background: transparent; border: 1px solid #454545; border-radius: 999px; padding: 2px 6px; white-space: nowrap; flex-shrink: 0; letter-spacing: -0.06px; }
+  .plan-stage-reason { font-family: 'Inter', sans-serif; font-size: 12px; color: #98a2b3; line-height: 1.45; margin: 0; }
   .plan-stage-actions { display: flex; gap: 8px; align-items: center; flex-shrink: 0; flex-wrap: wrap; }
-  .plan-btn { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 500; border-radius: 6px; padding: 6px 12px; cursor: pointer; border: 1.5px solid #d0d5dd; background: #fff; color: #344054; line-height: 1.45; white-space: nowrap; }
+  .plan-btn { font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; border-radius: 8px; padding: 10px 12px; cursor: pointer; border: 1.5px solid #d6d6d6; background: #fff; color: #2b2b2b; line-height: 1.45; white-space: nowrap; }
   .plan-btn:hover { background: #f9fafb; }
-  .plan-btn-dark { background: #1671d9; color: #fff; border-color: #1671d9; }
-  .plan-btn-dark:hover { background: #1259b0; border-color: #1259b0; }
+  .plan-btn-dark { background: #1671d9; color: #fff; border-color: #1671d9; border-width: 0; }
+  .plan-btn-dark:hover { background: #1259b0; }
   .plan-note-form { display: flex; flex-direction: column; gap: 8px; margin-top: 2px; }
   .plan-note-form textarea { width: 100%; border: 1px solid #e4e7ec; border-radius: 8px; padding: 10px 14px; font-family: 'Inter', sans-serif; font-size: 12px; color: #344054; resize: vertical; box-sizing: border-box; outline: none; line-height: 1.45; }
   .plan-note-form textarea:focus { border-color: #1671d9; }
@@ -524,41 +531,104 @@
   .plan-note-saved { background: #f0f2f5; border-radius: 6px; padding: 8px 12px; font-family: 'Inter', sans-serif; font-size: 12px; color: #475367; line-height: 1.45; }
   .plan-note-saved strong { font-weight: 600; color: #344054; }
   .plan-repo-list { display: flex; flex-direction: column; gap: 6px; margin-top: 2px; }
-  .plan-repo-item { border: 1px solid #e4e7ec; border-radius: 6px; padding: 10px 14px; display: flex; flex-direction: column; gap: 4px; background: #f9fafb; }
+  .plan-repo-item { border: 1px solid #e4e7ec; border-radius: 6px; padding: 10px 14px; display: flex; flex-direction: column; gap: 3px; background: #f9fafb; }
   .plan-repo-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-  .plan-repo-name { font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; color: #344054; line-height: 1.45; }
-  .plan-repo-reason { font-family: 'Inter', sans-serif; font-size: 11px; color: #667185; line-height: 1.45; margin: 0; }
-  .plan-side { width: 360px; flex-shrink: 0; display: flex; flex-direction: column; gap: 14px; background: #f9fafb; border: 1px solid #e4e7ec; border-radius: 8px; padding: 24px; align-self: flex-start; }
+  .plan-repo-name { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 400; color: #344054; line-height: 1.45; }
+  .plan-repo-reason { font-family: 'Inter', sans-serif; font-size: 12px; color: #98a2b3; line-height: 1.45; margin: 0; }
+  .plan-side { width: 380px; flex-shrink: 0; display: flex; flex-direction: column; gap: 10px; background: #f9fafb; border: 1px solid #e4e7ec; border-radius: 8px; padding: 24px; align-self: flex-start; }
   .plan-side-title { font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 600; color: #344054; line-height: 1.48; margin: 0; }
   .plan-side-body { font-family: 'Inter', sans-serif; font-size: 12px; color: #667185; line-height: 1.45; margin: 0; }
-  .plan-footer-link { font-family: 'Inter', sans-serif; font-size: 14px; color: #667185; cursor: pointer; background: none; border: none; padding: 0; line-height: 1.45; }
-  .plan-footer-link:hover { color: #344054; text-decoration: underline; }
-  /* ── Approval screen ──────────────────────────────────────────────────── */
-  .appr-body { flex: 1; display: flex; gap: 16px; padding: 24px; overflow: hidden; background: #f5f5f5; min-height: 0; }
-  .appr-panel-left { flex: 1; min-width: 0; background: #fff; border: 1px solid #d0d5dd; border-radius: 8px; overflow-y: auto; display: flex; flex-direction: column; }
-  .appr-main { flex: 1; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
-  .appr-h1 { font-family: 'Inter', sans-serif; font-size: 20px; font-weight: 700; color: #111; line-height: 1.3; flex-shrink: 0; margin: 0; }
-  .appr-subtitle { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 400; color: #595959; line-height: 1.6; flex-shrink: 0; margin: 0; }
+  .plan-footer-link { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 400; color: #98a2b3; cursor: pointer; background: none; border: none; padding: 0; line-height: 1.45; }
+  .plan-footer-link:hover { color: #667185; }
+  /* ── Approval screen (Hi-Fi) ─────────────────────────────────────────────── */
+  .appr-body { flex: 1; display: flex; gap: 20px; padding: 28px 32px; overflow: hidden; background: #fff; min-height: 0; }
+  .appr-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; }
+  .appr-h1 { font-family: 'Inter', sans-serif; font-size: 24px; font-weight: 700; color: #344054; letter-spacing: -0.48px; line-height: 1.2; flex-shrink: 0; margin: 0; }
+  .appr-subtitle { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 400; color: #667185; line-height: 1.45; flex-shrink: 0; margin: 0; }
   .appr-legend { display: flex; gap: 20px; align-items: center; flex-shrink: 0; }
   .appr-legend-item { display: flex; gap: 6px; align-items: center; }
   .appr-legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-  .appr-legend-text { font-family: 'Inter', sans-serif; font-size: 11px; color: #737373; }
-  .appr-repo-item { border: 1px solid #d0d5dd; border-radius: 6px; padding: 12px 16px; display: flex; flex-direction: column; gap: 4px; background: #fff; flex-shrink: 0; }
-  .appr-repo-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-  .appr-repo-name { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; color: #111; }
-  .appr-repo-badge { background: #eaecf0; border-radius: 4px; padding: 2px 8px; font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 500; color: #344054; white-space: nowrap; flex-shrink: 0; }
-  .appr-repo-reason { font-family: 'Inter', sans-serif; font-size: 12px; color: #737373; line-height: 1.5; margin: 0; }
-  .appr-side { width: 360px; flex-shrink: 0; display: flex; flex-direction: column; gap: 14px; background: #f5f5f5; border: 1px solid #d0d5dd; border-radius: 8px; padding: 20px; }
-  .appr-side-title { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 700; color: #111; margin: 0; }
-  .appr-side-body { font-family: 'Inter', sans-serif; font-size: 12px; color: #595959; line-height: 1.6; margin: 0; }
-  .appr-rollback { background: #eaecf0; border: 1px solid #d0d5dd; border-radius: 6px; padding: 12px 16px; display: flex; flex-direction: column; gap: 4px; }
-  .appr-rollback-title { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 700; color: #111; margin: 0; }
-  .appr-rollback-body { font-family: 'Inter', sans-serif; font-size: 12px; color: #595959; line-height: 1.5; margin: 0; }
-  .appr-notice { background: #eaecf0; border-radius: 4px; padding: 10px 12px; font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 500; color: #344054; line-height: 1.5; }
-  .appr-footer-back { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 500; color: #344054; background: #fff; border: 1px solid #d0d5dd; border-radius: 6px; padding: 8px 16px; cursor: pointer; }
-  .appr-footer-back:hover { background: #f5f5f5; }
-  .appr-footer-cta { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; color: #fff; background: #1a1a1a; border: none; border-radius: 6px; padding: 10px 20px; cursor: pointer; white-space: nowrap; }
-  .appr-footer-cta:hover { background: #333; }
+  .appr-legend-text { font-family: 'Inter', sans-serif; font-size: 12px; color: #98a2b3; }
+  .appr-repo-card { border: 1px solid #e4e7ec; border-radius: 8px; padding: 16px 20px; display: flex; flex-direction: column; gap: 4px; background: #fff; flex-shrink: 0; }
+  .appr-repo-header { display: flex; align-items: center; justify-content: space-between; }
+  .appr-repo-name { font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 600; color: #344054; line-height: 1.48; }
+  .appr-repo-evidence { font-family: 'Inter', sans-serif; font-size: 12px; color: #98a2b3; line-height: 1.45; margin: 0; }
+  .appr-side { width: 380px; flex-shrink: 0; background: #f9fafb; border: 1px solid #e4e7ec; border-radius: 8px; padding: 24px; display: flex; flex-direction: column; gap: 32px; align-self: flex-start; }
+  .appr-side-title { font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 600; color: #344054; line-height: 1.48; margin: 0; }
+  .appr-side-body { font-family: 'Inter', sans-serif; font-size: 12px; color: #667185; line-height: 1.45; margin: 0; }
+  .appr-rollback { background: #fff; border: 1px solid #e4e7ec; border-radius: 6px; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; }
+  .appr-rollback-title { font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 600; color: #344054; line-height: 1.48; margin: 0; }
+  .appr-rollback-body { font-family: 'Inter', sans-serif; font-size: 12px; color: #667185; line-height: 1.45; margin: 0; }
+  .appr-notice { background: #ededed; border-radius: 6px; padding: 10px 12px; font-family: 'Inter', sans-serif; font-size: 12px; color: #667185; line-height: 1.45; }
+  .appr-headsup { background: #fff7e5; border: 1.5px solid #d98c1a; border-radius: 8px; padding: 16px 20px; display: flex; flex-direction: column; gap: 4px; }
+  .appr-headsup-title { font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 600; color: #8c590d; line-height: 1.48; margin: 0; }
+  .appr-headsup-body { font-family: 'Inter', sans-serif; font-size: 12px; color: #73521a; line-height: 1.45; margin: 0; }
+  .appr-dest-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.35); z-index: 10; }
+  .appr-dest-modal { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 460px; background: #fff; border-radius: 8px; padding: 22px 24px; display: flex; flex-direction: column; gap: 24px; z-index: 11; }
+  .appr-dest-modal-title { font-family: 'Inter', sans-serif; font-size: 18px; font-weight: 600; color: #334054; margin: 0; line-height: normal; }
+  .appr-dest-modal-content { display: flex; flex-direction: column; gap: 12px; }
+  .appr-dest-modal-body { font-family: 'Inter', sans-serif; font-size: 12px; color: #667085; line-height: 1.45; margin: 0; }
+  .appr-dest-info { background: #e3effc; border: 1px solid #3d89df; border-radius: 6px; padding: 10px 12px; }
+  .appr-dest-info-text { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 500; color: #667085; line-height: 1.45; margin: 0; }
+  .appr-dest-note { font-family: 'Inter', sans-serif; font-size: 10px; color: #8c99ad; line-height: 1.45; margin: 0; }
+  /* ── Execution screen (Hi-Fi) ────────────────────────────────────────── */
+  .exec-body { flex: 1; display: flex; gap: 20px; padding: 28px 32px; overflow: hidden; background: #fff; min-height: 0; }
+  .exec-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; }
+  .exec-h1 { font-family: 'Inter', sans-serif; font-size: 24px; font-weight: 700; color: #344054; letter-spacing: -0.48px; line-height: 1.2; flex-shrink: 0; margin: 0; }
+  .exec-interrupt-banner { background: #fbeae9; border-radius: 8px; padding: 14px 20px; display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; }
+  .exec-interrupt-title { font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 600; color: #d42620; line-height: 1.48; margin: 0; }
+  .exec-interrupt-body { font-family: 'Inter', sans-serif; font-size: 12px; color: #dd524d; line-height: 1.45; margin: 0; }
+  .exec-info-banner { background: #ededed; border-radius: 6px; padding: 10px 16px; flex-shrink: 0; }
+  .exec-info-text { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 500; color: #404040; line-height: 1.45; margin: 0; }
+  .exec-item-card { border: 1px solid #e4e7ec; border-radius: 8px; padding: 16px 20px; display: flex; flex-direction: column; gap: 4px; background: #fff; flex-shrink: 0; }
+  .exec-item-header { display: flex; align-items: center; justify-content: space-between; }
+  .exec-item-name { font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 600; color: #344054; line-height: 1.48; }
+  .exec-item-note { font-family: 'Inter', sans-serif; font-size: 12px; color: #98a2b3; line-height: 1.45; margin: 0; }
+  .exec-side { width: 380px; flex-shrink: 0; background: #f9fafb; border: 1px solid #e4e7ec; border-radius: 8px; padding: 24px; display: flex; flex-direction: column; gap: 14px; align-self: flex-start; }
+  .exec-side-title { font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 600; color: #344054; line-height: 1.48; margin: 0; }
+  .exec-side-body { font-family: 'Inter', sans-serif; font-size: 12px; color: #667185; line-height: 1.45; margin: 0; }
+  .exec-side-note { font-family: 'Inter', sans-serif; font-size: 12px; color: #98a2b3; line-height: 1.45; margin: 0; }
+  /* Verifying screen */
+  .verify-item-card { border: 1px solid #e4e7ec; border-radius: 8px; padding: 16px 20px; display: flex; flex-direction: column; gap: 4px; background: #fff; flex-shrink: 0; }
+  .verify-anomaly-card { border: 1.5px solid #d98c1a; border-radius: 8px; padding: 16px 20px; display: flex; flex-direction: column; gap: 4px; background: #fff7e5; flex-shrink: 0; }
+  .verify-item-note { font-family: 'Inter', sans-serif; font-size: 12px; color: #98a2b3; line-height: 1.45; margin: 0; }
+  .verify-item-note-anomaly { color: #73521a; }
+  /* Decommission screens */
+  .decomm-body { flex: 1; display: flex; flex-direction: column; gap: 12px; padding: 28px 32px; overflow-y: auto; background: #fff; min-height: 0; }
+  .decomm-card { border: 1px solid #e4e7ec; border-radius: 8px; padding: 16px 20px; display: flex; flex-direction: column; gap: 4px; background: #fff; flex-shrink: 0; }
+  .decomm-status-card { border: 1px solid #e4e7ec; border-radius: 8px; padding: 16px 20px; display: flex; flex-direction: column; gap: 4px; background: #f9fafb; flex-shrink: 0; }
+  .decomm-warning-card { border: 1.5px solid #d98c1a; border-radius: 8px; padding: 16px 20px; display: flex; flex-direction: column; gap: 4px; background: #fff7e5; flex-shrink: 0; }
+  .decomm-card-title { font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 600; color: #344054; line-height: 1.48; margin: 0; }
+  .decomm-card-body { font-family: 'Inter', sans-serif; font-size: 12px; color: #667185; line-height: 1.45; margin: 0; }
+  .decomm-card-muted { font-family: 'Inter', sans-serif; font-size: 12px; color: #98a2b3; line-height: 1.45; margin: 0; }
+  .decomm-warning-title { font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 600; color: #8c590d; line-height: 1.48; margin: 0; }
+  .decomm-warning-body { font-family: 'Inter', sans-serif; font-size: 12px; color: #73521a; line-height: 1.45; margin: 0; }
+  .decomm-export-btn { border: 1.5px solid #d6d6d6; border-radius: 8px; padding: 10px 12px; background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .decomm-export-btn span { font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; color: #2b2b2b; line-height: 1.45; padding: 0 8px; }
+  .decomm-export-btn:hover { border-color: #a6a6a6; }
+  /* Decommission modal */
+  .decomm-modal { background: #fff; border: 2px solid #262626; border-radius: 8px; padding: 22px 24px; width: 460px; display: flex; flex-direction: column; gap: 12px; }
+  .decomm-modal-title { font-family: 'Inter', sans-serif; font-size: 18px; font-weight: 600; color: #334054; line-height: normal; margin: 0; text-align: center; }
+  .decomm-modal-body { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 400; color: #d42620; line-height: normal; margin: 0; }
+  .decomm-modal-info { background: #ededed; border-radius: 6px; padding: 10px 12px; }
+  .decomm-modal-info-text { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 500; color: #333; line-height: normal; margin: 0; }
+  /* Export preview screen */
+  .export-body { flex: 1; display: flex; gap: 20px; padding: 28px 32px; overflow: hidden; background: #fff; min-height: 0; }
+  .export-main { flex: 1; background: #f9fafb; border: 1px solid #e4e7ec; border-radius: 8px; padding: 20px; display: flex; flex-direction: column; gap: 12px; overflow: hidden; min-width: 0; }
+  .export-preview-box { background: #fff; border: 1px solid #d0d5dd; border-radius: 6px; padding: 24px; display: flex; flex-direction: column; gap: 10px; flex: 1; overflow-y: auto; min-height: 0; }
+  .export-preview-heading { font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 600; color: #344054; line-height: 1.48; margin: 0; }
+  .export-preview-text { font-family: 'Inter', sans-serif; font-size: 12px; color: #667185; line-height: 1.45; margin: 0; }
+  .export-preview-muted { font-family: 'Inter', sans-serif; font-size: 12px; color: #98a2b3; line-height: 1.45; margin: 0; }
+  .export-side { width: 380px; flex-shrink: 0; background: #f9fafb; border: 1px solid #e4e7ec; border-radius: 8px; padding: 24px; display: flex; flex-direction: column; gap: 14px; overflow-y: auto; }
+  .export-side-label { font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 600; color: #344054; line-height: 1.48; margin: 0; }
+  .export-side-value { font-family: 'Inter', sans-serif; font-size: 12px; color: #667185; line-height: 1.45; margin: 0; }
+  .export-side-muted { font-family: 'Inter', sans-serif; font-size: 12px; color: #98a2b3; line-height: 1.45; margin: 0; }
+  .export-format-box { background: #e0e0e0; border: 1px solid #666; border-radius: 6px; padding: 8px 12px; }
+  .export-format-text { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; color: #333; line-height: 1.45; margin: 0; }
+  .export-note-box { background: #e0e0e0; border-radius: 6px; padding: 10px 12px; }
+  .export-note-text { font-family: 'Inter', sans-serif; font-size: 12px; color: #333; line-height: 1.45; margin: 0; }
+  .export-back-text { font-family: 'Inter', sans-serif; font-size: 12px; color: #98a2b3; line-height: 1.45; background: none; border: none; cursor: pointer; padding: 0; }
+  .exec-footer-count { font-family: 'Inter', sans-serif; font-size: 12px; color: #98a2b3; line-height: 1.45; }
   /* ══════════════════════════════════════════════════════════════════════ */
 </style>
 </head>
@@ -618,16 +688,15 @@
 
 <!-- Decommission confirmation -->
 <div class="modal-overlay" id="modal-decommission">
-  <div class="modal">
-    <h2 id="modal-decom-title">Decommission source?</h2>
-    <p>This will mark the migration as complete and remove all local working data. The migration record will remain so you can export it later.</p>
-    <div class="callout callout-warning" style="margin-bottom:0;">
-      <h4>This cannot be undone via shiftctl</h4>
-      <p>You will need to manually verify your source platform is no longer in use before proceeding.</p>
+  <div class="decomm-modal">
+    <p class="decomm-modal-title" id="modal-decom-title">Decommission the GitHub source?</p>
+    <p class="decomm-modal-body">This is the one irreversible step in this migration. GitHub access will be revoked and the source will no longer be reachable from shiftctl. The exported migration record will still exist if you saved it.</p>
+    <div class="decomm-modal-info">
+      <p class="decomm-modal-info-text" id="modal-decom-evidence">All items verified. 0 requests to the source in 14 days. This action is safe based on that evidence, but cannot be undone once confirmed.</p>
     </div>
-    <div class="modal-actions">
-      <button class="btn-secondary" id="modal-decom-cancel">Cancel</button>
-      <button class="btn-danger" id="modal-decom-confirm">Yes, Decommission</button>
+    <div class="hifi-modal-actions">
+      <button class="hifi-modal-cancel" id="modal-decom-cancel">Cancel</button>
+      <button class="hifi-modal-confirm" id="modal-decom-confirm">Yes, Decommission</button>
     </div>
   </div>
 </div>
@@ -656,6 +725,7 @@ let hasUnsavedCorrection = false;
 let pollTimer = null;
 let planNoteOpen = new Set();    // stage numbers with note form open
 let planItemsHidden = new Set(); // stage numbers with items collapsed
+let seenAssessRepos = new Set(); // repo names already rendered — only new ones animate in
 
 // ── Polling ──────────────────────────────────────────────────────────────────
 async function fetchState() {
@@ -664,11 +734,14 @@ async function fetchState() {
     if (!res.ok) return;
     const newState = await res.json();
     const prevScreen = serverState ? serverState.screen : null;
+    const prevStateStr = JSON.stringify(serverState);
     serverState = newState;
-    // If the server screen changed, clear client-side screen
+    // If the server screen changed, clear client-side screen override
     if (prevScreen && prevScreen !== newState.screen) {
       clientScreen = null;
     }
+    // Skip re-render if nothing has changed — avoids blowing away focused inputs
+    if (prevStateStr === JSON.stringify(newState) && prevScreen === newState.screen) return;
     render();
   } catch (e) {
     // ignore fetch errors — will retry
@@ -683,7 +756,14 @@ function startPolling() {
 // ── Render ───────────────────────────────────────────────────────────────────
 function render() {
   if (!serverState) return;
-
+  try {
+    _render();
+  } catch(e) {
+    document.getElementById('page-body').innerHTML =
+      `<div style="padding:32px;font-family:monospace;color:#d42620;">Render error: ${e.message}<br><pre>${e.stack}</pre></div>`;
+  }
+}
+function _render() {
   updateTopBar();
 
   const screen = clientScreen || serverState.screen;
@@ -695,6 +775,7 @@ function render() {
     case 'assessment':      renderAssessment(); break;
     case 'planning':        renderPlanning(); break;
     case 'approval':        renderApproval(); break;
+    case 'approval-destination': renderApproval(true); break;
     case 'execution':       renderExecution(); break;
     case 'verifying':       renderVerifying(); break;
     case 'decommission':    renderDecommission(); break;
@@ -708,7 +789,17 @@ function updateTopBar() {
   const title = document.getElementById('topbar-title');
   const statusEl = document.getElementById('topbar-status');
   if (serverState) {
-    title.textContent = serverState.migration_name || '';
+    const rec = serverState.record;
+    if (rec && rec.source_platform && rec.destination_name) {
+      const platformLabel = { github: 'GitHub', gitlab: 'GitLab', bitbucket: 'Bitbucket', azure: 'Azure DevOps' };
+      const cap = s => platformLabel[s.toLowerCase()] || (s ? s.charAt(0).toUpperCase() + s.slice(1) : '');
+      const src = cap(rec.source_platform);
+      const dst = cap(rec.destination_name);
+      const mname = serverState.migration_name || '';
+      title.textContent = `${src}  →  ${dst}${mname ? ', ' + mname : ''}`;
+    } else {
+      title.textContent = serverState.migration_name || '';
+    }
   }
 
   let badgeClass = 'badge-warm';
@@ -724,23 +815,40 @@ function updateTopBar() {
       const hasAnalysis = !!(assess && assess.analysis);
       const facts = assess ? assess.facts : null;
       const repoCount = assess ? assess.repo_count : 0;
-      if (hasAnalysis) { badgeClass = 'badge-blue'; label = 'Scan complete'; }
+      if (hasAnalysis) { badgeClass = 'badge-dodger'; label = 'Scan complete'; }
       else if (facts && facts.length > 0) { badgeClass = 'badge-lightblue'; label = `Scanning ${facts.length} of ${repoCount || '?'} repositories`; }
       else { badgeClass = 'badge-lightblue'; label = 'Scanning…'; }
       break;
     }
-    case 'planning':              badgeClass = 'badge-neutral'; label = '● Reviewing plan'; break;
-    case 'approval':              badgeClass = 'badge-neutral'; label = '● Waiting for your approval'; break;
-    case 'execution': {
-      const es = serverState && serverState.execstate;
-      const interrupted = es && es.stages.some(s => s.status === 'interrupted');
-      if (interrupted) { badgeClass = 'badge-red'; label = 'Interrupted'; }
-      else             { badgeClass = 'badge-blue'; label = 'Executing'; }
+    case 'planning':              badgeClass = 'badge-lightblue'; label = 'Reviewing plan...'; break;
+    case 'approval-destination':  badgeClass = 'badge-gray-muted'; label = 'Waiting for destination access'; break;
+    case 'approval': {
+      const _aStage = serverState.active_stage || 1;
+      const _aPlan = serverState.plan;
+      const _aStageData = _aPlan && _aPlan.stages ? (_aPlan.stages.find(s => s.number === _aStage) || _aPlan.stages[0]) : null;
+      const _aHasGuess = _aStageData && (_aStageData.repos || []).some(r => r.confidence === 'best_guess');
+      badgeClass = _aHasGuess ? 'badge-gray-muted' : 'badge-warm';
+      label = 'Waiting for your approval';
       break;
     }
-    case 'verifying':             badgeClass = 'badge-blue';  label = 'Verifying'; break;
-    case 'decommission':          badgeClass = 'badge-green'; label = 'All stages verified'; break;
-    case 'decommission-complete': badgeClass = 'badge-green'; label = 'Complete'; break;
+    case 'execution': {
+      const _es = serverState && serverState.execstate;
+      const _as = serverState.active_stage;
+      const _pr = serverState.active_progress;
+      const _interrupted = _es && _es.stages.some(s => s.status === 'interrupted');
+      const _items = _pr && _pr.items ? _pr.items : [];
+      const _isComplete = _items.length > 0 && _items.every(i => i.status === 'done');
+      const _doneCount = _items.filter(i => i.status === 'done').length;
+      const _totalStages = _es ? _es.stages.length : 0;
+      if (_interrupted) { badgeClass = 'badge-warm'; label = 'Reconnecting\u2026'; }
+      else if (_isComplete) { badgeClass = 'badge-apple'; label = `Stage ${_as} of ${_totalStages} complete`; }
+      else { badgeClass = 'badge-lightblue'; label = `Executing Stage ${_as} - item ${_doneCount + 1} of ${_items.length}`; }
+      break;
+    }
+    case 'verifying': { const _vas = serverState.active_stage || 1; badgeClass = 'badge-lightblue'; label = `Verifying Stage ${_vas}`; break; }
+    case 'decommission': badgeClass = 'badge-warm'; label = 'Done - 0 items pending'; break;
+    case 'decommission-complete': badgeClass = 'badge-apple'; label = 'Migration complete'; break;
+    case 'export-preview':        badgeClass = 'badge-apple'; label = 'Migration complete'; break;
     default: badgeClass = 'badge-warm'; label = screen;
   }
 
@@ -813,7 +921,7 @@ function renderSetup() {
                 <span class="setup-card-title">1. Source: ${escHtml(src)}</span>
                 <span class="badge-pill badge-green">Connected</span>
               </div>
-              <p class="setup-card-sub">Access scope: repo (read only). Token generated on ${escHtml(srcDomain)}, never by shiftctl.</p>
+              <p class="setup-card-sub">Every repo this token can access will be scanned. To limit scope, use a fine-grained token scoped to specific repos.</p>
             </div>
 
             <!-- Card 2: Destination -->
@@ -834,9 +942,19 @@ function renderSetup() {
                 value="${escHtml(ctx)}" />
             </div>
 
-            <!-- Card 4: Migration name -->
+            <!-- Card 4: Repo filter -->
             <div class="setup-card">
-              <div class="setup-card-title">4. Migration name</div>
+              <div class="setup-card-title" style="margin-bottom:8px;">4. Which repos? (optional)</div>
+              <label class="setup-input-label">Comma-separated list of repos to migrate, e.g. owner/repo1, owner/repo2. Leave blank to include all.</label>
+              <input class="setup-input" id="filter-input"
+                placeholder="owner/repo1, owner/repo2"
+                value="${escHtml((serverState.repo_filter || []).join(', '))}"
+                style="margin-top:6px;">
+            </div>
+
+            <!-- Card 5: Migration name -->
+            <div class="setup-card">
+              <div class="setup-card-title">5. Migration name</div>
               <div class="setup-migration-val">${escHtml(name)}</div>
             </div>
           </div>
@@ -871,6 +989,19 @@ function renderSetup() {
     openModal('modal-disconnect');
   };
   document.getElementById('btn-to-confirm').onclick = () => { clientScreen = 'confirm-shared'; render(); };
+
+  let filterTimer = null;
+  const filterInput = document.getElementById('filter-input');
+  if (filterInput) {
+    filterInput.addEventListener('input', () => {
+      clearTimeout(filterTimer);
+      filterTimer = setTimeout(() => {
+        const val = filterInput.value.trim();
+        const repos = val ? val.split(',').map(r => r.trim()).filter(Boolean) : [];
+        postJSON('/api/filter', { repos }).catch(() => {});
+      }, 800);
+    });
+  }
 }
 
 // ── Screen: confirm-shared ───────────────────────────────────────────────────
@@ -894,12 +1025,10 @@ function renderConfirmShared() {
         </div>
       </div>
       <div class="hifi-footer confirm-footer-right">
-        <button class="hifi-btn-primary" id="btn-start-assess">Start Assessment</button>
+        <button class="hifi-btn-primary" id="btn-start-assess" onclick="startAssessment(this)">Start Assessment</button>
       </div>
     </div>
   `);
-
-  document.getElementById('btn-start-assess').onclick = () => { clientScreen = null; render(); };
 }
 
 // ── Screen: assessment ───────────────────────────────────────────────────────
@@ -911,12 +1040,12 @@ function renderAssessment() {
   const items = findings || facts || [];
   const repoCount = assess ? assess.repo_count : 0;
   const hasAnalysis = !!(assess && assess.analysis);
-  const scanning = !hasAnalysis && facts && facts.length > 0;
+  const scanning = !hasAnalysis && facts && facts.length > 0 && !serverState.assess_error;
   const knownUnknowns = assess && assess.analysis ? (assess.analysis.known_unknowns || []) : [];
 
   let repoCards = '';
   if (items.length === 0) {
-    repoCards = `<p class="assess-side-body" style="padding:16px 0;">No repositories found yet. Run <strong>shiftctl assess ${escHtml(serverState.migration_name)}</strong> in your terminal.</p>`;
+    repoCards = `<p class="assess-side-body" style="padding:16px 0;">${serverState.assess_running ? 'Scanning repositories…' : 'No repositories found yet. Click Start Assessment to begin.'}</p>`;
   } else {
     repoCards = items.map((item, idx) => {
       const name = item.full_name || item.name || '';
@@ -925,9 +1054,11 @@ function renderAssessment() {
       const evidence = item.evidence || item.reasoning || '';
       const correction = corrections[name];
       const isBestGuess = conf === 'best_guess';
+      const isNew = !seenAssessRepos.has(name);
+      seenAssessRepos.add(name);
 
       return `
-        <div class="assess-card" data-repo="${escHtml(name)}">
+        <div class="assess-card${isNew ? ' assess-card-new' : ''}" data-repo="${escHtml(name)}">
           <div class="assess-card-header">
             <span class="assess-card-name">${escHtml(name)}</span>
             <div class="assess-card-badges">
@@ -946,7 +1077,7 @@ function renderAssessment() {
               <textarea rows="2" placeholder="Describe the correction…" id="cf-text-${idx}" style="width:100%;border:1px solid #e4e7ec;border-radius:8px;padding:10px 14px;font-family:'Inter',sans-serif;font-size:12px;color:#344054;resize:vertical;margin-bottom:8px;"></textarea>
               <div class="correction-form-actions">
                 <button class="assess-action-btn" data-cancel-idx="${idx}">Cancel</button>
-                <button class="assess-action-btn" style="background:#2b2b2b;color:#fff;border-color:#2b2b2b;" data-submit-idx="${idx}" data-repo="${escHtml(name)}">Submit Correction</button>
+                <button class="assess-action-btn" style="background:#1671d9;color:#fff;border-color:#1671d9;" data-submit-idx="${idx}" data-repo="${escHtml(name)}">Submit Correction</button>
               </div>
             </div>
           ` : ''}
@@ -981,16 +1112,19 @@ function renderAssessment() {
           ${repoCards}
         </div>
         <div class="assess-side">
-          <p class="assess-side-title">What's happening now</p>
           <div style="display:flex;flex-direction:column;gap:14px;">
             <p class="assess-side-body">${scanning
               ? 'Reading repo configs, CI workflows, and webhook definitions. Nothing is sent anywhere, this all runs on your machine.'
               : hasAnalysis
                 ? 'Analysis complete. Review the findings and flag any items that look wrong before continuing to planning.'
-                : 'Waiting for assessment to begin. Run shiftctl assess in your terminal.'
+                : serverState.assess_running
+                  ? 'Assessment starting — scanning your repositories now.'
+                  : 'Assessment not started yet.'
             }</p>
+            ${serverState.assess_error ? `<p style="color:#d42620;font-size:13px;margin:0;font-family:Inter,sans-serif;">${escHtml(serverState.assess_error)}</p>` : ''}
             ${statsText ? `<p class="assess-side-stats">${escHtml(statsText)}</p>` : ''}
-            <div class="assess-callout">You can switch away, a desktop notification will let you know when this finishes.</div>
+            ${serverState.assess_error ? `<button class="hifi-btn-stroke" style="align-self:flex-start;margin-top:4px;" onclick="startAssessment(this)">Retry Assessment</button>` : ''}
+            ${scanning ? `<div class="assess-callout">Assessment is running in the background. You can safely switch tabs.</div>` : ''}
             ${headsUp ? `
               <div class="assess-headsup">
                 <p class="assess-headsup-title">Heads Up — Couldn't fully confirm this one</p>
@@ -1000,10 +1134,9 @@ function renderAssessment() {
           </div>
         </div>
       </div>
-      <div class="hifi-footer">
-        <button class="hifi-btn-stroke" id="btn-pause-scan">Pause Scan</button>
+      <div class="hifi-footer" style="justify-content:flex-end;">
         <button class="${hasAnalysis ? 'hifi-btn-primary' : 'hifi-btn-disabled'}" id="btn-to-planning" ${!hasAnalysis ? 'disabled' : ''}>
-          ${hasAnalysis ? 'Continue to Planning' : 'Continue to Planning (scan in progress)'}
+          ${hasAnalysis ? 'Continue to Planning' : serverState.assess_error ? 'Assessment failed — retry above' : 'Waiting for scan to complete…'}
         </button>
       </div>
     </div>
@@ -1015,13 +1148,28 @@ function renderAssessment() {
     if (flagBtn) {
       const idx = flagBtn.dataset.flagIdx;
       const form = document.getElementById(`cf-${idx}`);
-      if (form) { form.classList.add('open'); hasUnsavedCorrection = true; }
+      if (form) {
+        form.classList.add('open');
+        hasUnsavedCorrection = true;
+        flagBtn.style.background = '#1671d9';
+        flagBtn.style.color = '#fff';
+        flagBtn.style.borderColor = '#1671d9';
+      }
     }
     const cancelBtn = e.target.closest('[data-cancel-idx]');
     if (cancelBtn) {
       const idx = cancelBtn.dataset.cancelIdx;
       const form = document.getElementById(`cf-${idx}`);
-      if (form) { form.classList.remove('open'); hasUnsavedCorrection = false; }
+      if (form) {
+        form.classList.remove('open');
+        hasUnsavedCorrection = false;
+        // Reset the Flag as incorrect button
+        const card = form.closest('[data-repo]');
+        if (card) {
+          const fb = card.querySelector('[data-flag-idx]');
+          if (fb) { fb.style.background = ''; fb.style.color = ''; fb.style.borderColor = ''; }
+        }
+      }
     }
     const submitBtn = e.target.closest('[data-submit-idx]');
     if (submitBtn) {
@@ -1070,7 +1218,11 @@ function renderPlanning() {
         <div class="plan-body">
           <div class="plan-main">
             <h1 class="plan-h1">Your Migration Plan</h1>
-            <p class="plan-subtitle">No plan available yet. Run <code>shiftctl plan ${escHtml(serverState.migration_name)}</code> in your terminal to generate one.</p>
+            <p class="plan-subtitle">Assessment complete. Generate a migration plan to continue.</p>
+            <div style="margin-top:20px;">
+              <button class="hifi-btn-primary" id="btn-generate-plan" onclick="generatePlan(this)">Generate Plan</button>
+              <p id="plan-gen-error" style="display:none;color:#d42620;font-size:13px;margin:8px 0 0;font-family:Inter,sans-serif;"></p>
+            </div>
           </div>
         </div>
       </div>
@@ -1086,10 +1238,10 @@ function renderPlanning() {
     const hasHigh = repos.some(r => r.risk_level === 'high');
     const hasGuess = repos.some(r => r.confidence === 'best_guess');
     let text = `${count} item${count !== 1 ? 's' : ''}`;
-    if (hasHigh && hasGuess) text += ' · Best guess or flagged';
-    else if (hasHigh) text += ' · High risk items';
-    else if (hasGuess) text += ' · Best guess';
-    else text += ' · Confirmed, low risk';
+    if (hasHigh && hasGuess) text += ' - Best guess or flagged';
+    else if (hasHigh) text += ' - High risk items';
+    else if (hasGuess) text += ' - Best guess';
+    else text += ' - Confirmed, low risk';
     return text;
   }
 
@@ -1122,13 +1274,16 @@ function renderPlanning() {
       <div class="plan-note-saved"><strong>Note saved:</strong> "${escHtml(stage.note)}"</div>
     ` : '';
 
+    const cardGap = isHidden ? '8px' : '16px';
     return `
-      <div class="plan-stage-card">
-        <div class="plan-stage-header">
-          <span class="plan-stage-title">Stage ${stage.number} — ${escHtml(stage.label || '')}</span>
-          <span class="plan-stage-summary">${escHtml(stageSummaryText(stage))}</span>
+      <div class="plan-stage-card" style="gap:${cardGap}">
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <div class="plan-stage-header">
+            <span class="plan-stage-title">Stage ${stage.number} - ${escHtml(stage.label || '')}</span>
+            <span class="plan-stage-summary">${escHtml(stageSummaryText(stage))}</span>
+          </div>
+          ${stage.reason ? `<p class="plan-stage-reason">${escHtml(stage.reason)}</p>` : ''}
         </div>
-        ${stage.reason ? `<p class="plan-stage-reason">${escHtml(stage.reason)}</p>` : ''}
         <div class="plan-stage-actions">
           <button class="plan-btn" data-plan-move-up="${stage.number}">Move Up</button>
           <button class="plan-btn" data-plan-move-down="${stage.number}">Move Down</button>
@@ -1146,29 +1301,21 @@ function renderPlanning() {
     <div class="hifi-page">
       <div class="plan-body">
         <div class="plan-main">
-          <h1 class="plan-h1">Your Migration Plan</h1>
-          <p class="plan-subtitle">${totalItems} repos, staged into ${p.stages.length} batches. Reorder, edit, or annotate anything before approving — nothing runs until you approve each stage separately.</p>
-          <div class="plan-legend">
-            <div class="plan-legend-item">
-              <div class="plan-legend-dot" style="background:#0f973d;"></div>
-              <span class="plan-legend-text">Confirmed — found real evidence in the code</span>
-            </div>
-            <div class="plan-legend-item">
-              <div class="plan-legend-dot" style="background:#f3a218;"></div>
-              <span class="plan-legend-text">Best guess — inferred, worth double-checking</span>
-            </div>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <h1 class="plan-h1">Your Migration Plan</h1>
+            <p class="plan-subtitle">${totalItems} repos, staged into ${p.stages.length} batches. Reorder, edit, or annotate anything before approving, nothing runs until you approve each stage separately.</p>
           </div>
           ${stagesHtml}
         </div>
         <div class="plan-side">
-          <p class="plan-side-title">What could go wrong (premortem)</p>
+          <p class="plan-side-title">What could go wrong (Premortem)</p>
           <p class="plan-side-body">Each stage has its own rollback plan, shown again on that stage's approval screen.</p>
-          <p class="plan-side-body">Source repos stay untouched throughout — nothing is deleted until you explicitly decommission at the very end.</p>
+          <p class="plan-side-body">Source repos stay untouched throughout, nothing is deleted until you explicitly decommission at the very end.</p>
         </div>
       </div>
       <div class="hifi-footer">
         <button class="plan-footer-link" id="btn-plan-back">Back to Assessment</button>
-        <button class="hifi-btn-primary" id="btn-plan-approve">Looks good — Review Stage 1 to Approve</button>
+        <button class="hifi-btn-primary" id="btn-plan-approve">Review Stage 1</button>
       </div>
     </div>
   `);
@@ -1217,11 +1364,10 @@ function renderPlanning() {
 }
 
 // ── Screen: approval ─────────────────────────────────────────────────────────
-function renderApproval() {
+function renderApproval(isDestinationAccess) {
   const p = serverState.plan;
   if (!p || !p.stages || p.stages.length === 0) { clientScreen = 'planning'; render(); return; }
 
-  // Default to stage 1 when no execstate exists yet (navigated here from planning)
   const activeStage = serverState.active_stage || 1;
   const stage = p.stages.find(s => s.number === activeStage) || p.stages[0];
   if (!stage) { clientScreen = 'planning'; render(); return; }
@@ -1229,7 +1375,10 @@ function renderApproval() {
   const totalStages = p.stages.length;
   const repos = stage.repos || [];
 
-  // Build dynamic subtitle listing other stages by label
+  // Detect escalation: stage has any best_guess repo
+  const hasEscalation = repos.some(r => r.confidence === 'best_guess');
+
+  // Build subtitle listing other stages
   const otherStages = p.stages.filter(s => s.number !== activeStage);
   let subtitleOthers = '';
   if (otherStages.length > 0) {
@@ -1238,80 +1387,117 @@ function renderApproval() {
   }
   const subtitle = `This will migrate the ${repos.length} repo${repos.length !== 1 ? 's' : ''} below.${subtitleOthers}`;
 
-  function apprRepoBadgeText(r) {
-    const conf = r.confidence === 'confirmed' ? 'Confirmed' : 'Best guess';
-    const risk = r.risk_level === 'high' ? 'high risk' : r.risk_level === 'medium' ? 'medium risk' : 'low risk';
-    return `${conf} ${risk}`;
+  function apprRepoBadge(r) {
+    if (r.confidence === 'confirmed' && r.risk_level === 'high') {
+      return `<span class="badge-pill badge-red">Confirmed high risk</span>`;
+    } else if (r.confidence === 'confirmed') {
+      const riskText = r.risk_level === 'medium' ? 'medium risk' : 'low risk';
+      return `<span class="badge-pill badge-outline-gray">Confirmed ${riskText}</span>`;
+    } else {
+      const riskText = r.risk_level === 'high' ? 'high risk' : r.risk_level === 'medium' ? 'medium risk' : 'low risk';
+      return `<span class="badge-pill badge-orange">Best guess, ${riskText}</span>`;
+    }
   }
 
   const reposHtml = repos.map(r => `
-    <div class="appr-repo-item">
+    <div class="appr-repo-card">
       <div class="appr-repo-header">
         <span class="appr-repo-name">${escHtml(r.full_name)}</span>
-        <span class="appr-repo-badge">${apprRepoBadgeText(r)}</span>
+        ${apprRepoBadge(r)}
       </div>
-      ${r.reasoning ? `<p class="appr-repo-reason">Reasoning: ${escHtml(r.reasoning)}</p>` : ''}
+      ${r.reasoning ? `<p class="appr-repo-evidence">Reasoning: ${escHtml(r.reasoning)}</p>` : ''}
     </div>
   `).join('');
 
-  // Rollback text derived from migration source/destination
   const rec = serverState.record;
   const src = rec ? escHtml(rec.source_platform) : 'source';
   const dst = rec ? escHtml(rec.destination_name) : 'destination';
 
-  setBody(`
-    <div class="hifi-page">
-      <div class="appr-body">
-        <div class="appr-panel-left">
-          <div class="appr-main">
-            <h1 class="appr-h1">Approve Stage ${activeStage} of ${totalStages} - ${escHtml(stage.label || '')}</h1>
-            <p class="appr-subtitle">${escHtml(subtitle)}</p>
-            <div class="appr-legend">
-              <div class="appr-legend-item">
-                <div class="appr-legend-dot" style="background:#b0b0b0;"></div>
-                <span class="appr-legend-text">Confirmed - found real evidence in the code</span>
-              </div>
-              <div class="appr-legend-item">
-                <div class="appr-legend-dot" style="background:transparent;border:1px solid #b0b0b0;"></div>
-                <span class="appr-legend-text">Best guess - inferred, worth double-checking</span>
-              </div>
-            </div>
-            ${reposHtml}
-          </div>
+  const sideBodyOthers = otherStages.length > 0
+    ? ` ${otherStages.map(s => `Stage ${s.number} (${escHtml(s.label || '')}, ${s.repos ? s.repos.length : 0} item${(s.repos && s.repos.length !== 1) ? 's' : ''})`).join(' and ')} stay untouched until you approve them separately, later.`
+    : '';
+
+  const sideGap = (hasEscalation || isDestinationAccess) ? '14px' : '32px';
+  const sideTitleText = (hasEscalation || isDestinationAccess) ? 'What approving does' : 'What Approving Does';
+
+  const headsUpHtml = hasEscalation ? `
+    <div class="appr-headsup">
+      <p class="appr-headsup-title">Heads Up - This needs a closer look before you approve</p>
+      <p class="appr-headsup-body">shiftctl isn't fully sure about ${escHtml(repos.filter(r => r.confidence === 'best_guess').map(r => r.full_name).join(', '))}, and this stage touches something especially important. Worth checking yourself before approving this stage.</p>
+    </div>
+  ` : '';
+
+  const destModalHtml = isDestinationAccess ? `
+    <div class="appr-dest-overlay"></div>
+    <div class="appr-dest-modal">
+      <p class="appr-dest-modal-title">Stage ${activeStage} approved. One more thing...</p>
+      <div class="appr-dest-modal-content">
+        <p class="appr-dest-modal-body">This is the first stage that actually writes to ${dst}. Check your terminal, shiftctl is asking for ${dst} access now, since it wasn't needed until this exact moment.</p>
+        <div class="appr-dest-info">
+          <p class="appr-dest-info-text">Why now, not at setup? Destination write access is requested only when a stage genuinely needs it, never collected upfront just in case.</p>
         </div>
-        <div class="appr-side">
-          <p class="appr-side-title">What approving does</p>
-          <p class="appr-side-body">Starts execution on exactly the ${repos.length} item${repos.length !== 1 ? 's' : ''} listed here, right now. Nothing else.${otherStages.length > 0 ? ` ${otherStages.map(s => `Stage ${s.number} (${escHtml(s.label || '')}, ${s.repos ? s.repos.length : 0} item${(s.repos && s.repos.length !== 1) ? 's' : ''})`).join(' and ')} stay untouched until you approve them separately, later.` : ''}</p>
+        <p class="appr-dest-note">This screen updates automatically once you paste the access token in your terminal.</p>
+      </div>
+    </div>
+  ` : '';
+
+  setBody(`
+    <div class="hifi-page" style="position:relative;">
+      <div class="appr-body">
+        <div class="appr-main">
+          <h1 class="appr-h1">Approve Stage ${activeStage} of ${totalStages} - ${escHtml(stage.label || '')}</h1>
+          <p class="appr-subtitle">${escHtml(subtitle)}</p>
+          <div class="appr-legend">
+            <div class="appr-legend-item">
+              <div class="appr-legend-dot" style="background:#0f973d;"></div>
+              <span class="appr-legend-text">Confirmed - found real evidence in the code</span>
+            </div>
+            <div class="appr-legend-item">
+              <div class="appr-legend-dot" style="background:#f3a218;"></div>
+              <span class="appr-legend-text">Best guess - inferred, worth double-checking</span>
+            </div>
+          </div>
+          ${reposHtml}
+        </div>
+        <div class="appr-side" style="gap:${sideGap}">
+          <p class="appr-side-title">${sideTitleText}</p>
+          <p class="appr-side-body">Starts execution on exactly the ${repos.length} item${repos.length !== 1 ? 's' : ''} listed here, right now. Nothing else.${sideBodyOthers}</p>
           <div class="appr-rollback">
             <p class="appr-rollback-title">Rollback plan for this stage</p>
-            <p class="appr-rollback-body">If anything fails: ${src} repos stay read-only and untouched for 30 days. ${dst} repos can be deleted individually without affecting other stages.</p>
+            <p class="appr-rollback-body">If anything fails: ${src} stays read-only and untouched for 30 days. ${dst} repos can be deleted individually without affecting other stages.</p>
           </div>
-          <div class="appr-notice">There is no "approve everything" option - every stage is approved on its own.</div>
+          <div class="appr-notice">There is no "approve everything" option, every stage is approved on its own.</div>
+          ${headsUpHtml}
         </div>
       </div>
       <div class="hifi-footer">
-        <button class="appr-footer-back" id="btn-back-plan">Back to Plan</button>
-        <button class="appr-footer-cta" id="btn-approve">Approve Stage ${activeStage} (${repos.length} item${repos.length !== 1 ? 's' : ''}) - Start Execution</button>
+        <button class="hifi-btn-stroke" id="btn-back-plan">Back to Plan</button>
+        <button class="hifi-btn-primary" id="btn-approve">Approve Stage ${activeStage}</button>
       </div>
+      ${destModalHtml}
     </div>
   `);
 
   document.getElementById('btn-back-plan').onclick = () => { clientScreen = 'planning'; render(); };
   document.getElementById('btn-approve').onclick = async () => {
+    // In destination-access state, dismiss the overlay (demo: go back to approval)
+    if (isDestinationAccess) { clientScreen = null; render(); return; }
+
     const btn = document.getElementById('btn-approve');
     btn.disabled = true;
     btn.textContent = 'Approving…';
     try {
       await postJSON('/api/approve', { stage_number: activeStage });
-      document.getElementById('modal-approved-title').textContent = `Stage ${activeStage} approved`;
-      document.getElementById('modal-approved-cmd').textContent =
-        `shiftctl execute ${serverState.migration_name} --stage ${activeStage}`;
-      openModal('modal-approved');
-      fetchState();
+      // Show "Waiting for Destination Access" overlay (first stage that writes to destination)
+      if (activeStage === 1) {
+        clientScreen = 'approval-destination';
+        render();
+      } else {
+        fetchState();
+      }
     } catch(e) {
       btn.disabled = false;
-      btn.textContent = `Approve Stage ${activeStage} (${repos.length} item${repos.length !== 1 ? 's' : ''}) - Start Execution`;
-      btn.className = 'appr-footer-cta';
+      btn.textContent = `Approve Stage ${activeStage}`;
       alert('Approval failed: ' + e.message);
     }
   };
@@ -1326,187 +1512,241 @@ function renderExecution() {
 
   if (!exec) { renderPlanning(); return; }
 
-  // Find the active stage state
   const stageState = exec.stages.find(s => s.number === activeStage);
   const isInterrupted = stageState && stageState.status === 'interrupted';
-  const isApproved = stageState && stageState.status === 'approved';
   const totalStages = exec.stages.length;
 
   const stageInfo = p && p.stages ? p.stages.find(s => s.number === activeStage) : null;
   const stageLabel = stageInfo ? stageInfo.label : '';
 
-  let itemsHtml = '';
-  if (isApproved && !prog) {
-    itemsHtml = `
-      <div class="callout callout-info" style="margin-bottom:16px;">
-        <h4>Approved — waiting for execution</h4>
-        <p>Run this command in your terminal to begin:</p>
-        <code style="font-family:var(--mono);font-size:13px;display:block;margin-top:6px;">shiftctl execute ${escHtml(serverState.migration_name)} --stage ${activeStage}</code>
-      </div>
-    `;
-  } else if (prog && prog.items) {
-    // Check if all done
-    const allDone = prog.items.every(it => it.status === 'done');
-    const doneCount = prog.items.filter(i => i.status === 'done').length;
+  // Fall back to approved items if execution hasn't started yet
+  const approvalRecord = exec.approvals ? exec.approvals.find(a => a.stage_number === activeStage) : null;
+  const fallbackItems = approvalRecord ? (approvalRecord.items || []).map(i => ({ ...i, status: 'queued' })) : [];
+  const items = (prog && prog.items && prog.items.length > 0) ? prog.items : fallbackItems;
+  const isStageComplete = items.length > 0 && items.every(i => i.status === 'done');
+  const doneCount = items.filter(i => i.status === 'done').length;
+  const uncertainCount = items.filter(i => i.status === 'uncertain').length;
+  const notStartedCount = items.filter(i => i.status !== 'done' && i.status !== 'uncertain' && i.status !== 'executing').length;
 
-    if (allDone) {
-      const remaining = totalStages - activeStage;
-      itemsHtml = `
-        <div class="banner" style="margin-bottom:16px;">
-          ✓ Stage ${activeStage} of ${totalStages} complete. ${remaining > 0 ? `${remaining} more stage${remaining !== 1 ? 's' : ''} remain.` : 'All stages executed.'}
-        </div>
-      `;
+  function itemBadge(status) {
+    switch (status) {
+      case 'done':      return `<span class="badge-pill badge-green">Done</span>`;
+      case 'executing': return `<span class="badge-pill badge-dodger">In progress...</span>`;
+      case 'uncertain': return `<span class="badge-pill badge-warm">Uncertain</span>`;
+      case 'failed':    return `<span class="badge-pill badge-red">Failed</span>`;
+      default:          return `<span class="badge-pill badge-outline-gray">Not started</span>`;
     }
-
-    itemsHtml += prog.items.map(item => {
-      let chipClass, statusText;
-      switch(item.status) {
-        case 'done': chipClass = 'chip-done'; statusText = 'Done'; break;
-        case 'executing': chipClass = 'chip-in-progress'; statusText = 'In progress'; break;
-        case 'uncertain': chipClass = 'chip-uncertain'; statusText = 'Uncertain'; break;
-        case 'failed': chipClass = 'chip-anomaly'; statusText = 'Failed'; break;
-        default: chipClass = 'chip-queued'; statusText = 'Queued';
-      }
-      return `
-        <div class="repo-row">
-          <div class="repo-main">
-            <div class="repo-name">${escHtml(item.full_name)}</div>
-            <div style="margin-top:4px;">
-              <span class="chip ${chipClass}">${statusText}</span>
-              ${item.error ? `<span style="font-size:12px;color:#991b1b;margin-left:6px;">${escHtml(item.error)}</span>` : ''}
-            </div>
-          </div>
-        </div>
-      `;
-    }).join('');
   }
 
-  const title = isInterrupted
-    ? `Stage ${activeStage} of ${totalStages} — Connection Lost`
-    : `Executing Stage ${activeStage} of ${totalStages}${stageLabel ? ' — ' + stageLabel : ''}`;
+  function itemNote(item) {
+    if (item.note) return escHtml(item.note);
+    if (item.status === 'done') return 'Repo transferred, webhook recreated, CI config translated';
+    if (item.status === 'executing') return 'Translating GitHub Actions to GitLab CI...';
+    if (item.status === 'uncertain') return 'Connection lost mid-step, re-verifying against GitLab now, not assuming it finished';
+    return 'Queued';
+  }
+
+  const itemsHtml = items.map(item => `
+    <div class="exec-item-card">
+      <div class="exec-item-header">
+        <span class="exec-item-name">${escHtml(item.full_name)}</span>
+        ${itemBadge(item.status)}
+      </div>
+      <p class="exec-item-note">${itemNote(item)}</p>
+    </div>
+  `).join('');
+
+  // Title
+  const h1Text = isStageComplete
+    ? `Stage ${activeStage} of ${totalStages} complete${stageLabel ? ' - ' + stageLabel : ''}`
+    : `Staged Execution - Stage ${activeStage} of ${totalStages}`;
+
+  // Top banner
+  let topBannerHtml = '';
+  if (isInterrupted) {
+    topBannerHtml = `
+      <div class="exec-interrupt-banner">
+        <p class="exec-interrupt-title">Execution interrupted</p>
+        <p class="exec-interrupt-body">Connection lost mid-stage. Shiftctl will attempt to reconnect automatically.</p>
+      </div>
+    `;
+  } else if (isStageComplete) {
+    const remaining = totalStages - activeStage;
+    const otherStages = p && p.stages ? p.stages.filter(s => s.number > activeStage) : [];
+    const othersText = otherStages.map(s => `Stage ${s.number} (${escHtml(s.label || '')})`).join(' and ');
+    topBannerHtml = `
+      <div class="exec-info-banner">
+        <p class="exec-info-text">${remaining} more stage${remaining !== 1 ? 's' : ''} remain before the migration is complete${othersText ? ', ' + othersText + ' still need their own approval.' : '.'}</p>
+      </div>
+    `;
+  }
+
+  // Determine whether execution is pending start (approved but no progress yet)
+  const isApprovedNotStarted = stageState && stageState.status === 'approved' && items.length === 0;
+  const isExecuteRunning = serverState.execute_running;
+  const executeError = serverState.execute_error || '';
+
+  // Footer count
+  const footerCountText = isInterrupted
+    ? `${doneCount} of ${items.length} done${uncertainCount > 0 ? ' - ' + uncertainCount + ' uncertain' : ''}${notStartedCount > 0 ? ' - ' + notStartedCount + ' not started' : ''}`
+    : isApprovedNotStarted
+      ? 'Stage approved — ready to execute'
+      : `${doneCount} of ${items.length} items complete`;
+
+  // Footer button
+  const footerBtnHtml = isInterrupted
+    ? `<button class="hifi-btn-primary" id="btn-exec-resume">Resume Stage ${activeStage}</button>`
+    : isStageComplete
+      ? `<button class="hifi-btn-primary" id="btn-go-verify">Continue to Verification</button>`
+      : isApprovedNotStarted
+        ? `<button class="hifi-btn-primary" id="btn-start-exec">Start Execution</button>`
+        : isExecuteRunning
+          ? `<button class="hifi-btn-disabled" disabled>Running…</button>`
+          : `<button class="hifi-btn-stroke" id="btn-pause">Pause Execution</button>`;
+
+  // Side panel — show credential form when needed
+  const sidePanelHtml = `
+    <p class="exec-side-title">If you pause</p>
+    <p class="exec-side-body">Completed items stay live, they are not rolled back. In-progress items finish their current step, then stop. Not-started items are untouched.</p>
+    <p class="exec-side-note">This stage was already approved, you're watching execution, not approving it again.</p>
+    ${executeError && !executeError.includes('destination_credential_required') ? `<p style="color:#d42620;font-size:13px;margin:8px 0 0;font-family:Inter,sans-serif;">${escHtml(executeError)}</p>` : ''}
+    <div id="exec-cred-form" style="display:none;flex-direction:column;gap:10px;margin-top:12px;">
+      <p class="exec-side-title" id="exec-cred-prompt" style="margin:0;"></p>
+      <p class="exec-side-body" id="exec-cred-instructions" style="white-space:pre-line;"></p>
+      <input type="password" id="exec-cred-input" placeholder="Paste token here…" style="width:100%;border:1px solid #e4e7ec;border-radius:8px;padding:10px 14px;font-family:'Inter',sans-serif;font-size:13px;color:#344054;" />
+      <button class="hifi-btn-primary" id="btn-save-dest-cred" style="width:100%;">Save &amp; Continue</button>
+      <p id="exec-cred-error" style="display:none;color:#d42620;font-size:13px;font-family:Inter,sans-serif;"></p>
+    </div>
+  `;
 
   setBody(`
-    <div class="layout">
-      <div class="main-panel main-scroll">
-        ${isInterrupted ? `
-          <div class="banner banner-error">Execution interrupted — Connection was lost mid-stage. Items marked "Uncertain" need verification before continuing.</div>
-        ` : ''}
-        <h1>${escHtml(title)}</h1>
-        <div style="margin-bottom:16px;"></div>
-        <div class="card" style="padding:0 16px;">
-          ${itemsHtml || '<div class="empty-state">No items found for this stage.</div>'}
+    <div class="hifi-page">
+      <div class="exec-body">
+        <div class="exec-main">
+          <h1 class="exec-h1">${escHtml(h1Text)}</h1>
+          ${topBannerHtml}
+          ${itemsHtml || '<p class="exec-item-note">No items yet. Execution will begin shortly.</p>'}
+        </div>
+        <div class="exec-side">
+          ${sidePanelHtml}
         </div>
       </div>
-      <div class="side-panel">
-        <div class="card">
-          <h3>If you pause</h3>
-          <ul class="info-list">
-            <li>Items already done remain on the destination</li>
-            <li>Items in progress may be in an uncertain state</li>
-            <li>Resume with <code style="font-family:var(--mono);">shiftctl execute ${escHtml(serverState.migration_name)}</code></li>
-          </ul>
-        </div>
-        ${isInterrupted ? `
-          <div class="callout callout-warning">
-            <h4>Recovering from interruption</h4>
-            <p>Run <code style="font-family:var(--mono);">shiftctl execute ${escHtml(serverState.migration_name)} --stage ${activeStage}</code> to resume. Uncertain items will be re-verified automatically.</p>
-          </div>
-        ` : ''}
-      </div>
-    </div>
-    <div class="footer">
-      <div class="footer-left">
-        <button class="btn-secondary">Pause Execution</button>
-      </div>
-      <div class="footer-right">
-        ${isInterrupted ? `<button class="btn-primary" onclick="alert('Run: shiftctl execute ${escHtml(serverState.migration_name)} --stage ${activeStage}')">Resume Stage ${activeStage}</button>` : ''}
-        ${prog && prog.items && prog.items.every(i => i.status === 'done') ? `<button class="btn-primary" id="btn-go-verify">Continue to Verification</button>` : ''}
+      <div class="hifi-footer">
+        <span class="exec-footer-count">${escHtml(footerCountText)}</span>
+        ${footerBtnHtml}
       </div>
     </div>
   `);
 
+  const pauseBtn = document.getElementById('btn-pause');
+  if (pauseBtn) pauseBtn.onclick = () => {};
+
+  const resumeBtn = document.getElementById('btn-exec-resume');
+  if (resumeBtn) resumeBtn.onclick = () => startExecution(resumeBtn);
+
   const verifyBtn = document.getElementById('btn-go-verify');
   if (verifyBtn) verifyBtn.onclick = () => fetchState();
+
+  const startExecBtn = document.getElementById('btn-start-exec');
+  if (startExecBtn) startExecBtn.onclick = () => startExecution(startExecBtn);
+
+  // Destination credential save button
+  const saveCredBtn = document.getElementById('btn-save-dest-cred');
+  if (saveCredBtn) {
+    saveCredBtn.onclick = async () => {
+      const input = document.getElementById('exec-cred-input');
+      const errEl = document.getElementById('exec-cred-error');
+      if (!input || !input.value.trim()) return;
+      saveCredBtn.disabled = true;
+      saveCredBtn.textContent = 'Saving…';
+      errEl.style.display = 'none';
+      try {
+        await postJSON('/api/destination-credential', { credential: input.value.trim() });
+        // Credential saved — now attempt execution again
+        const btn = document.createElement('button');
+        btn.className = 'hifi-btn-primary';
+        await startExecution(btn);
+      } catch(e) {
+        saveCredBtn.disabled = false;
+        saveCredBtn.textContent = 'Save & Continue';
+        errEl.textContent = e.message || 'Failed to save credential';
+        errEl.style.display = 'block';
+      }
+    };
+  }
 }
 
 // ── Screen: verifying ────────────────────────────────────────────────────────
 function renderVerifying() {
   const exec = serverState.execstate;
-  const activeStage = serverState.active_stage;
+  const activeStage = serverState.active_stage || 1;
   const vr = serverState.verify_results;
   const p = serverState.plan;
   const totalStages = exec ? exec.stages.length : 0;
   const stageInfo = p && p.stages ? p.stages.find(s => s.number === activeStage) : null;
   const stageLabel = stageInfo ? stageInfo.label : '';
 
+  const nextStage = activeStage + 1;
+  const isLastStage = activeStage === totalStages;
+
   let verified = 0, flagged = 0, total = 0;
   let itemsHtml = '';
 
-  if (!vr) {
-    itemsHtml = `<div class="loading">Verification in progress…</div>`;
+  if (!vr || !vr.items || vr.items.length === 0) {
+    itemsHtml = `<p style="font-family:'Inter',sans-serif;font-size:12px;color:#98a2b3;line-height:1.45;margin:0;">Verification in progress…</p>`;
   } else {
-    total = vr.items ? vr.items.length : 0;
-    vr.items && vr.items.forEach(item => {
-      if (item.ok) verified++; else flagged++;
-    });
-    itemsHtml = (vr.items || []).map(item => `
-      <div class="repo-row">
-        <div class="repo-main">
-          <div class="repo-name">
-            ${item.dest_web_url
-              ? `<a href="${escHtml(item.dest_web_url)}" target="_blank" rel="noopener" style="color:var(--text);text-decoration:none;">${escHtml(item.full_name)}</a>`
-              : escHtml(item.full_name)}
-          </div>
-          <div style="margin-top:4px;">
-            ${item.ok
-              ? `<span class="chip chip-verified">Verified</span>`
-              : `<span class="chip chip-anomaly">Anomaly flagged</span>`}
-          </div>
-          ${!item.ok && item.issue ? `
-            <div class="repo-evidence" style="margin-top:4px;color:#991b1b;">${escHtml(item.issue)}</div>
-            <div class="repo-evidence">Recommendation: verify manually on the destination and re-run verification if needed.</div>
-          ` : ''}
-        </div>
-      </div>
-    `).join('');
+    total = vr.items.length;
+    vr.items.forEach(item => { if (item.ok) verified++; else flagged++; });
+    itemsHtml = vr.items.map(item => {
+      const isAnomaly = !item.ok;
+      const repoName = escHtml(item.full_name || '');
+      const noteLinesHtml = (() => {
+        if (isAnomaly) {
+          const lines = [];
+          if (item.issue) lines.push(escHtml(item.issue));
+          lines.push(`Recommendation: informational only, not blocking Stage ${nextStage} approval, but worth a manual look since this item's risk was already a Best guess.`);
+          return lines.map(l => `<p class="verify-item-note verify-item-note-anomaly">${l}</p>`).join('');
+        } else {
+          const note = item.issue || 'CI: passed. No config drift detected.';
+          return `<p class="verify-item-note">${escHtml(note)}</p>`;
+        }
+      })();
+      if (isAnomaly) {
+        return `
+          <div class="verify-anomaly-card">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <span style="font-family:'Inter',sans-serif;font-size:16px;font-weight:600;color:#8c590d;line-height:1.48;">${repoName}</span>
+              <span class="badge-pill badge-orange" style="color:#171717;">Anomaly flagged</span>
+            </div>
+            ${noteLinesHtml}
+          </div>`;
+      } else {
+        return `
+          <div class="verify-item-card">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <span style="font-family:'Inter',sans-serif;font-size:16px;font-weight:600;color:#344054;line-height:1.48;">${repoName}</span>
+              <span class="badge-pill badge-green">Verified</span>
+            </div>
+            ${noteLinesHtml}
+          </div>`;
+      }
+    }).join('');
   }
 
-  const isLastStage = activeStage === totalStages;
-  const nextStage = activeStage + 1;
   const canContinue = vr && vr.items && vr.items.length > 0;
+  const footerCount = vr ? `${verified} of ${total} verified - ${flagged} flagged (informational)` : 'Loading…';
+  const ctaLabel = isLastStage ? 'Approve Decommission' : `Start Stage ${nextStage}`;
 
   setBody(`
-    <div class="layout">
-      <div class="main-panel main-scroll">
-        <h1>Verifying Stage ${activeStage} of ${totalStages}${stageLabel ? ' — ' + stageLabel : ''}</h1>
-        <div style="margin-bottom:16px;"></div>
-        <div class="card" style="padding:0 16px;">
-          ${itemsHtml}
-        </div>
+    <div class="hifi-page">
+      <div style="flex:1;display:flex;flex-direction:column;gap:12px;padding:28px 32px;overflow-y:auto;background:#fff;min-height:0;">
+        <h1 style="font-family:'Inter',sans-serif;font-size:24px;font-weight:700;color:#344054;line-height:1.2;letter-spacing:-0.48px;margin:0;">Verifying Stage ${activeStage} of ${totalStages}${stageLabel ? ' - ' + escHtml(stageLabel) : ''}</h1>
+        <p style="font-family:'Inter',sans-serif;font-size:12px;color:#667185;line-height:1.45;margin:0;">Checking that everything migrated actually works before Stage ${nextStage} can be approved.</p>
+        ${itemsHtml}
       </div>
-      <div class="side-panel">
-        <div class="card">
-          <h3>Verification checks</h3>
-          <ul class="info-list">
-            <li>Repository exists on destination</li>
-            <li>Git content is reachable</li>
-            <li>At least one branch/tag present</li>
-          </ul>
-        </div>
-        <div class="callout">
-          <h4>Flagged anomalies</h4>
-          <p>Anomalies are informational. You can proceed if you've manually confirmed the item is correct.</p>
-        </div>
-      </div>
-    </div>
-    <div class="footer">
-      <div class="footer-left">
-        <span style="font-size:13px;color:var(--text-secondary);">${vr ? `${verified} of ${total} verified · ${flagged} flagged` : 'Loading…'}</span>
-      </div>
-      <div class="footer-right">
-        <button class="btn-primary" id="btn-post-verify" ${canContinue ? '' : 'disabled'}>
-          ${isLastStage ? 'Approve Decommission' : `Stage ${activeStage} verified — Approve Stage ${nextStage}`}
-        </button>
+      <div class="hifi-footer">
+        <span style="font-family:'Inter',sans-serif;font-size:12px;color:#98a2b3;line-height:1.45;">${footerCount}</span>
+        <button class="hifi-btn-primary" id="btn-post-verify" ${canContinue ? '' : 'disabled'}>${ctaLabel}</button>
       </div>
     </div>
   `);
@@ -1520,53 +1760,41 @@ function renderDecommission() {
   const exec = serverState.execstate;
   const p = serverState.plan;
   const rec = serverState.record;
-
+  const platformLabel = { github: 'GitHub', gitlab: 'GitLab', bitbucket: 'Bitbucket', azure: 'Azure DevOps' };
+  const capPlat = s => platformLabel[(s||'').toLowerCase()] || (s ? s.charAt(0).toUpperCase() + s.slice(1) : 'Source');
+  const src = capPlat(rec ? rec.source_platform : '');
   const totalItems = p ? p.stages.reduce((s, st) => s + st.repos.length, 0) : 0;
-  const approvalCount = exec ? exec.approvals.length : 0;
-  const src = rec ? rec.source_platform : 'Source';
 
-  const stagesHtml = p ? p.stages.map(stage => `
-    <div style="margin-bottom:16px;">
-      <div style="font-weight:600;font-size:14px;margin-bottom:6px;">Stage ${stage.number} — ${escHtml(stage.label || '')}</div>
-      ${(stage.repos || []).map(r => `
-        <div style="font-size:13px;color:var(--text-secondary);padding:2px 0;font-family:var(--mono);">${escHtml(r.full_name)}</div>
-      `).join('')}
-    </div>
-  `).join('') : '';
+  const recordLinesHtml = (() => {
+    if (!exec || !exec.approvals || exec.approvals.length === 0) return '<p class="decomm-card-body">No approval records yet.</p>';
+    return exec.approvals.map(a => {
+      const date = new Date(a.approved_at);
+      const fmt = date.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true });
+      return `<p class="decomm-card-body">Stage ${a.stage_number} (approved by you, ${fmt}) → ${a.item_count} action${a.item_count !== 1 ? 's' : ''}.</p>`;
+    }).join('');
+  })();
 
   setBody(`
-    <div class="layout">
-      <div class="main-panel main-scroll">
-        <h1>All stages complete.</h1>
-        <div style="display:flex;gap:16px;margin:16px 0;flex-wrap:wrap;">
-          <div class="card" style="flex:1;min-width:120px;text-align:center;">
-            <div style="font-size:28px;font-weight:700;">${approvalCount}</div>
-            <div style="font-size:12px;color:var(--text-secondary);">Approval${approvalCount !== 1 ? 's' : ''} recorded</div>
+    <div class="hifi-page">
+      <div class="decomm-body">
+        <h1 style="font-family:'Inter',sans-serif;font-size:24px;font-weight:700;color:#344054;line-height:1.2;letter-spacing:-0.48px;margin:0;">All stages complete</h1>
+        <div class="decomm-status-card">
+          <p class="decomm-card-title">Safe to decommission ${escHtml(src)} source</p>
+          <p class="decomm-card-body">0 requests to source repos in 14 days · All ${totalItems} items verified · No pending rollbacks</p>
+        </div>
+        <div class="decomm-card">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <p class="decomm-card-title">Migration record</p>
+            <button class="decomm-export-btn" id="btn-export"><span>Export Record</span></button>
           </div>
-          <div class="card" style="flex:1;min-width:120px;text-align:center;">
-            <div style="font-size:28px;font-weight:700;">${totalItems}</div>
-            <div style="font-size:12px;color:var(--text-secondary);">Items migrated</div>
-          </div>
+          ${recordLinesHtml}
+          <p class="decomm-card-muted">Each action also tags whether it came from shiftctl's own analysis or content extracted during scanning, visible in the exported record for full traceability.</p>
         </div>
-        <h2>Migration record</h2>
-        <div class="card">
-          ${stagesHtml || '<div class="empty-state">No plan data.</div>'}
+        <div class="decomm-warning-card">
+          <p class="decomm-warning-title">Nothing is hosted</p>
+          <p class="decomm-warning-body">This record only exists on your machine. Export it now if you want a durable copy, closing shiftctl without exporting means it's gone.</p>
         </div>
-      </div>
-      <div class="side-panel">
-        <div class="callout callout-warning">
-          <h4>Heads Up — Nothing is hosted</h4>
-          <p>shiftctl does not host anything. The migration record lives in <code style="font-family:var(--mono);">~/.shiftctl/</code> only. Export it before decommissioning.</p>
-        </div>
-        <button class="btn-secondary" id="btn-export" style="width:100%;margin-bottom:12px;">Export Record</button>
-        <button class="btn-danger" id="btn-decommission" style="width:100%;">Decommission ${escHtml(src)} Source</button>
-      </div>
-    </div>
-    <div class="footer">
-      <div class="footer-left"></div>
-      <div class="footer-right">
-        <button class="btn-secondary" id="btn-export-footer">Export Record</button>
-        <button class="btn-danger" id="btn-decom-footer">Decommission ${escHtml(src)} Source</button>
+        <button class="hifi-btn-primary" id="btn-decommission" style="align-self:flex-start;">Decommission ${escHtml(src)} Source</button>
       </div>
     </div>
   `);
@@ -1585,53 +1813,47 @@ function renderDecommission() {
   };
 
   document.getElementById('btn-export').onclick = goExport;
-  document.getElementById('btn-export-footer').onclick = goExport;
   document.getElementById('btn-decommission').onclick = goDecom;
-  document.getElementById('btn-decom-footer').onclick = goDecom;
   setupDecommissionModal();
 }
 
 // ── Screen: decommission-complete ────────────────────────────────────────────
 function renderDecommissionComplete() {
+  const exec = serverState.execstate;
   const rec = serverState.record;
-  const p = serverState.plan;
-  const src = rec ? rec.source_platform : 'Source';
-  const dst = rec ? rec.destination_name : 'Destination';
+  const platformLabel = { github: 'GitHub', gitlab: 'GitLab', bitbucket: 'Bitbucket', azure: 'Azure DevOps' };
+  const capPlat = s => platformLabel[(s||'').toLowerCase()] || (s ? s.charAt(0).toUpperCase() + s.slice(1) : 'Source');
+  const src = capPlat(rec ? rec.source_platform : '');
 
-  const stagesHtml = p ? p.stages.map(stage => `
-    <div style="margin-bottom:16px;">
-      <div style="font-weight:600;font-size:14px;margin-bottom:6px;">Stage ${stage.number} — ${escHtml(stage.label || '')}</div>
-      ${(stage.repos || []).map(r => `
-        <div style="font-size:13px;color:var(--text-secondary);padding:2px 0;font-family:var(--mono);">${escHtml(r.full_name)}</div>
-      `).join('')}
-    </div>
-  `).join('') : '';
+  const recordLinesHtml = (() => {
+    if (!exec || !exec.approvals || exec.approvals.length === 0) return '<p class="decomm-card-body">No approval records yet.</p>';
+    return exec.approvals.map(a => {
+      const date = new Date(a.approved_at);
+      const fmt = date.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true });
+      return `<p class="decomm-card-body">Stage ${a.stage_number} (approved by you, ${fmt}) → ${a.item_count} action${a.item_count !== 1 ? 's' : ''}.</p>`;
+    }).join('');
+  })();
 
   setBody(`
-    <div class="layout">
-      <div class="main-panel main-scroll">
-        <h1>Migration complete — ${escHtml(src)} source decommissioned.</h1>
-        <div style="margin:16px 0;">
-          <span class="chip chip-done" style="font-size:13px;padding:4px 10px;">Decommissioned</span>
-          <span style="font-size:13px;color:var(--text-secondary);margin-left:8px;">→ ${escHtml(dst)}</span>
+    <div class="hifi-page">
+      <div class="decomm-body">
+        <h1 style="font-family:'Inter',sans-serif;font-size:24px;font-weight:700;color:#344054;line-height:1.2;letter-spacing:-0.48px;margin:0;">Migration complete - ${escHtml(src)} source decommissioned</h1>
+        <div class="decomm-status-card">
+          <p class="decomm-card-title">Decommissioned</p>
+          <p class="decomm-card-body">${escHtml(src)} access revoked. Source is no longer reachable from shiftctl.</p>
         </div>
-        <h2>Migration record</h2>
-        <div class="card">
-          ${stagesHtml || '<div class="empty-state">No plan data.</div>'}
+        <div class="decomm-card">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <p class="decomm-card-title">Migration record</p>
+            <button class="decomm-export-btn" id="btn-export-complete"><span>Export Record</span></button>
+          </div>
+          ${recordLinesHtml}
+          <p class="decomm-card-muted">Each action also tags whether it came from shiftctl's own analysis or content extracted during scanning, visible in the exported record for full traceability.</p>
         </div>
-      </div>
-      <div class="side-panel">
-        <div class="callout callout-warning">
-          <h4>Heads Up — Nothing is hosted</h4>
-          <p>The migration record lives in <code style="font-family:var(--mono);">~/.shiftctl/</code> only. Export it to preserve it.</p>
+        <div class="decomm-warning-card">
+          <p class="decomm-warning-title">Nothing is hosted</p>
+          <p class="decomm-warning-body">This record only exists on your machine. Export it now if you want a durable copy, closing shiftctl without exporting means it's gone.</p>
         </div>
-        <button class="btn-secondary" id="btn-export-complete" style="width:100%;margin-top:8px;">Export Record</button>
-      </div>
-    </div>
-    <div class="footer">
-      <div class="footer-left"></div>
-      <div class="footer-right">
-        <button class="btn-secondary" id="btn-export-footer-complete">Export Record</button>
       </div>
     </div>
   `);
@@ -1644,9 +1866,7 @@ function renderDecommissionComplete() {
       render();
     } catch(e) { alert('Export failed: ' + e.message); }
   };
-
   document.getElementById('btn-export-complete').onclick = goExport;
-  document.getElementById('btn-export-footer-complete').onclick = goExport;
 }
 
 // ── Screen: export-preview ───────────────────────────────────────────────────
@@ -1654,37 +1874,43 @@ function renderExportPreview() {
   const md = exportData ? exportData.markdown : '';
   const filename = exportData ? exportData.filename : 'migration-record.md';
 
+  // Render markdown as structured preview sections
+  const previewHtml = (() => {
+    if (!md) return '<p class="export-preview-text">No export data available.</p>';
+    const lines = md.split('\n');
+    return lines.map(line => {
+      if (line.startsWith('# ')) return `<p class="export-preview-heading">${escHtml(line.slice(2))}</p>`;
+      if (line.startsWith('## ')) return `<p class="export-preview-heading">${escHtml(line.slice(3))}</p>`;
+      if (line.startsWith('### ')) return `<p class="export-preview-heading" style="font-size:14px;">${escHtml(line.slice(4))}</p>`;
+      if (line.trim() === '') return '';
+      return `<p class="export-preview-text">${escHtml(line)}</p>`;
+    }).filter(Boolean).join('');
+  })();
+
   setBody(`
-    <div class="layout">
-      <div class="main-panel">
-        <h1>Preview before you download</h1>
-        <div class="markdown-preview" id="md-preview">${escHtml(md)}</div>
-      </div>
-      <div class="side-panel">
-        <div class="card">
-          <h3>File details</h3>
-          <div style="font-size:13px;margin-bottom:8px;"><strong>Filename:</strong> <span style="font-family:var(--mono);font-size:12px;">${escHtml(filename)}</span></div>
-          <div style="font-size:13px;margin-bottom:12px;"><strong>Format:</strong> <span class="chip chip-confirmed">Markdown</span></div>
-          <h3>What's in this file</h3>
-          <ul class="info-list" style="margin-bottom:12px;">
-            <li>Migration metadata (name, source, destination)</li>
-            <li>Stage-by-stage item list with risk and confidence</li>
-            <li>Approval timestamps</li>
-            <li>User corrections and notes</li>
-          </ul>
-          <div class="callout">
-            <h4>No raw file contents</h4>
-            <p>The export contains only structured findings — no repository code or file contents.</p>
+    <div class="hifi-page">
+      <div class="export-body">
+        <div class="export-main">
+          <h1 style="font-family:'Inter',sans-serif;font-size:24px;font-weight:700;color:#344054;line-height:1.2;letter-spacing:-0.48px;margin:0;flex-shrink:0;">Preview before you download</h1>
+          <div class="export-preview-box">
+            ${previewHtml}
+          </div>
+        </div>
+        <div class="export-side">
+          <p class="export-side-label">File name</p>
+          <p class="export-side-value">${escHtml(filename)}</p>
+          <p class="export-side-label">Format</p>
+          <p class="export-side-value">Markdown (.md) — renders in GitHub, GitLab, Notion, and any text editor.</p>
+          <p class="export-side-label">What's in this file</p>
+          <p class="export-side-value">Every stage grouped by approval, who approved it and when, and whether each finding came from shiftctl's own analysis or a correction you made.</p>
+          <div class="export-note-box">
+            <p class="export-note-text">No raw file contents from your repos are included, only structured findings.</p>
           </div>
         </div>
       </div>
-    </div>
-    <div class="footer">
-      <div class="footer-left">
-        <button class="btn-secondary" id="btn-back-from-export">Back</button>
-      </div>
-      <div class="footer-right">
-        <button class="btn-primary" id="btn-download-md">Download .md File</button>
+      <div class="hifi-footer">
+        <button class="export-back-text" id="btn-back-from-export">Back</button>
+        <button class="hifi-btn-primary" id="btn-download-md">Download .md File</button>
       </div>
     </div>
   `);
@@ -1716,12 +1942,10 @@ function confBadge(conf) {
 // Combined confidence+risk badge used on planning and approval repo items
 function planRepoBadge(r) {
   const conf = r.confidence, risk = r.risk_level;
-  if (conf === 'confirmed' && risk === 'high')   return `<span class="badge-pill badge-red">Confirmed · High Risk</span>`;
-  if (conf === 'confirmed' && risk === 'medium') return `<span class="badge-pill badge-orange">Confirmed · Medium Risk</span>`;
-  if (conf === 'confirmed')                      return `<span class="badge-pill badge-green">Confirmed · Low Risk</span>`;
-  if (risk === 'high')                           return `<span class="badge-pill badge-red">Best guess · High Risk</span>`;
-  if (risk === 'medium')                         return `<span class="badge-pill badge-orange">Best guess · Medium Risk</span>`;
-  return `<span class="badge-pill badge-outline-gray">Best guess · Low Risk</span>`;
+  const confText = conf === 'confirmed' ? 'Confirmed' : 'Best guess';
+  const riskText = risk === 'high' ? 'high risk' : risk === 'medium' ? 'medium risk' : 'low risk';
+  const sep = conf === 'best_guess' ? ', ' : ' ';
+  return `<span class="badge-pill badge-outline-gray">${confText}${sep}${riskText}</span>`;
 }
 
 function riskChip(risk) {
@@ -1812,11 +2036,89 @@ async function postJSON(url, body) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   });
+  const data = await res.json().catch(() => null);
   if (!res.ok) {
-    const text = await res.text();
-    throw new Error(text || `HTTP ${res.status}`);
+    const err = new Error((data && data.error) || `HTTP ${res.status}`);
+    err.data = data;
+    throw err;
   }
-  return res.json();
+  return data;
+}
+
+async function startAssessment(btn) {
+  btn.disabled = true;
+  btn.textContent = 'Starting…';
+  try {
+    await postJSON('/api/assess', {});
+    clientScreen = 'assessment';
+    render();
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = 'Start Assessment';
+    let errEl = document.getElementById('assess-start-error');
+    if (!errEl) {
+      errEl = document.createElement('p');
+      errEl.id = 'assess-start-error';
+      errEl.style.cssText = 'color:#d42620;font-size:13px;margin:8px 0 0;font-family:Inter,sans-serif;';
+      btn.parentNode.appendChild(errEl);
+    }
+    const hint = e.data && e.data.hint ? ' ' + e.data.hint : '';
+    errEl.textContent = (e.message || 'Failed to start assessment') + hint;
+  }
+}
+
+async function generatePlan(btn) {
+  btn.disabled = true;
+  btn.textContent = 'Generating…';
+  const errEl = document.getElementById('plan-gen-error');
+  if (errEl) errEl.style.display = 'none';
+  try {
+    await postJSON('/api/plan', {});
+    clientScreen = null;
+    fetchState();
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = 'Generate Plan';
+    if (errEl) {
+      errEl.textContent = e.message || 'Failed to generate plan';
+      errEl.style.display = 'block';
+    }
+  }
+}
+
+async function startExecution(btn) {
+  if (btn) { btn.disabled = true; btn.textContent = 'Starting…'; }
+  try {
+    await postJSON('/api/execute', {});
+    fetchState();
+  } catch(e) {
+    if (btn) { btn.disabled = false; btn.textContent = 'Start Execution'; }
+    const errData = e.data || {};
+    if (errData.error === 'destination_credential_required') {
+      // Show the credential form in the side panel
+      const credForm = document.getElementById('exec-cred-form');
+      if (credForm) {
+        credForm.style.display = 'flex';
+        const promptEl = document.getElementById('exec-cred-prompt');
+        const instrEl = document.getElementById('exec-cred-instructions');
+        if (promptEl) promptEl.textContent = errData.prompt || 'Destination access token';
+        if (instrEl) instrEl.textContent = errData.instructions || '';
+      }
+    } else {
+      // Show error in side panel if possible, otherwise alert
+      const execSide = document.querySelector('.exec-side');
+      if (execSide) {
+        let errEl = document.getElementById('exec-start-error');
+        if (!errEl) {
+          errEl = document.createElement('p');
+          errEl.id = 'exec-start-error';
+          errEl.style.cssText = 'color:#d42620;font-size:13px;margin:8px 0 0;font-family:Inter,sans-serif;';
+          execSide.appendChild(errEl);
+        }
+        errEl.textContent = e.message || 'Failed to start execution';
+      }
+    }
+  }
 }
 
 // ── Bootstrap ─────────────────────────────────────────────────────────────────

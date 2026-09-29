@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"embed"
 	"encoding/json"
 	"fmt"
@@ -9,10 +10,12 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/shiftctl/shiftctl/internal/assessment"
 	"github.com/shiftctl/shiftctl/internal/credentials"
+	"github.com/shiftctl/shiftctl/internal/destination"
 	"github.com/shiftctl/shiftctl/internal/execstate"
 	"github.com/shiftctl/shiftctl/internal/executor"
 	"github.com/shiftctl/shiftctl/internal/migration"
@@ -35,12 +38,23 @@ type CombinedState struct {
 	ActiveProgress *executor.StageProgress `json:"active_progress,omitempty"`
 	VerifyResults  *verifier.SavedReport   `json:"verify_results,omitempty"`
 	Corrections    map[string]string       `json:"corrections,omitempty"`
+	RepoFilter     []string                `json:"repo_filter,omitempty"`
+	AssessRunning  bool                    `json:"assess_running,omitempty"`
+	AssessError    string                  `json:"assess_error,omitempty"`
+	ExecuteRunning bool                    `json:"execute_running,omitempty"`
+	ExecuteError   string                  `json:"execute_error,omitempty"`
 }
 
 // Server handles HTTP for the browser companion.
 type Server struct {
-	name string
-	mux  *http.ServeMux
+	name           string
+	mux            *http.ServeMux
+	assessMu       sync.Mutex
+	assessRunning  bool
+	assessError    string
+	executeMu      sync.Mutex
+	executeRunning bool
+	executeError   string
 }
 
 // New creates a Server for the given migration name.
@@ -58,6 +72,11 @@ func New(name string) *Server {
 	mux.HandleFunc("/api/disconnect", s.handleDisconnect)
 	mux.HandleFunc("/api/decommission", s.handleDecommission)
 	mux.HandleFunc("/api/export", s.handleExport)
+	mux.HandleFunc("/api/assess", s.handleAssess)
+	mux.HandleFunc("/api/plan", s.handlePlan)
+	mux.HandleFunc("/api/execute", s.handleExecute)
+	mux.HandleFunc("/api/destination-credential", s.handleDestinationCredential)
+	mux.HandleFunc("/api/filter", s.handleFilter)
 	mux.Handle("/", static)
 
 	s.mux = mux
@@ -83,6 +102,17 @@ func (s *Server) handleState(w http.ResponseWriter, r *http.Request) {
 func (s *Server) buildState() (*CombinedState, error) {
 	st := &CombinedState{MigrationName: s.name}
 
+	// Populate in-memory running/error state.
+	s.assessMu.Lock()
+	st.AssessRunning = s.assessRunning
+	st.AssessError = s.assessError
+	s.assessMu.Unlock()
+
+	s.executeMu.Lock()
+	st.ExecuteRunning = s.executeRunning
+	st.ExecuteError = s.executeError
+	s.executeMu.Unlock()
+
 	rec, err := migration.Load(s.name)
 	if err != nil {
 		st.Screen = "first-run"
@@ -105,9 +135,16 @@ func (s *Server) buildState() (*CombinedState, error) {
 	assess, _ := assessment.Load(s.name)
 	st.Assessment = assess
 	st.Corrections = s.loadCorrections()
+	st.RepoFilter = loadFilter(s.name)
 
 	if assess == nil {
-		st.Screen = "setup"
+		// If assessment is running, show the assessment screen so the UI can
+		// display progress. Otherwise fall back to the setup screen.
+		if st.AssessRunning {
+			st.Screen = "assessment"
+		} else {
+			st.Screen = "setup"
+		}
 		return st, nil
 	}
 
@@ -405,6 +442,57 @@ func (s *Server) saveCorrections(m map[string]string) error {
 	return os.WriteFile(path, data, 0600)
 }
 
+func filterPath(name string) (string, error) {
+	base, err := migration.ShiftctlDir()
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(base, "migrations", migration.SanitizeName(name), "filter.json"), nil
+}
+
+func loadFilter(name string) []string {
+	path, err := filterPath(name)
+	if err != nil {
+		return nil
+	}
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil
+	}
+	var repos []string
+	_ = json.Unmarshal(data, &repos)
+	return repos
+}
+
+func (s *Server) handleFilter(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	var body struct {
+		Repos []string `json:"repos"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		http.Error(w, "bad request", http.StatusBadRequest)
+		return
+	}
+	path, err := filterPath(s.name)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	data, err := json.MarshalIndent(body.Repos, "", "  ")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if err := os.WriteFile(path, data, 0600); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	writeJSON(w, map[string]any{"ok": true})
+}
+
 func removeMigrationData(name string) error {
 	base, err := migration.ShiftctlDir()
 	if err != nil {
@@ -475,7 +563,295 @@ func exportFilename(rec *migration.Record) string {
 	return fmt.Sprintf("shiftctl-migration-record-%s-%s.md", src, dst)
 }
 
+// ── /api/assess ───────────────────────────────────────────────────────────────
+
+func (s *Server) handleAssess(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	apiKey := os.Getenv("ANTHROPIC_API_KEY")
+	if apiKey == "" {
+		writeJSONStatus(w, http.StatusBadRequest, map[string]any{
+			"error": "ANTHROPIC_API_KEY not set",
+			"hint":  "export ANTHROPIC_API_KEY=sk-ant-... then restart shiftctl serve",
+		})
+		return
+	}
+	workspaceID := os.Getenv("ANTHROPIC_WORKSPACE_ID")
+
+	token, err := credentials.Get(s.name, "source")
+	if err != nil {
+		writeJSONStatus(w, http.StatusBadRequest, map[string]any{"error": "source credential not found: " + err.Error()})
+		return
+	}
+
+	rec, err := migration.Load(s.name)
+	if err != nil {
+		writeJSONStatus(w, http.StatusBadRequest, map[string]any{"error": "migration not found: " + err.Error()})
+		return
+	}
+
+	s.assessMu.Lock()
+	if s.assessRunning {
+		s.assessMu.Unlock()
+		writeJSONStatus(w, http.StatusConflict, map[string]any{"error": "assessment already running"})
+		return
+	}
+	s.assessRunning = true
+	s.assessError = ""
+	s.assessMu.Unlock()
+
+	repoFilter := loadFilter(s.name)
+
+	go func() {
+		defer func() {
+			s.assessMu.Lock()
+			s.assessRunning = false
+			s.assessMu.Unlock()
+		}()
+		_, err := assessment.Run(context.Background(), rec, token, apiKey, workspaceID, repoFilter, nil)
+		if err != nil {
+			s.assessMu.Lock()
+			s.assessError = err.Error()
+			s.assessMu.Unlock()
+		}
+	}()
+
+	writeJSON(w, map[string]any{"ok": true})
+}
+
+// ── /api/plan ─────────────────────────────────────────────────────────────────
+
+func (s *Server) handlePlan(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	assess, err := assessment.Load(s.name)
+	if err != nil || assess == nil || assess.Analysis == nil {
+		writeJSONStatus(w, http.StatusBadRequest, map[string]any{"error": "assessment not complete"})
+		return
+	}
+
+	p, err := plan.Build(assess)
+	if err != nil {
+		writeJSONStatus(w, http.StatusInternalServerError, map[string]any{"error": err.Error()})
+		return
+	}
+	if err := plan.Save(p); err != nil {
+		writeJSONStatus(w, http.StatusInternalServerError, map[string]any{"error": err.Error()})
+		return
+	}
+
+	writeJSON(w, map[string]any{"ok": true})
+}
+
+// ── /api/execute ──────────────────────────────────────────────────────────────
+
+func (s *Server) handleExecute(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	s.executeMu.Lock()
+	if s.executeRunning {
+		s.executeMu.Unlock()
+		writeJSONStatus(w, http.StatusConflict, map[string]any{"error": "execution already running"})
+		return
+	}
+	s.executeMu.Unlock()
+
+	p, err := plan.Load(s.name)
+	if err != nil {
+		writeJSONStatus(w, http.StatusBadRequest, map[string]any{"error": "plan not found"})
+		return
+	}
+
+	exec, err := execstate.LoadOrInit(s.name, p)
+	if err != nil {
+		writeJSONStatus(w, http.StatusInternalServerError, map[string]any{"error": err.Error()})
+		return
+	}
+
+	// Find the approved/executing/interrupted stage to run.
+	var activeStage *plan.Stage
+	var activeStageState *execstate.StageState
+	for i := range exec.Stages {
+		ss := &exec.Stages[i]
+		if ss.Status == execstate.StatusApproved || ss.Status == execstate.StatusExecuting || ss.Status == execstate.StatusInterrupted {
+			activeStageState = ss
+			for j := range p.Stages {
+				if p.Stages[j].Number == ss.Number {
+					stageCopy := p.Stages[j]
+					activeStage = &stageCopy
+					break
+				}
+			}
+			break
+		}
+	}
+
+	if activeStage == nil || activeStageState == nil {
+		writeJSONStatus(w, http.StatusBadRequest, map[string]any{"error": "no approved stage found to execute"})
+		return
+	}
+
+	if err := executor.CheckGitAvailable(); err != nil {
+		writeJSONStatus(w, http.StatusBadRequest, map[string]any{"error": err.Error()})
+		return
+	}
+
+	srcCred, err := credentials.Get(s.name, "source")
+	if err != nil {
+		writeJSONStatus(w, http.StatusBadRequest, map[string]any{"error": "source credential not found: " + err.Error()})
+		return
+	}
+
+	rec, err := migration.Load(s.name)
+	if err != nil {
+		writeJSONStatus(w, http.StatusBadRequest, map[string]any{"error": "migration not found: " + err.Error()})
+		return
+	}
+
+	dest := destination.ForName(rec.DestinationName)
+	if dest == nil {
+		writeJSONStatus(w, http.StatusBadRequest, map[string]any{"error": "unknown destination: " + rec.DestinationName})
+		return
+	}
+
+	dstCred, err := credentials.Get(s.name, "destination")
+	if err != nil {
+		writeJSONStatus(w, http.StatusBadRequest, map[string]any{
+			"error":        "destination_credential_required",
+			"instructions": dest.CredentialInstructions(),
+			"prompt":       dest.CredentialPrompt(),
+		})
+		return
+	}
+
+	ctx := context.Background()
+	username, err := dest.ValidateCredential(ctx, dstCred)
+	if err != nil {
+		writeJSONStatus(w, http.StatusBadRequest, map[string]any{
+			"error":        "destination_credential_required",
+			"instructions": dest.CredentialInstructions(),
+			"prompt":       dest.CredentialPrompt(),
+		})
+		return
+	}
+
+	stageNum := activeStage.Number
+	stageCopy := *activeStage
+
+	s.executeMu.Lock()
+	s.executeRunning = true
+	s.executeError = ""
+	s.executeMu.Unlock()
+
+	go func() {
+		defer func() {
+			s.executeMu.Lock()
+			s.executeRunning = false
+			s.executeMu.Unlock()
+		}()
+
+		// Reload exec state inside goroutine to get latest.
+		execState, err := execstate.Load(s.name)
+		if err != nil {
+			s.executeMu.Lock()
+			s.executeError = err.Error()
+			s.executeMu.Unlock()
+			return
+		}
+
+		// Transition to executing.
+		_ = execstate.Transition(execState, stageNum, execstate.StatusExecuting)
+
+		opts := executor.Options{
+			SourcePlatform:   rec.SourcePlatform,
+			SourceCredential: srcCred,
+			DestCredential:   dstCred,
+			Dest:             dest,
+			DestNamespace:    username,
+		}
+
+		_, runErr := executor.Run(ctx, execState, stageCopy, opts)
+
+		// Reload for transition.
+		execState2, loadErr := execstate.Load(s.name)
+		if loadErr == nil {
+			if runErr != nil {
+				_ = execstate.Transition(execState2, stageNum, execstate.StatusInterrupted)
+				s.executeMu.Lock()
+				s.executeError = runErr.Error()
+				s.executeMu.Unlock()
+			} else {
+				_ = execstate.Transition(execState2, stageNum, execstate.StatusVerifying)
+			}
+		} else if runErr != nil {
+			s.executeMu.Lock()
+			s.executeError = runErr.Error()
+			s.executeMu.Unlock()
+		}
+	}()
+
+	writeJSON(w, map[string]any{"ok": true})
+}
+
+// ── /api/destination-credential ───────────────────────────────────────────────
+
+func (s *Server) handleDestinationCredential(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var body struct {
+		Credential string `json:"credential"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil || body.Credential == "" {
+		writeJSONStatus(w, http.StatusBadRequest, map[string]any{"error": "credential is required"})
+		return
+	}
+
+	rec, err := migration.Load(s.name)
+	if err != nil {
+		writeJSONStatus(w, http.StatusBadRequest, map[string]any{"error": "migration not found"})
+		return
+	}
+
+	dest := destination.ForName(rec.DestinationName)
+	if dest == nil {
+		writeJSONStatus(w, http.StatusBadRequest, map[string]any{"error": "unknown destination: " + rec.DestinationName})
+		return
+	}
+
+	ctx := context.Background()
+	username, err := dest.ValidateCredential(ctx, body.Credential)
+	if err != nil {
+		writeJSONStatus(w, http.StatusBadRequest, map[string]any{"error": err.Error()})
+		return
+	}
+
+	if err := credentials.Set(s.name, "destination", body.Credential); err != nil {
+		writeJSONStatus(w, http.StatusInternalServerError, map[string]any{"error": err.Error()})
+		return
+	}
+
+	writeJSON(w, map[string]any{"ok": true, "username": username})
+}
+
 func writeJSON(w http.ResponseWriter, v any) {
 	w.Header().Set("Content-Type", "application/json")
+	_ = json.NewEncoder(w).Encode(v)
+}
+
+func writeJSONStatus(w http.ResponseWriter, status int, v any) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
 	_ = json.NewEncoder(w).Encode(v)
 }
