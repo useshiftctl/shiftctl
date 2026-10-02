@@ -40,6 +40,8 @@ type CombinedState struct {
 	VerifyResults  *verifier.SavedReport   `json:"verify_results,omitempty"`
 	Corrections    map[string]string       `json:"corrections,omitempty"`
 	RepoFilter     []string                `json:"repo_filter,omitempty"`
+	AnthropicKeyMissing bool                `json:"anthropic_key_missing,omitempty"`
+	AnthropicKeyError   string              `json:"anthropic_key_error,omitempty"`
 	AssessRunning  bool                    `json:"assess_running,omitempty"`
 	AssessError    string                  `json:"assess_error,omitempty"`
 	AssessScanned  int                     `json:"assess_scanned,omitempty"`
@@ -79,6 +81,7 @@ func New(name string) *Server {
 	mux.HandleFunc("/api/approve", s.handleApprove)
 	mux.HandleFunc("/api/correction", s.handleCorrection)
 	mux.HandleFunc("/api/plan/note", s.handlePlanNote)
+	mux.HandleFunc("/api/plan/reorder", s.handlePlanReorder)
 	mux.HandleFunc("/api/disconnect", s.handleDisconnect)
 	mux.HandleFunc("/api/decommission", s.handleDecommission)
 	mux.HandleFunc("/api/export", s.handleExport)
@@ -135,6 +138,16 @@ func (s *Server) buildState() (*CombinedState, error) {
 	st.VerifyRunning = s.verifyRunning
 	st.VerifyError = s.verifyError
 	s.verifyMu.Unlock()
+
+	// Check Anthropic API key availability.
+	apiKey := os.Getenv("ANTHROPIC_API_KEY")
+	if apiKey == "" {
+		st.AnthropicKeyMissing = true
+		st.AnthropicKeyError = "ANTHROPIC_API_KEY is not set. Run: export ANTHROPIC_API_KEY=sk-ant-api-... in your terminal before starting the companion."
+	} else if strings.HasPrefix(apiKey, "wrkspc_") {
+		st.AnthropicKeyMissing = true
+		st.AnthropicKeyError = "ANTHROPIC_API_KEY is set to a workspace ID, not an API key. Your API key starts with 'sk-ant-...' — find it at https://console.anthropic.com/ Your workspace ID (wrkspc_...) goes in ANTHROPIC_WORKSPACE_ID instead."
+	}
 
 	rec, err := migration.Load(s.name)
 	if err != nil {
@@ -359,6 +372,57 @@ func (s *Server) handlePlanNote(w http.ResponseWriter, r *http.Request) {
 			p.Stages[i].Note = body.Note
 			break
 		}
+	}
+	if err := plan.Save(p); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	writeJSON(w, map[string]any{"ok": true})
+}
+
+// ── /api/plan/reorder ─────────────────────────────────────────────────────────
+
+func (s *Server) handlePlanReorder(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	var body struct {
+		StageNumber int    `json:"stage_number"`
+		Direction   string `json:"direction"` // "up" or "down"
+	}
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		http.Error(w, "bad request", http.StatusBadRequest)
+		return
+	}
+	p, err := plan.Load(s.name)
+	if err != nil {
+		http.Error(w, "plan not found", http.StatusNotFound)
+		return
+	}
+	idx := -1
+	for i, st := range p.Stages {
+		if st.Number == body.StageNumber {
+			idx = i
+			break
+		}
+	}
+	if idx < 0 {
+		http.Error(w, "stage not found", http.StatusNotFound)
+		return
+	}
+	swapIdx := idx - 1
+	if body.Direction == "down" {
+		swapIdx = idx + 1
+	}
+	if swapIdx < 0 || swapIdx >= len(p.Stages) {
+		writeJSON(w, map[string]any{"ok": true}) // already at boundary, no-op
+		return
+	}
+	p.Stages[idx], p.Stages[swapIdx] = p.Stages[swapIdx], p.Stages[idx]
+	// Re-number stages after swap
+	for i := range p.Stages {
+		p.Stages[i].Number = i + 1
 	}
 	if err := plan.Save(p); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

@@ -60,6 +60,11 @@
   .badge-gray       { background: #575757; }
   .badge-blue       { background: #1671d9; }
   .badge-lightblue  { background: #41bce2; }
+  .badge-pulse { animation: badgePulse 1.6s ease-in-out infinite; }
+  @keyframes badgePulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.55; }
+  }
   .badge-red        { background: #d42620; }
   .badge-orange     { background: #f3a218; color: #171717; }
   .badge-outline-gray { background: transparent; border: 1px solid #454545; color: #454545; }
@@ -114,12 +119,6 @@
 
   /* ── Buttons ── */
   button { cursor: pointer; font-family: var(--font); font-size: 14px; border: none; }
-  .btn-primary {
-    background: #111; color: #fff; border-radius: 8px;
-    padding: 9px 18px; font-weight: 500;
-  }
-  .btn-primary:hover { background: #333; }
-  .btn-primary:disabled { background: #ccc; cursor: not-allowed; }
   .btn-secondary {
     background: #fff; color: #333; border: 1px solid #ccc; border-radius: 8px;
     padding: 9px 18px; font-weight: 500;
@@ -501,7 +500,7 @@
   .assess-card-header { display: flex; align-items: center; justify-content: space-between; }
   .assess-card-name { font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 600; color: #344054; line-height: 1.48; }
   .assess-card-badges { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
-  .assess-card-evidence { font-family: 'Inter', sans-serif; font-size: 12px; color: #667185; line-height: 1.45; margin: 0; }
+  .assess-card-evidence { font-family: 'Inter', sans-serif; font-size: 12px; color: #667185; line-height: 1.45; margin: 0; margin-top: 8px; }
   .assess-card-actions { display: flex; gap: 8px; }
   .assess-action-btn { border: 1.5px solid #d6d6d6; border-radius: 8px; padding: 10px 12px; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; color: #2b2b2b; background: #fff; cursor: pointer; line-height: 1.45; }
   .assess-side { width: 380px; flex-shrink: 0; display: flex; flex-direction: column; gap: 14px; background: #f9fafb; border: 1px solid #e4e7ec; border-radius: 8px; padding: 24px; align-self: flex-start; }
@@ -532,6 +531,13 @@
   .plan-btn:hover { background: #f9fafb; }
   .plan-btn-dark { background: #1671d9; color: #fff; border-color: #1671d9; border-width: 0; }
   .plan-btn-dark:hover { background: #1259b0; }
+  .plan-icon-btn { width: 28px; height: 28px; border-radius: 6px; border: 1.5px solid #d6d6d6; background: #fff; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-size: 13px; color: #575757; flex-shrink: 0; padding: 0; }
+  .plan-icon-btn:hover { background: #f9fafb; }
+  .plan-icon-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  .plan-toggle-link { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 500; color: #667185; background: none; border: none; cursor: pointer; padding: 0; display: inline-flex; align-items: center; gap: 4px; }
+  .plan-toggle-link:hover { color: #344054; }
+  .plan-add-note-link { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 500; color: #1671d9; background: none; border: none; cursor: pointer; padding: 0; }
+  .plan-add-note-link:hover { text-decoration: underline; }
   .plan-note-form { display: flex; flex-direction: column; gap: 8px; margin-top: 2px; }
   .plan-note-form textarea { width: 100%; border: 1px solid #e4e7ec; border-radius: 8px; padding: 10px 14px; font-family: 'Inter', sans-serif; font-size: 12px; color: #344054; resize: vertical; box-sizing: border-box; outline: none; line-height: 1.45; }
   .plan-note-form textarea:focus { border-color: #1671d9; }
@@ -542,7 +548,7 @@
   .plan-repo-item { border: 1px solid #e4e7ec; border-radius: 6px; padding: 10px 14px; display: flex; flex-direction: column; gap: 3px; background: #f9fafb; }
   .plan-repo-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
   .plan-repo-name { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 400; color: #344054; line-height: 1.45; }
-  .plan-repo-reason { font-family: 'Inter', sans-serif; font-size: 12px; color: #98a2b3; line-height: 1.45; margin: 0; }
+  .plan-repo-reason { font-family: 'Inter', sans-serif; font-size: 12px; color: #98a2b3; line-height: 1.45; margin: 0; margin-top: 6px; }
   .plan-side { width: 380px; flex-shrink: 0; display: flex; flex-direction: column; gap: 10px; background: #f9fafb; border: 1px solid #e4e7ec; border-radius: 8px; padding: 24px; align-self: flex-start; }
   .plan-side-title { font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 600; color: #344054; line-height: 1.48; margin: 0; }
   .plan-side-body { font-family: 'Inter', sans-serif; font-size: 12px; color: #667185; line-height: 1.45; margin: 0; }
@@ -560,7 +566,7 @@
   .appr-repo-card { border: 1px solid #e4e7ec; border-radius: 8px; padding: 16px 20px; display: flex; flex-direction: column; gap: 4px; background: #fff; flex-shrink: 0; }
   .appr-repo-header { display: flex; align-items: center; justify-content: space-between; }
   .appr-repo-name { font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 600; color: #344054; line-height: 1.48; }
-  .appr-repo-evidence { font-family: 'Inter', sans-serif; font-size: 12px; color: #98a2b3; line-height: 1.45; margin: 0; }
+  .appr-repo-evidence { font-family: 'Inter', sans-serif; font-size: 12px; color: #98a2b3; line-height: 1.45; margin: 0; margin-top: 8px; }
   .appr-side { width: 380px; flex-shrink: 0; background: #f9fafb; border: 1px solid #e4e7ec; border-radius: 8px; padding: 24px; display: flex; flex-direction: column; gap: 32px; align-self: flex-start; }
   .appr-side-title { font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 600; color: #344054; line-height: 1.48; margin: 0; }
   .appr-side-body { font-family: 'Inter', sans-serif; font-size: 12px; color: #667185; line-height: 1.45; margin: 0; }
@@ -615,7 +621,7 @@
   .decomm-export-btn span { font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; color: #2b2b2b; line-height: 1.45; padding: 0 8px; }
   .decomm-export-btn:hover { border-color: #a6a6a6; }
   /* Decommission modal */
-  .decomm-modal { background: #fff; border: 2px solid #262626; border-radius: 8px; padding: 22px 24px; width: 460px; display: flex; flex-direction: column; gap: 12px; }
+  .decomm-modal { background: #fff; border-radius: 8px; padding: 22px 24px; width: 460px; display: flex; flex-direction: column; gap: 12px; }
   .decomm-modal-title { font-family: 'Inter', sans-serif; font-size: 18px; font-weight: 600; color: #334054; line-height: normal; margin: 0; text-align: center; }
   .decomm-modal-body { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 400; color: #d42620; line-height: normal; margin: 0; }
   .decomm-modal-info { background: #ededed; border-radius: 6px; padding: 10px 12px; }
@@ -635,7 +641,6 @@
   .export-format-text { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; color: #333; line-height: 1.45; margin: 0; }
   .export-note-box { background: #e0e0e0; border-radius: 6px; padding: 10px 12px; }
   .export-note-text { font-family: 'Inter', sans-serif; font-size: 12px; color: #333; line-height: 1.45; margin: 0; }
-  .export-back-text { font-family: 'Inter', sans-serif; font-size: 12px; color: #98a2b3; line-height: 1.45; background: none; border: none; cursor: pointer; padding: 0; }
   .exec-footer-count { font-family: 'Inter', sans-serif; font-size: 12px; color: #98a2b3; line-height: 1.45; }
   /* ══════════════════════════════════════════════════════════════════════ */
 </style>
@@ -689,7 +694,7 @@
     </div>
     <p style="margin-top:12px;font-size:12px;color:var(--text-secondary);">This page will update automatically as execution proceeds.</p>
     <div class="modal-actions">
-      <button class="btn-primary" id="modal-approved-close">Got it</button>
+      <button class="hifi-btn-primary" id="modal-approved-close">Got it</button>
     </div>
   </div>
 </div>
@@ -750,6 +755,9 @@ async function fetchState() {
     }
     // Skip re-render if nothing has changed — avoids blowing away focused inputs
     if (prevStateStr === JSON.stringify(newState) && prevScreen === newState.screen) return;
+    // Skip re-render if user is actively typing in an input or textarea
+    const ae = document.activeElement;
+    if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA')) return;
     render();
   } catch (e) {
     // ignore fetch errors — will retry
@@ -851,8 +859,11 @@ function updateTopBar() {
       const _isComplete = _items.length > 0 && _items.every(i => i.status === 'done');
       const _doneCount = _items.filter(i => i.status === 'done').length;
       const _totalStages = _es ? _es.stages.length : 0;
+      const _stageState = _es && _es.stages ? _es.stages.find(s => s.number === _as) : null;
+      const _isApproved = _stageState && _stageState.status === 'approved' && !serverState.execute_running;
       if (_interrupted) { badgeClass = 'badge-warm'; label = 'Reconnecting\u2026'; }
       else if (_isComplete) { badgeClass = 'badge-apple'; label = `Stage ${_as} of ${_totalStages} complete`; }
+      else if (_isApproved) { badgeClass = 'badge-warm'; label = `Stage ${_as} approved — ready to execute`; }
       else { badgeClass = 'badge-lightblue'; label = `Executing Stage ${_as} - item ${_doneCount + 1} of ${_items.length}`; }
       break;
     }
@@ -863,7 +874,8 @@ function updateTopBar() {
     default: badgeClass = 'badge-warm'; label = screen;
   }
 
-  statusEl.innerHTML = `<span class="badge-pill ${badgeClass}">${label}</span>`;
+  const isLive = serverState && (serverState.assess_running || serverState.execute_running || serverState.verify_running);
+  statusEl.innerHTML = `<span class="badge-pill ${badgeClass}${isLive ? ' badge-pulse' : ''}">${label}</span>`;
 }
 
 function setBody(html) {
@@ -1140,6 +1152,13 @@ function renderSetup() {
             <div class="setup-side-callout">Everything happens on your computer. Nothing leaves it unless you say so.</div>
 
             <p class="setup-side-fine">Shiftctl uses AI to look at your setup and suggest a plan, but you check and approve everything before it actually does anything.</p>
+
+            ${serverState.anthropic_key_missing ? `
+            <div style="background:#fff1f0;border:1px solid #fca5a5;border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;margin-top:8px;">
+              <p style="margin:0;font-size:13px;font-weight:600;color:#d42620;font-family:Inter,sans-serif;">Anthropic API key required</p>
+              <p style="margin:0;font-size:12px;color:#7f1d1d;font-family:Inter,sans-serif;line-height:1.5;">${escHtml(serverState.anthropic_key_error)}</p>
+              <p style="margin:0;font-size:12px;color:#7f1d1d;font-family:Inter,sans-serif;line-height:1.5;">Once set, restart this companion server and the button below will unlock.</p>
+            </div>` : ''}
           </div>
 
         </div>
@@ -1148,7 +1167,7 @@ function renderSetup() {
       <!-- Footer -->
       <div class="hifi-footer">
         <button class="hifi-footer-link" id="btn-disconnect">Disconnect &amp; Remove All Local Data</button>
-        <button class="hifi-btn-primary" id="btn-to-confirm">Continue to Assessment</button>
+        <button class="${serverState.anthropic_key_missing ? 'hifi-btn-disabled' : 'hifi-btn-primary'}" id="btn-to-confirm" ${serverState.anthropic_key_missing ? 'disabled' : ''}>Continue to Assessment</button>
       </div>
     </div>
   `);
@@ -1279,7 +1298,11 @@ function renderAssessment() {
             </div>
           </div>
           ${evidence ? `<p class="assess-card-evidence">${escHtml(evidence)}</p>` : ''}
-          ${correction ? `<p class="assess-card-evidence" style="color:#8c590d;">Flagged: ${escHtml(correction)}</p>` : ''}
+          ${correction === '__confirmed__'
+            ? `<p class="assess-card-evidence" style="color:#0f973d;">✓ Confirmed by user</p>`
+            : correction
+              ? `<p class="assess-card-evidence" style="color:#8c590d;">Flagged: ${escHtml(correction)}</p>`
+              : ''}
           ${isBestGuess && !correction ? `
             <div class="assess-card-actions">
               <button class="assess-action-btn" data-looks-right="${escHtml(name)}">Looks right</button>
@@ -1289,7 +1312,7 @@ function renderAssessment() {
               <textarea rows="2" placeholder="Describe the correction…" id="cf-text-${idx}" style="width:100%;border:1px solid #e4e7ec;border-radius:8px;padding:10px 14px;font-family:'Inter',sans-serif;font-size:12px;color:#344054;resize:vertical;margin-bottom:8px;"></textarea>
               <div class="correction-form-actions">
                 <button class="assess-action-btn" data-cancel-idx="${idx}">Cancel</button>
-                <button class="assess-action-btn" style="background:#1671d9;color:#fff;border-color:#1671d9;" data-submit-idx="${idx}" data-repo="${escHtml(name)}">Submit Correction</button>
+                <button class="hifi-btn-primary" style="font-size:14px;padding:8px 12px;" data-submit-idx="${idx}" data-repo="${escHtml(name)}">Submit Correction</button>
               </div>
             </div>
           ` : ''}
@@ -1325,20 +1348,27 @@ function renderAssessment() {
         </div>
         <div class="assess-side">
           <div style="display:flex;flex-direction:column;gap:14px;">
-            <p class="assess-side-body">${scanning
-              ? 'Reading repo configs, CI workflows, and webhook definitions. Nothing is sent anywhere, this all runs on your machine.'
-              : hasAnalysis
-                ? 'Analysis complete. Review the findings and flag any items that look wrong before continuing to planning.'
-                : serverState.assess_running
-                  ? (scanned > 0
-                    ? `Scanning repositories… ${scanned} of ${assessTotal || '?'} done.`
-                    : 'Assessment starting — scanning your repositories now.')
-                  : 'Assessment not started yet.'
-            }</p>
-            ${serverState.assess_error ? `<p style="color:#d42620;font-size:13px;margin:0;font-family:Inter,sans-serif;">${escHtml(serverState.assess_error)}</p>` : ''}
+            ${hasAnalysis ? `
+            <div style="background:#f0faf4;border:1px solid #6dbb8a;border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;">
+              <p style="margin:0;font-size:13px;font-weight:600;color:#0f6b35;font-family:Inter,sans-serif;">Analysis complete</p>
+              <p style="margin:0;font-size:12px;color:#1a5c35;font-family:Inter,sans-serif;line-height:1.5;">Review the findings below and flag anything that looks wrong before continuing to planning.</p>
+            </div>
+          ` : serverState.assess_error ? '' : scanning ? `
+            <p class="assess-side-body">AI is analysing your repositories. This can take a minute — nothing is sent anywhere, this all runs on your machine.</p>
+            <div class="assess-callout">Running in the background. You can safely switch tabs.</div>
+          ` : serverState.assess_running ? `
+            <p class="assess-side-body">${scanned > 0 ? `Scanning repositories… ${scanned} of ${assessTotal || '?'} done.` : 'Assessment starting — scanning your repositories now.'}</p>
+            <div class="assess-callout">Running in the background. You can safely switch tabs.</div>
+          ` : `
+            <p class="assess-side-body">Assessment not started yet.</p>
+          `}
+            ${serverState.assess_error ? `
+              <div style="background:#fff1f0;border:1px solid #fca5a5;border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;">
+                <p style="margin:0;font-size:13px;font-weight:600;color:#d42620;font-family:Inter,sans-serif;">Assessment failed</p>
+                <p style="margin:0;font-size:12px;color:#7f1d1d;font-family:Inter,sans-serif;line-height:1.5;">${escHtml(serverState.assess_error)}</p>
+              </div>` : ''}
             ${statsText ? `<p class="assess-side-stats">${escHtml(statsText)}</p>` : ''}
             ${serverState.assess_error ? `<button class="hifi-btn-stroke" style="align-self:flex-start;margin-top:4px;" onclick="startAssessment(this)">Retry Assessment</button>` : ''}
-            ${scanning ? `<div class="assess-callout">Assessment is running in the background. You can safely switch tabs.</div>` : ''}
             ${headsUp ? `
               <div class="assess-headsup">
                 <p class="assess-headsup-title">Heads Up — Couldn't fully confirm this one</p>
@@ -1358,6 +1388,12 @@ function renderAssessment() {
 
   // Event delegation for correction forms and action buttons
   document.getElementById('page-body').addEventListener('click', function(e) {
+    const looksRightBtn = e.target.closest('[data-looks-right]');
+    if (looksRightBtn) {
+      const name = looksRightBtn.dataset.looksRight;
+      postJSON('/api/correction', { full_name: name, note: '__confirmed__' }).then(() => fetchState()).catch(() => {});
+      return;
+    }
     const flagBtn = e.target.closest('[data-flag-idx]');
     if (flagBtn) {
       const idx = flagBtn.dataset.flagIdx;
@@ -1414,9 +1450,9 @@ function renderAssessment() {
           if (body && repo) body.textContent = `Your note on ${repo} ${excerpt} hasn't been submitted yet. You can finish submitting it, or continue without saving it.`;
         }
         openModal('modal-unsaved');
-        pendingUnsavedAction = () => { clientScreen = null; render(); };
+        pendingUnsavedAction = () => { clientScreen = 'planning'; render(); };
       } else {
-        clientScreen = null;
+        clientScreen = 'planning';
         render();
       }
     };
@@ -1427,16 +1463,14 @@ function renderAssessment() {
 function renderPlanning() {
   const p = serverState.plan;
   if (!p || !p.stages || p.stages.length === 0) {
+    // Auto-generate the plan — no intermediate screen needed
+    generatePlan(null);
     setBody(`
       <div class="hifi-page">
         <div class="plan-body">
           <div class="plan-main">
             <h1 class="plan-h1">Your Migration Plan</h1>
-            <p class="plan-subtitle">Assessment complete. Generate a migration plan to continue.</p>
-            <div style="margin-top:20px;">
-              <button class="hifi-btn-primary" id="btn-generate-plan" onclick="generatePlan(this)">Generate Plan</button>
-              <p id="plan-gen-error" style="display:none;color:#d42620;font-size:13px;margin:8px 0 0;font-family:Inter,sans-serif;"></p>
-            </div>
+            <p class="plan-subtitle">Generating your migration plan…</p>
           </div>
         </div>
       </div>
@@ -1468,9 +1502,8 @@ function renderPlanning() {
       <div class="plan-repo-item">
         <div class="plan-repo-header">
           <span class="plan-repo-name">${escHtml(r.full_name)}</span>
-          ${planRepoBadge(r)}
         </div>
-        ${r.reasoning ? `<p class="plan-repo-reason">Reasoning: ${escHtml(r.reasoning)}</p>` : ''}
+        ${r.reasoning ? `<p class="plan-repo-reason">${escHtml(r.reasoning)}</p>` : ''}
       </div>
     `).join('');
 
@@ -1485,28 +1518,37 @@ function renderPlanning() {
     ` : '';
 
     const noteSavedHtml = (!isNoteOpen && stage.note) ? `
-      <div class="plan-note-saved"><strong>Note saved:</strong> "${escHtml(stage.note)}"</div>
+      <div class="plan-note-saved" data-plan-toggle-note="${stage.number}" style="cursor:pointer;" title="Click to edit note"><strong>Note:</strong> "${escHtml(stage.note)}"</div>
     ` : '';
 
-    const cardGap = isHidden ? '8px' : '16px';
+    const totalStages = p.stages.length;
+    const canMoveUp = stage.number > 1;
+    const canMoveDown = stage.number < totalStages;
+    const repoCount = repos.length;
     return `
-      <div class="plan-stage-card" style="gap:${cardGap}">
-        <div style="display:flex;flex-direction:column;gap:4px;">
-          <div class="plan-stage-header">
+      <div class="plan-stage-card" style="gap:10px;">
+        <!-- Header: title + badge only -->
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+          <div style="display:flex;flex-direction:column;gap:3px;flex:1;min-width:0;">
             <span class="plan-stage-title">Stage ${stage.number} - ${escHtml(stage.label || '')}</span>
-            <span class="plan-stage-summary">${escHtml(stageSummaryText(stage))}</span>
+            ${stage.reason ? `<p class="plan-stage-reason" style="margin:0;">${escHtml(stage.reason)}</p>` : ''}
           </div>
-          ${stage.reason ? `<p class="plan-stage-reason">${escHtml(stage.reason)}</p>` : ''}
+          <span class="plan-stage-summary" style="flex-shrink:0;margin-top:2px;">${repoCount} repo${repoCount !== 1 ? 's' : ''}</span>
         </div>
-        <div class="plan-stage-actions">
-          <button class="plan-btn" data-plan-move-up="${stage.number}">Move Up</button>
-          <button class="plan-btn" data-plan-move-down="${stage.number}">Move Down</button>
-          <button class="plan-btn${isNoteOpen ? ' plan-btn-dark' : ''}" data-plan-toggle-note="${stage.number}">Add a Note About This Stage</button>
-          <button class="plan-btn${!isHidden ? ' plan-btn-dark' : ''}" data-plan-toggle-items="${stage.number}">${isHidden ? 'Show Items' : 'Hide Items'}</button>
-        </div>
-        ${noteFormHtml}
+
+        <!-- Repo list -->
+        <div class="plan-repo-list">${reposHtml}</div>
+
+        <!-- Note -->
         ${noteSavedHtml}
-        ${!isHidden ? `<div class="plan-repo-list">${reposHtml}</div>` : ''}
+        ${isNoteOpen ? noteFormHtml : ''}
+
+        <!-- Secondary actions row -->
+        <div style="display:flex;align-items:center;gap:12px;margin-top:8px;padding-top:10px;border-top:1px solid #f2f4f7;">
+          ${canMoveUp ? `<button class="plan-add-note-link" data-plan-move-up="${stage.number}" title="Run this stage earlier in the migration">↑ Run earlier</button>` : ''}
+          ${canMoveDown ? `<button class="plan-add-note-link" data-plan-move-down="${stage.number}" title="Run this stage later in the migration">↓ Run later</button>` : ''}
+          ${!isNoteOpen ? `<button class="plan-add-note-link" data-plan-toggle-note="${stage.number}" style="margin-left:auto;">+ Add note</button>` : ''}
+        </div>
       </div>
     `;
   }).join('');
@@ -1528,7 +1570,7 @@ function renderPlanning() {
         </div>
       </div>
       <div class="hifi-footer">
-        <button class="plan-footer-link" id="btn-plan-back">Back to Assessment</button>
+        <button class="hifi-btn-stroke" id="btn-plan-back">Back to Assessment</button>
         <button class="hifi-btn-primary" id="btn-plan-approve">Review Stage 1</button>
       </div>
     </div>
@@ -1537,7 +1579,11 @@ function renderPlanning() {
   document.getElementById('btn-plan-back').onclick = () => { clientScreen = 'assessment'; render(); };
   document.getElementById('btn-plan-approve').onclick = () => { clientScreen = 'approval'; render(); };
 
-  document.getElementById('page-body').addEventListener('click', function(e) {
+  // Remove previous listener before adding a new one to avoid accumulation across re-renders
+  if (window._planClickHandler) {
+    document.getElementById('page-body').removeEventListener('click', window._planClickHandler);
+  }
+  window._planClickHandler = function(e) {
     // Toggle note form open/close
     const toggleNote = e.target.closest('[data-plan-toggle-note]');
     if (toggleNote) {
@@ -1566,15 +1612,22 @@ function renderPlanning() {
       }
       return;
     }
-    // Toggle items hidden/shown
-    const toggleItems = e.target.closest('[data-plan-toggle-items]');
-    if (toggleItems) {
-      const num = parseInt(toggleItems.dataset.planToggleItems);
-      if (planItemsHidden.has(num)) planItemsHidden.delete(num);
-      else planItemsHidden.add(num);
-      renderPlanning(); return;
+    // Move stage up
+    const moveUp = e.target.closest('[data-plan-move-up]');
+    if (moveUp) {
+      const num = parseInt(moveUp.dataset.planMoveUp);
+      postJSON('/api/plan/reorder', { stage_number: num, direction: 'up' }).then(() => fetchState()).catch(() => {});
+      return;
     }
-  });
+    // Move stage down
+    const moveDown = e.target.closest('[data-plan-move-down]');
+    if (moveDown) {
+      const num = parseInt(moveDown.dataset.planMoveDown);
+      postJSON('/api/plan/reorder', { stage_number: num, direction: 'down' }).then(() => fetchState()).catch(() => {});
+      return;
+    }
+  };
+  document.getElementById('page-body').addEventListener('click', window._planClickHandler);
 }
 
 // ── Screen: approval ─────────────────────────────────────────────────────────
@@ -1796,7 +1849,7 @@ function renderExecution() {
   }
 
   // Determine whether execution is pending start (approved but no progress yet)
-  const isApprovedNotStarted = stageState && stageState.status === 'approved' && items.length === 0;
+  const isApprovedNotStarted = stageState && stageState.status === 'approved' && !serverState.execute_running && !items.some(i => i.status === 'executing' || i.status === 'done');
   const isExecuteRunning = serverState.execute_running;
   const executeError = serverState.execute_error || '';
 
@@ -1816,7 +1869,7 @@ function renderExecution() {
         ? `<button class="hifi-btn-primary" id="btn-start-exec">Start Execution</button>`
         : isExecuteRunning
           ? `<button class="hifi-btn-disabled" disabled>Running…</button>`
-          : `<button class="hifi-btn-stroke" id="btn-pause">Pause Execution</button>`;
+          : `<button class="hifi-btn-primary" id="btn-pause">Resume Execution</button>`;
 
   // Side panel — show credential form when needed
   const sidePanelHtml = `
@@ -1864,7 +1917,7 @@ function renderExecution() {
   `);
 
   const pauseBtn = document.getElementById('btn-pause');
-  if (pauseBtn) pauseBtn.onclick = () => {};
+  if (pauseBtn) pauseBtn.onclick = () => startExecution(pauseBtn);
 
   const resumeBtn = document.getElementById('btn-exec-resume');
   if (resumeBtn) resumeBtn.onclick = () => startExecution(resumeBtn);
@@ -2194,7 +2247,7 @@ function renderExportPreview() {
         </div>
       </div>
       <div class="hifi-footer">
-        <button class="export-back-text" id="btn-back-from-export">Back</button>
+        <button class="hifi-btn-stroke" id="btn-back-from-export">Back</button>
         <button class="hifi-btn-primary" id="btn-download-md">Download .md File</button>
       </div>
     </div>
@@ -2353,8 +2406,7 @@ async function startAssessment(btn) {
 }
 
 async function generatePlan(btn) {
-  btn.disabled = true;
-  btn.textContent = 'Generating…';
+  if (btn) { btn.disabled = true; btn.textContent = 'Generating…'; }
   const errEl = document.getElementById('plan-gen-error');
   if (errEl) errEl.style.display = 'none';
   try {
@@ -2362,8 +2414,7 @@ async function generatePlan(btn) {
     clientScreen = null;
     fetchState();
   } catch(e) {
-    btn.disabled = false;
-    btn.textContent = 'Generate Plan';
+    if (btn) { btn.disabled = false; btn.textContent = 'Generate Plan'; }
     if (errEl) {
       errEl.textContent = e.message || 'Failed to generate plan';
       errEl.style.display = 'block';
