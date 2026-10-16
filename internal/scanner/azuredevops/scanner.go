@@ -19,8 +19,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/shiftctl/shiftctl/internal/redact"
-	githubscanner "github.com/shiftctl/shiftctl/internal/scanner/github"
+	"github.com/useshiftctl/shiftctl/internal/redact"
+	githubscanner "github.com/useshiftctl/shiftctl/internal/scanner/github"
 )
 
 const (

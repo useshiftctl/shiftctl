@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	githubscanner "github.com/shiftctl/shiftctl/internal/scanner/github"
+	githubscanner "github.com/useshiftctl/shiftctl/internal/scanner/github"
 )
 
 // buildSystemPrompt returns a system prompt tailored to the source platform so

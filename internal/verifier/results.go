@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/shiftctl/shiftctl/internal/migration"
+	"github.com/useshiftctl/shiftctl/internal/migration"
 )
 
 // SavedReport is the on-disk representation of a verification run.

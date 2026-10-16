@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/shiftctl/shiftctl/internal/migration"
+	"github.com/useshiftctl/shiftctl/internal/migration"
 )
 
 // Save writes the plan atomically to disk.

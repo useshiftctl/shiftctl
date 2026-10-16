@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/shiftctl/shiftctl/internal/migration"
+	"github.com/useshiftctl/shiftctl/internal/migration"
 )
 
 // ItemStatus is the execution state of a single repository in a stage.

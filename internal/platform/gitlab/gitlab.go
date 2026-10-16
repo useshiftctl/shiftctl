@@ -3,7 +3,7 @@ package gitlab
 import (
 	"context"
 
-	glscanner "github.com/shiftctl/shiftctl/internal/scanner/gitlab"
+	glscanner "github.com/useshiftctl/shiftctl/internal/scanner/gitlab"
 )
 
 type platform struct{}

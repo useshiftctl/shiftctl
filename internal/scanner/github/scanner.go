@@ -14,7 +14,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/shiftctl/shiftctl/internal/redact"
+	"github.com/useshiftctl/shiftctl/internal/redact"
 )
 
 const (

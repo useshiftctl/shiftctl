@@ -1,10 +1,10 @@
 package platform
 
 import (
-	"github.com/shiftctl/shiftctl/internal/platform/azuredevops"
-	"github.com/shiftctl/shiftctl/internal/platform/bitbucket"
-	"github.com/shiftctl/shiftctl/internal/platform/github"
-	"github.com/shiftctl/shiftctl/internal/platform/gitlab"
+	"github.com/useshiftctl/shiftctl/internal/platform/azuredevops"
+	"github.com/useshiftctl/shiftctl/internal/platform/bitbucket"
+	"github.com/useshiftctl/shiftctl/internal/platform/github"
+	"github.com/useshiftctl/shiftctl/internal/platform/gitlab"
 )
 
 // GitHub returns the GitHub Platform implementation.

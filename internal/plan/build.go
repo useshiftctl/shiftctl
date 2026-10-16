@@ -5,8 +5,8 @@ import (
 	"sort"
 	"time"
 
-	"github.com/shiftctl/shiftctl/internal/ai"
-	"github.com/shiftctl/shiftctl/internal/assessment"
+	"github.com/useshiftctl/shiftctl/internal/ai"
+	"github.com/useshiftctl/shiftctl/internal/assessment"
 )
 
 // Build converts an assessment into a staged Plan. The staging rules follow

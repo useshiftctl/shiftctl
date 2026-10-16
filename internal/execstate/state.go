@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/shiftctl/shiftctl/internal/migration"
-	"github.com/shiftctl/shiftctl/internal/plan"
+	"github.com/useshiftctl/shiftctl/internal/migration"
+	"github.com/useshiftctl/shiftctl/internal/plan"
 )
 
 // LoadOrInit returns the execution state for the named migration. If no state

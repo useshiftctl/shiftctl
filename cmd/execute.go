@@ -8,12 +8,12 @@ import (
 	"github.com/charmbracelet/huh"
 	"github.com/spf13/cobra"
 
-	"github.com/shiftctl/shiftctl/internal/credentials"
-	"github.com/shiftctl/shiftctl/internal/destination"
-	"github.com/shiftctl/shiftctl/internal/execstate"
-	"github.com/shiftctl/shiftctl/internal/executor"
-	"github.com/shiftctl/shiftctl/internal/migration"
-	"github.com/shiftctl/shiftctl/internal/plan"
+	"github.com/useshiftctl/shiftctl/internal/credentials"
+	"github.com/useshiftctl/shiftctl/internal/destination"
+	"github.com/useshiftctl/shiftctl/internal/execstate"
+	"github.com/useshiftctl/shiftctl/internal/executor"
+	"github.com/useshiftctl/shiftctl/internal/migration"
+	"github.com/useshiftctl/shiftctl/internal/plan"
 )
 
 var retryFailed bool

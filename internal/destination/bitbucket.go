@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	githubscanner "github.com/shiftctl/shiftctl/internal/scanner/github"
+	githubscanner "github.com/useshiftctl/shiftctl/internal/scanner/github"
 )
 
 // bitbucketImpl is the Bitbucket Cloud implementation of Destination.

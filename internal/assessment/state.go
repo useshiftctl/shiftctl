@@ -7,9 +7,9 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/shiftctl/shiftctl/internal/ai"
-	githubscanner "github.com/shiftctl/shiftctl/internal/scanner/github"
-	"github.com/shiftctl/shiftctl/internal/migration"
+	"github.com/useshiftctl/shiftctl/internal/ai"
+	githubscanner "github.com/useshiftctl/shiftctl/internal/scanner/github"
+	"github.com/useshiftctl/shiftctl/internal/migration"
 )
 
 // State is the complete on-disk record of an assessment. It is written in two

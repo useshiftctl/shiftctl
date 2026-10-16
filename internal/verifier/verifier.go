@@ -9,9 +9,9 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/shiftctl/shiftctl/internal/destination"
-	"github.com/shiftctl/shiftctl/internal/executor"
-	"github.com/shiftctl/shiftctl/internal/plan"
+	"github.com/useshiftctl/shiftctl/internal/destination"
+	"github.com/useshiftctl/shiftctl/internal/executor"
+	"github.com/useshiftctl/shiftctl/internal/plan"
 )
 
 // ItemVerification is the outcome of verifying a single repository.

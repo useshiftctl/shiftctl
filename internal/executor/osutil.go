@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	githubscanner "github.com/shiftctl/shiftctl/internal/scanner/github"
-	"github.com/shiftctl/shiftctl/internal/plan"
+	githubscanner "github.com/useshiftctl/shiftctl/internal/scanner/github"
+	"github.com/useshiftctl/shiftctl/internal/plan"
 )
 
 func mkTempDir() (string, error) {

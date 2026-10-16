@@ -3,7 +3,7 @@ package bitbucket
 import (
 	"context"
 
-	bbscanner "github.com/shiftctl/shiftctl/internal/scanner/bitbucket"
+	bbscanner "github.com/useshiftctl/shiftctl/internal/scanner/bitbucket"
 )
 
 type platform struct{}

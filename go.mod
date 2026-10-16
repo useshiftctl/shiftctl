@@ -1,4 +1,4 @@
-module github.com/shiftctl/shiftctl
+module github.com/useshiftctl/shiftctl
 
 go 1.23.0
 

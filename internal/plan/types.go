@@ -3,7 +3,7 @@ package plan
 import (
 	"time"
 
-	"github.com/shiftctl/shiftctl/internal/ai"
+	"github.com/useshiftctl/shiftctl/internal/ai"
 )
 
 // Plan is the full staged migration plan, written to disk after the user runs

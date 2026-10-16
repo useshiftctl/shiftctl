@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"github.com/spf13/cobra"
 
-	"github.com/shiftctl/shiftctl/internal/assessment"
-	"github.com/shiftctl/shiftctl/internal/execstate"
-	"github.com/shiftctl/shiftctl/internal/executor"
-	"github.com/shiftctl/shiftctl/internal/migration"
-	"github.com/shiftctl/shiftctl/internal/plan"
+	"github.com/useshiftctl/shiftctl/internal/assessment"
+	"github.com/useshiftctl/shiftctl/internal/execstate"
+	"github.com/useshiftctl/shiftctl/internal/executor"
+	"github.com/useshiftctl/shiftctl/internal/migration"
+	"github.com/useshiftctl/shiftctl/internal/plan"
 )
 
 var statusCmd = &cobra.Command{

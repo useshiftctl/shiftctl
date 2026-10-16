@@ -6,9 +6,9 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/shiftctl/shiftctl/internal/destination"
-	"github.com/shiftctl/shiftctl/internal/execstate"
-	"github.com/shiftctl/shiftctl/internal/plan"
+	"github.com/useshiftctl/shiftctl/internal/destination"
+	"github.com/useshiftctl/shiftctl/internal/execstate"
+	"github.com/useshiftctl/shiftctl/internal/plan"
 )
 
 // RepoResult is the outcome of executing a single repository migration.

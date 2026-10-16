@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	githubscanner "github.com/shiftctl/shiftctl/internal/scanner/github"
+	githubscanner "github.com/useshiftctl/shiftctl/internal/scanner/github"
 )
 
 // gitHubImpl is the GitHub implementation of Destination.

@@ -9,8 +9,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/shiftctl/shiftctl/internal/migration"
-	"github.com/shiftctl/shiftctl/internal/server"
+	"github.com/useshiftctl/shiftctl/internal/migration"
+	"github.com/useshiftctl/shiftctl/internal/server"
 )
 
 var servePort int

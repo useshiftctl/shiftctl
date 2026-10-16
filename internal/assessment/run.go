@@ -8,12 +8,12 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/shiftctl/shiftctl/internal/ai"
-	"github.com/shiftctl/shiftctl/internal/migration"
-	adoscanner "github.com/shiftctl/shiftctl/internal/scanner/azuredevops"
-	bbscanner "github.com/shiftctl/shiftctl/internal/scanner/bitbucket"
-	githubscanner "github.com/shiftctl/shiftctl/internal/scanner/github"
-	glscanner "github.com/shiftctl/shiftctl/internal/scanner/gitlab"
+	"github.com/useshiftctl/shiftctl/internal/ai"
+	"github.com/useshiftctl/shiftctl/internal/migration"
+	adoscanner "github.com/useshiftctl/shiftctl/internal/scanner/azuredevops"
+	bbscanner "github.com/useshiftctl/shiftctl/internal/scanner/bitbucket"
+	githubscanner "github.com/useshiftctl/shiftctl/internal/scanner/github"
+	glscanner "github.com/useshiftctl/shiftctl/internal/scanner/gitlab"
 )
 
 // ProgressFunc is called after each repository is scanned, with the 1-based

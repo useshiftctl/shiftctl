@@ -7,7 +7,7 @@ import (
 	"context"
 	"strings"
 
-	githubscanner "github.com/shiftctl/shiftctl/internal/scanner/github"
+	githubscanner "github.com/useshiftctl/shiftctl/internal/scanner/github"
 )
 
 // Destination is a code-hosting platform that shiftctl can write to during

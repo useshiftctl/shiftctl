@@ -3,7 +3,7 @@ package azuredevops
 import (
 	"context"
 
-	adoscanner "github.com/shiftctl/shiftctl/internal/scanner/azuredevops"
+	adoscanner "github.com/useshiftctl/shiftctl/internal/scanner/azuredevops"
 )
 
 type platform struct{}

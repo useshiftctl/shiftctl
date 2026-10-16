@@ -11,8 +11,8 @@ import (
 	"github.com/charmbracelet/huh"
 	"github.com/spf13/cobra"
 
-	"github.com/shiftctl/shiftctl/internal/credentials"
-	"github.com/shiftctl/shiftctl/internal/migration"
+	"github.com/useshiftctl/shiftctl/internal/credentials"
+	"github.com/useshiftctl/shiftctl/internal/migration"
 )
 
 var disconnectCmd = &cobra.Command{
