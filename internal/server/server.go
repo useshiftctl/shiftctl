@@ -139,14 +139,14 @@ func (s *Server) buildState() (*CombinedState, error) {
 	st.VerifyError = s.verifyError
 	s.verifyMu.Unlock()
 
-	// Check Anthropic API key availability.
-	apiKey := os.Getenv("ANTHROPIC_API_KEY")
+	// Check Anthropic API key availability (keychain first, then env var).
+	apiKey := s.anthropicKey()
 	if apiKey == "" {
 		st.AnthropicKeyMissing = true
-		st.AnthropicKeyError = "ANTHROPIC_API_KEY is not set. Run: export ANTHROPIC_API_KEY=sk-ant-api-... in your terminal before starting the companion."
+		st.AnthropicKeyError = "Anthropic API key not found. Add it on the Setup screen or set ANTHROPIC_API_KEY in your terminal."
 	} else if strings.HasPrefix(apiKey, "wrkspc_") {
 		st.AnthropicKeyMissing = true
-		st.AnthropicKeyError = "ANTHROPIC_API_KEY is set to a workspace ID, not an API key. Your API key starts with 'sk-ant-...' — find it at https://console.anthropic.com/ Your workspace ID (wrkspc_...) goes in ANTHROPIC_WORKSPACE_ID instead."
+		st.AnthropicKeyError = "ANTHROPIC_API_KEY is set to a workspace ID, not an API key. Your API key starts with 'sk-ant-...' — find it at https://console.anthropic.com/"
 	}
 
 	rec, err := migration.Load(s.name)
@@ -658,11 +658,11 @@ func (s *Server) handleAssess(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	apiKey := os.Getenv("ANTHROPIC_API_KEY")
+	apiKey := s.anthropicKey()
 	if apiKey == "" {
 		writeJSONStatus(w, http.StatusBadRequest, map[string]any{
-			"error": "ANTHROPIC_API_KEY not set",
-			"hint":  "export ANTHROPIC_API_KEY=sk-ant-... then restart shiftctl serve",
+			"error": "Anthropic API key not set",
+			"hint":  "Add it on the Setup screen or set ANTHROPIC_API_KEY in your terminal",
 		})
 		return
 	}
@@ -1243,6 +1243,7 @@ func (s *Server) handleConnect(w http.ResponseWriter, r *http.Request) {
 		SourcePlatform   string `json:"source_platform"`
 		SourceCredential string `json:"source_credential"`
 		DestinationName  string `json:"destination_name"`
+		AnthropicKey     string `json:"anthropic_key"`
 		Context          string `json:"context"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
@@ -1250,8 +1251,15 @@ func (s *Server) handleConnect(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if body.SourcePlatform == "" || body.SourceCredential == "" || body.DestinationName == "" {
-		writeJSONStatus(w, http.StatusBadRequest, map[string]any{"error": "source_platform, source_credential, and destination_name are required"})
+	if body.SourcePlatform == "" || body.SourceCredential == "" || body.DestinationName == "" || body.AnthropicKey == "" {
+		writeJSONStatus(w, http.StatusBadRequest, map[string]any{"error": "source_platform, source_credential, destination_name, and anthropic_key are required"})
+		return
+	}
+	if strings.HasPrefix(body.AnthropicKey, "wrkspc_") {
+		writeJSONStatus(w, http.StatusBadRequest, map[string]any{
+			"error": "That's a workspace ID, not an API key. Your key starts with sk-ant-...",
+			"field": "anthropic_key",
+		})
 		return
 	}
 
@@ -1298,8 +1306,20 @@ func (s *Server) handleConnect(w http.ResponseWriter, r *http.Request) {
 		writeJSONStatus(w, http.StatusInternalServerError, map[string]any{"error": "could not store credential: " + err.Error()})
 		return
 	}
+	if err := credentials.Set(s.name, "anthropic", body.AnthropicKey); err != nil {
+		writeJSONStatus(w, http.StatusInternalServerError, map[string]any{"error": "could not store Anthropic key: " + err.Error()})
+		return
+	}
 
 	writeJSON(w, map[string]any{"ok": true, "username": username})
+}
+
+// anthropicKey returns the Anthropic API key, preferring the keychain over the env var.
+func (s *Server) anthropicKey() string {
+	if key, err := credentials.Get(s.name, "anthropic"); err == nil && key != "" {
+		return key
+	}
+	return os.Getenv("ANTHROPIC_API_KEY")
 }
 
 func writeJSON(w http.ResponseWriter, v any) {

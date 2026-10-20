@@ -71,6 +71,36 @@
   .badge-neutral { background: #e6e6e6; border: 1px solid #808080; color: #4d4d4d; font-size: 11px; font-weight: 500; }
   .badge-gray-muted { background: #e8e8e8; color: #a6a6a6; }
   .badge-dodger     { background: #4a9fed; }
+
+  /* ── Topbar badge: animated dots ── */
+  @keyframes badge-dot-fade {
+    0%, 100% { opacity: 0.3; }
+    50%      { opacity: 1; }
+  }
+  .badge-dots { display: inline-flex; align-items: center; gap: 1px; margin-left: 2px; }
+  .badge-dots span { display: inline-block; animation: badge-dot-fade 1.4s ease-in-out infinite; }
+  .badge-dots span:nth-child(1) { animation-delay: 0s; }
+  .badge-dots span:nth-child(2) { animation-delay: 0.22s; }
+  .badge-dots span:nth-child(3) { animation-delay: 0.44s; }
+
+  /* ── Topbar badge: shimmer sweep (topbar only) ── */
+  @keyframes badge-shimmer {
+    0%        { transform: skewX(-20deg) translateX(-180%); }
+    60%, 100% { transform: skewX(-20deg) translateX(380%); }
+  }
+  #topbar-status .badge-pill {
+    position: relative;
+    overflow: hidden;
+  }
+  #topbar-status .badge-pill.badge-shimmer::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    width: 50%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.28), transparent);
+    animation: badge-shimmer 2.8s ease-in-out infinite;
+  }
+
   /* legacy bordered pill — kept for unrebuilt screens */
   .status-pill {
     display: inline-flex; align-items: center; gap: 6px;
@@ -820,11 +850,12 @@ function updateTopBar() {
 
   let badgeClass = 'badge-warm';
   let label = '';
+  let isWaiting = false;
   const screen = clientScreen || (serverState ? serverState.screen : 'loading');
 
   switch (screen) {
     case 'first-run':             badgeClass = 'badge-warm';  label = 'Not started'; break;
-    case 'setup':                 badgeClass = 'badge-warm';  label = 'Awaiting input'; break;
+    case 'setup':                 badgeClass = 'badge-orange'; label = 'Awaiting input'; isWaiting = true; break;
     case 'confirm-shared':        badgeClass = 'badge-apple'; label = 'Ready to scan'; break;
     case 'assessment': {
       const assess = serverState.assessment;
@@ -834,20 +865,21 @@ function updateTopBar() {
       const _scanned = serverState.assess_scanned || 0;
       const _total = serverState.assess_total || 0;
       if (hasAnalysis) { badgeClass = 'badge-dodger'; label = 'Scan complete'; }
-      else if (facts && facts.length > 0) { badgeClass = 'badge-lightblue'; label = `Analysing ${facts.length} repos…`; }
-      else if (_scanned > 0) { badgeClass = 'badge-lightblue'; label = `Scanning ${_scanned} of ${_total || '?'} repositories`; }
-      else { badgeClass = 'badge-lightblue'; label = 'Scanning…'; }
+      else if (facts && facts.length > 0) { badgeClass = 'badge-lightblue'; label = `Analysing ${facts.length} repos`; isWaiting = true; }
+      else if (_scanned > 0) { badgeClass = 'badge-lightblue'; label = `Scanning ${_scanned} of ${_total || '?'} repositories`; isWaiting = true; }
+      else { badgeClass = 'badge-lightblue'; label = 'Scanning'; isWaiting = true; }
       break;
     }
-    case 'planning':              badgeClass = 'badge-lightblue'; label = 'Reviewing plan...'; break;
-    case 'approval-destination':  badgeClass = 'badge-gray-muted'; label = 'Waiting for destination access'; break;
+    case 'planning':              badgeClass = 'badge-lightblue'; label = 'Reviewing plan'; isWaiting = true; break;
+    case 'approval-destination':  badgeClass = 'badge-gray-muted'; label = 'Waiting for destination access'; isWaiting = true; break;
     case 'approval': {
       const _aStage = serverState.active_stage || 1;
       const _aPlan = serverState.plan;
       const _aStageData = _aPlan && _aPlan.stages ? (_aPlan.stages.find(s => s.number === _aStage) || _aPlan.stages[0]) : null;
       const _aHasGuess = _aStageData && (_aStageData.repos || []).some(r => r.confidence === 'best_guess');
-      badgeClass = _aHasGuess ? 'badge-gray-muted' : 'badge-warm';
+      badgeClass = _aHasGuess ? 'badge-gray-muted' : 'badge-orange';
       label = 'Waiting for your approval';
+      isWaiting = true;
       break;
     }
     case 'execution': {
@@ -861,13 +893,13 @@ function updateTopBar() {
       const _totalStages = _es ? _es.stages.length : 0;
       const _stageState = _es && _es.stages ? _es.stages.find(s => s.number === _as) : null;
       const _isApproved = _stageState && _stageState.status === 'approved' && !serverState.execute_running;
-      if (_interrupted) { badgeClass = 'badge-warm'; label = 'Reconnecting\u2026'; }
+      if (_interrupted) { badgeClass = 'badge-orange'; label = 'Reconnecting'; isWaiting = true; }
       else if (_isComplete) { badgeClass = 'badge-apple'; label = `Stage ${_as} of ${_totalStages} complete`; }
       else if (_isApproved) { badgeClass = 'badge-warm'; label = `Stage ${_as} approved — ready to execute`; }
-      else { badgeClass = 'badge-lightblue'; label = `Executing Stage ${_as} - item ${_doneCount + 1} of ${_items.length}`; }
+      else { badgeClass = 'badge-lightblue'; label = `Executing Stage ${_as} - item ${_doneCount + 1} of ${_items.length}`; isWaiting = true; }
       break;
     }
-    case 'verifying': { const _vas = serverState.active_stage || 1; badgeClass = 'badge-lightblue'; label = `Verifying Stage ${_vas}`; break; }
+    case 'verifying': { const _vas = serverState.active_stage || 1; badgeClass = 'badge-lightblue'; label = `Verifying Stage ${_vas}`; isWaiting = true; break; }
     case 'decommission': badgeClass = 'badge-warm'; label = 'Done - 0 items pending'; break;
     case 'decommission-complete': badgeClass = 'badge-apple'; label = 'Migration complete'; break;
     case 'export-preview':        badgeClass = 'badge-apple'; label = 'Migration complete'; break;
@@ -875,7 +907,8 @@ function updateTopBar() {
   }
 
   const isLive = serverState && (serverState.assess_running || serverState.execute_running || serverState.verify_running);
-  statusEl.innerHTML = `<span class="badge-pill ${badgeClass}${isLive ? ' badge-pulse' : ''}">${label}</span>`;
+  const dotsHtml = isWaiting ? '<span class="badge-dots"><span>.</span><span>.</span><span>.</span></span>' : '';
+  statusEl.innerHTML = `<span class="badge-pill ${badgeClass}${isLive ? ' badge-pulse' : ''}${isWaiting ? ' badge-shimmer' : ''}">${label}${dotsHtml}</span>`;
 }
 
 function setBody(html) {
@@ -933,7 +966,16 @@ function renderFirstRun() {
         </div>
 
         <div class="setup-card" style="display:flex;flex-direction:column;gap:8px;">
-          <p style="font-family:'Inter',sans-serif;font-size:14px;font-weight:600;color:#344054;margin:0;">3. Anything I should know? <span style="font-weight:400;color:#98a2b3;">(optional)</span></p>
+          <p style="font-family:'Inter',sans-serif;font-size:14px;font-weight:600;color:#344054;margin:0;">3. Anthropic API key</p>
+          <label style="font-family:'Inter',sans-serif;font-size:12px;color:#667185;">Required for AI assessment — stored in your macOS Keychain, never needed again. Get one at <a href="https://console.anthropic.com/" target="_blank" style="color:#1671d9;">console.anthropic.com</a></label>
+          <input type="password" id="fr-anthropic-key" placeholder="sk-ant-..."
+            style="width:100%;border:1px solid #e4e7ec;border-radius:8px;padding:10px 14px;font-family:'Inter',sans-serif;font-size:13px;color:#344054;box-sizing:border-box;"
+            value="${escHtml((window._frState && window._frState.anthropicKey) || '')}" />
+          <div id="fr-anthropic-status" style="font-family:'Inter',sans-serif;font-size:12px;min-height:18px;"></div>
+        </div>
+
+        <div class="setup-card" style="display:flex;flex-direction:column;gap:8px;">
+          <p style="font-family:'Inter',sans-serif;font-size:14px;font-weight:600;color:#344054;margin:0;">4. Anything I should know? <span style="font-weight:400;color:#98a2b3;">(optional)</span></p>
           <label style="font-family:'Inter',sans-serif;font-size:12px;color:#667185;">Your note — kept visually distinct from shiftctl's own responses</label>
           <input class="setup-input" id="fr-context" placeholder="Skip the marketing-team repos, needs to be done by end of Q3"
             value="${escHtml((window._frState && window._frState.context) || '')}" />
@@ -946,20 +988,23 @@ function renderFirstRun() {
     </div>
   `);
 
-  const srcSelect = document.getElementById('fr-src-platform');
-  const dstSelect = document.getElementById('fr-dst-platform');
-  const credWrap   = document.getElementById('fr-src-cred-wrap');
-  const credLabel  = document.getElementById('fr-src-cred-label');
-  const credInstr  = document.getElementById('fr-src-cred-instructions');
-  const credInput  = document.getElementById('fr-src-cred');
-  const srcStatus  = document.getElementById('fr-src-status');
-  const errBanner  = document.getElementById('fr-error');
-  const submitBtn  = document.getElementById('fr-submit');
+  const srcSelect    = document.getElementById('fr-src-platform');
+  const dstSelect    = document.getElementById('fr-dst-platform');
+  const credWrap     = document.getElementById('fr-src-cred-wrap');
+  const credLabel    = document.getElementById('fr-src-cred-label');
+  const credInstr    = document.getElementById('fr-src-cred-instructions');
+  const credInput    = document.getElementById('fr-src-cred');
+  const srcStatus    = document.getElementById('fr-src-status');
+  const anthropicInput  = document.getElementById('fr-anthropic-key');
+  const anthropicStatus = document.getElementById('fr-anthropic-status');
+  const errBanner    = document.getElementById('fr-error');
+  const submitBtn    = document.getElementById('fr-submit');
 
   // Preserve selections across re-renders caused by polling.
   if (window._frState) {
     srcSelect.value = window._frState.src || '';
     dstSelect.value = window._frState.dst || '';
+    if (window._frState.anthropicKey) anthropicInput.value = window._frState.anthropicKey;
     if (window._frState.src) {
       credWrap.style.display = 'flex';
       const p = (platforms.sources || []).find(p => p.id === window._frState.src);
@@ -975,7 +1020,9 @@ function renderFirstRun() {
   }
 
   function updateSubmit() {
-    const ready = srcSelect.value && dstSelect.value && credInput.value.trim() && window._frState.username;
+    const ak = anthropicInput.value.trim();
+    const akOk = ak && !ak.startsWith('wrkspc_');
+    const ready = srcSelect.value && dstSelect.value && credInput.value.trim() && window._frState.username && akOk;
     submitBtn.disabled = !ready;
   }
 
@@ -999,6 +1046,20 @@ function renderFirstRun() {
 
   const ctxInputFr = document.getElementById('fr-context');
   if (ctxInputFr) ctxInputFr.addEventListener('input', () => { window._frState.context = ctxInputFr.value; });
+
+  anthropicInput.addEventListener('input', () => {
+    const val = anthropicInput.value.trim();
+    window._frState.anthropicKey = val;
+    if (!val) { anthropicStatus.textContent = ''; }
+    else if (val.startsWith('wrkspc_')) {
+      anthropicStatus.style.color = '#d42620';
+      anthropicStatus.textContent = 'That\'s a workspace ID — your key starts with sk-ant-...';
+    } else {
+      anthropicStatus.style.color = '#0f973d';
+      anthropicStatus.textContent = '✓ Looks good';
+    }
+    updateSubmit();
+  });
 
   // Validate source credential when the user stops typing (debounced).
   let credTimer = null;
@@ -1040,6 +1101,7 @@ function renderFirstRun() {
         source_platform: srcSelect.value,
         source_credential: credInput.value.trim(),
         destination_name: dstSelect.value,
+        anthropic_key: anthropicInput.value.trim(),
         context: (document.getElementById('fr-context') || {}).value || '',
       });
       const data = await res.json();

@@ -70,7 +70,37 @@ func runConnect(_ *cobra.Command, _ []string) error {
 		return err
 	}
 
-	// ── Step 3: destination name (no credential yet) ─────────────────────────
+	// ── Step 3: Anthropic API key ─────────────────────────────────────────────
+	fmt.Println()
+	fmt.Println(bold.Render("shiftctl uses the Anthropic API for AI-powered assessment."))
+	fmt.Println(dim.Render("  Get a key at console.anthropic.com — new accounts receive $5 in credits."))
+	fmt.Println()
+
+	var anthropicKey string
+	if err := huh.NewForm(
+		huh.NewGroup(
+			huh.NewInput().
+				Title("Anthropic API key").
+				Description("Starts with sk-ant-... — stored securely in your keychain, never needed again.").
+				EchoMode(huh.EchoModePassword).
+				Validate(func(s string) error {
+					s = strings.TrimSpace(s)
+					if s == "" {
+						return fmt.Errorf("API key cannot be empty")
+					}
+					if strings.HasPrefix(s, "wrkspc_") {
+						return fmt.Errorf("that's a workspace ID, not an API key — your key starts with sk-ant-...")
+					}
+					return nil
+				}).
+				Value(&anthropicKey),
+		),
+	).Run(); err != nil {
+		return cancelledOrError(err)
+	}
+	anthropicKey = strings.TrimSpace(anthropicKey)
+
+	// ── Step 4: destination name (no credential yet) ─────────────────────────
 	var destName string
 	if err := huh.NewForm(
 		huh.NewGroup(
@@ -94,7 +124,7 @@ func runConnect(_ *cobra.Command, _ []string) error {
 		return cancelledOrError(err)
 	}
 
-	// ── Step 4: optional plain-English context ────────────────────────────────
+	// ── Step 5: optional plain-English context ────────────────────────────────
 	var userContext string
 	if err := huh.NewForm(
 		huh.NewGroup(
@@ -108,7 +138,7 @@ func runConnect(_ *cobra.Command, _ []string) error {
 		return cancelledOrError(err)
 	}
 
-	// ── Step 5: migration name ────────────────────────────────────────────────
+	// ── Step 6: migration name ────────────────────────────────────────────────
 	var rawName string
 	if err := huh.NewForm(
 		huh.NewGroup(
@@ -146,9 +176,13 @@ func runConnect(_ *cobra.Command, _ []string) error {
 		)
 	}
 
-	// ── Store credential ──────────────────────────────────────────────────────
+	// ── Store credentials ─────────────────────────────────────────────────────
 	if err := credentials.Set(name, "source", credential); err != nil {
 		return fmt.Errorf("could not store credential: %w", err)
+	}
+	if err := credentials.Set(name, "anthropic", anthropicKey); err != nil {
+		_ = credentials.Delete(name, "source")
+		return fmt.Errorf("could not store Anthropic key: %w", err)
 	}
 
 	// ── Save migration record ─────────────────────────────────────────────────
@@ -161,8 +195,8 @@ func runConnect(_ *cobra.Command, _ []string) error {
 		Status:          migration.StatusSetup,
 	}
 	if err := migration.Save(rec); err != nil {
-		// Best-effort cleanup: remove the stored credential if the record write fails.
 		_ = credentials.Delete(name, "source")
+		_ = credentials.Delete(name, "anthropic")
 		return fmt.Errorf("could not save migration record: %w", err)
 	}
 
