@@ -66,7 +66,7 @@ func (s *Scanner) ValidateAndGetUsername(ctx context.Context) (string, error) {
 		name = profile.EmailAddress
 	}
 	if name == "" {
-		return "", fmt.Errorf("could not retrieve Azure DevOps user info , check token scopes")
+		return "", fmt.Errorf("could not retrieve Azure DevOps user info. check token scopes")
 	}
 	return name, nil
 }
@@ -188,7 +188,7 @@ func (s *Scanner) scanRepo(ctx context.Context, project string, repo adoRepo) gi
 	return fact
 }
 
-// , Sub-call implementations ─────────────────────────────────────────────────
+// Sub-call implementations ─────────────────────────────────────────────────
 
 func (s *Scanner) fetchWebhooks(ctx context.Context, project, repoID string) ([]githubscanner.WebhookFact, error) {
 	// ADO service hooks are org-level, filterable by publisher and resource.
@@ -335,7 +335,7 @@ func (s *Scanner) fetchDependencyFiles(ctx context.Context, project, repoID, bra
 	return facts, nil
 }
 
-// , Repository and project listing ────────────────────────────────────────────
+// Repository and project listing ────────────────────────────────────────────
 
 func (s *Scanner) listProjects(ctx context.Context) ([]adoProject, error) {
 	u := s.orgURL() + "/_apis/projects?api-version=" + apiVersion + "&$top=" + fmt.Sprint(pageTop)
@@ -356,7 +356,7 @@ func (s *Scanner) listRepos(ctx context.Context, project string) ([]adoRepo, err
 	return result.Value, nil
 }
 
-// , Azure DevOps API types ─────────────────────────────────────────────────────
+// Azure DevOps API types ─────────────────────────────────────────────────────
 
 type adoListResult[T any] struct {
 	Count int `json:"count"`
@@ -426,7 +426,7 @@ type adoBuildDef struct {
 	} `json:"process"`
 }
 
-// , HTTP helpers ──────────────────────────────────────────────────────────────
+// HTTP helpers ──────────────────────────────────────────────────────────────
 
 func (s *Scanner) orgURL() string {
 	return "https://dev.azure.com/" + s.org
@@ -455,12 +455,12 @@ func (s *Scanner) getJSONAbsolute(ctx context.Context, fullURL string, out inter
 		io.Copy(io.Discard, resp.Body)
 		return errNotFound
 	case http.StatusUnauthorized:
-		return fmt.Errorf("invalid Azure DevOps token (401) , check your PAT has Code: Read scope")
+		return fmt.Errorf("invalid Azure DevOps token (401). check your PAT has Code: Read scope")
 	case http.StatusForbidden:
 		io.Copy(io.Discard, resp.Body)
 		return errNotFound
-	case http.StatusNonAuthoritativeInfo: // 203 , redirect to login page
-		return fmt.Errorf("invalid Azure DevOps credentials , organisation may not exist or token is invalid")
+	case http.StatusNonAuthoritativeInfo: // 203. redirect to login page
+		return fmt.Errorf("invalid Azure DevOps credentials. organisation may not exist or token is invalid")
 	default:
 		body, _ := io.ReadAll(resp.Body)
 		return fmt.Errorf("Azure DevOps API returned %d: %s", resp.StatusCode, truncate(string(body), 200))
@@ -494,7 +494,7 @@ func (s *Scanner) getRaw(ctx context.Context, fullURL string) ([]byte, error) {
 	}
 }
 
-// , Conversion helpers ────────────────────────────────────────────────────────
+// Conversion helpers ────────────────────────────────────────────────────────
 
 func repoFactFromADO(org, project string, r adoRepo) githubscanner.RepoFact {
 	defaultBranch := strings.TrimPrefix(r.DefaultBranch, "refs/heads/")
@@ -576,7 +576,7 @@ func containsStr(ss []string, s string) bool {
 	return false
 }
 
-// , Dependency parsers ────────────────────────────────────────────────────────
+// Dependency parsers ────────────────────────────────────────────────────────
 
 func parseDependencyContent(filename, content string) ([]string, error) {
 	switch filename {

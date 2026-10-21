@@ -53,7 +53,7 @@ func NewClient(apiKey, workspaceID string) *Client {
 func (c *Client) complete(ctx context.Context, req anthropicRequest) (*anthropicResponse, error) {
 	if strings.HasPrefix(c.apiKey, "wrkspc_") {
 		return nil, fmt.Errorf("ANTHROPIC_API_KEY is set to a workspace ID, not an API key.\n\n" +
-			"  Your API key starts with 'sk-ant-...' , find it at https://console.anthropic.com/\n" +
+			"  Your API key starts with 'sk-ant-...'. find it at https://console.anthropic.com/\n" +
 			"  Your workspace ID (wrkspc_...) goes in ANTHROPIC_WORKSPACE_ID instead")
 	}
 
@@ -76,7 +76,7 @@ func (c *Client) complete(ctx context.Context, req anthropicRequest) (*anthropic
 
 	resp, err := c.httpClient.Do(httpReq)
 	if err != nil {
-		return nil, fmt.Errorf("Anthropic API request failed , check your internet connection: %w", err)
+		return nil, fmt.Errorf("Anthropic API request failed. check your internet connection: %w", err)
 	}
 	defer resp.Body.Close()
 
@@ -89,11 +89,11 @@ func (c *Client) complete(ctx context.Context, req anthropicRequest) (*anthropic
 	case http.StatusOK:
 		// ok, fall through
 	case http.StatusUnauthorized:
-		return nil, fmt.Errorf("Anthropic API key is invalid , check your ANTHROPIC_API_KEY environment variable")
+		return nil, fmt.Errorf("Anthropic API key is invalid. check your ANTHROPIC_API_KEY environment variable")
 	case http.StatusTooManyRequests:
-		return nil, fmt.Errorf("Anthropic API rate limit exceeded , wait a moment and try again")
+		return nil, fmt.Errorf("Anthropic API rate limit exceeded. wait a moment and try again")
 	case 529:
-		return nil, fmt.Errorf("Anthropic API is overloaded , try again in a moment")
+		return nil, fmt.Errorf("Anthropic API is overloaded. try again in a moment")
 	default:
 		// Try to extract the error message from the response body.
 		var errResp anthropicResponse

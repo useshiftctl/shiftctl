@@ -17,7 +17,7 @@ import (
 func LoadOrInit(migrationName string, p *plan.Plan) (*State, error) {
 	s, err := Load(migrationName)
 	if err == nil {
-		// Validate that the loaded state matches the current plan , if the
+		// Validate that the loaded state matches the current plan; if the
 		// plan was regenerated with a different number of stages, reinitialise.
 		if len(s.Stages) == len(p.Stages) {
 			return s, nil
@@ -119,7 +119,7 @@ func NextPendingStage(s *State) (*StageState, error) {
 			prev := s.Stages[i-1]
 			if prev.Status != StatusVerified {
 				return nil, fmt.Errorf(
-					"Stage %d cannot be approved yet , Stage %d must complete and be verified first\n"+
+					"Stage %d cannot be approved yet. Stage %d must complete and be verified first\n"+
 						"(Stage %d is currently: %s)",
 					stage.Number, prev.Number, prev.Number, prev.Status,
 				)
@@ -141,7 +141,7 @@ func Transition(s *State, stageNumber int, to StageStatus) error {
 	return Save(s)
 }
 
-// , Helpers ──────────────────────────────────────────────────────────────────
+// Helpers ──────────────────────────────────────────────────────────────────
 
 func initFromPlan(p *plan.Plan) *State {
 	stages := make([]StageState, len(p.Stages))

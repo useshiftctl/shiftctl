@@ -41,7 +41,7 @@ func Load(migrationName string) (*Plan, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return nil, fmt.Errorf("no plan found for migration %q , run 'shiftctl plan %s' first", migrationName, migrationName)
+			return nil, fmt.Errorf("no plan found for migration %q. run 'shiftctl plan %s' first", migrationName, migrationName)
 		}
 		return nil, fmt.Errorf("reading plan: %w", err)
 	}

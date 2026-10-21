@@ -18,7 +18,7 @@ approval. Uses AI to analyze your repositories and propose a migration plan ,
 you review and approve every step before anything runs.
 
 To remove all local data at any time: shiftctl disconnect --purge`,
-	// No RunE , show help by default when called with no subcommand.
+	// No RunE. show help by default when called with no subcommand.
 }
 
 // Execute is the entry point called from main.

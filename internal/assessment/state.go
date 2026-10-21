@@ -25,7 +25,7 @@ type State struct {
 }
 
 // SaveFacts writes the scanning results to disk. Called after scanning
-// completes, before the AI analysis begins , so a crash between the two phases
+// completes, before the AI analysis begins. so a crash between the two phases
 // can resume from the saved facts rather than re-scanning.
 func SaveFacts(migrationName string, facts []githubscanner.RepoFact) error {
 	s := &State{
@@ -59,7 +59,7 @@ func Load(migrationName string) (*State, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return nil, fmt.Errorf("no assessment found for migration %q , run 'shiftctl assess %s' first", migrationName, migrationName)
+			return nil, fmt.Errorf("no assessment found for migration %q. run 'shiftctl assess %s' first", migrationName, migrationName)
 		}
 		return nil, fmt.Errorf("reading assessment state: %w", err)
 	}

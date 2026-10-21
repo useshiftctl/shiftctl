@@ -53,7 +53,7 @@ func runDecommission(_ *cobra.Command, args []string) error {
 	// ── Load execstate ────────────────────────────────────────────────────────
 	p, err := plan.Load(name)
 	if err != nil {
-		return fmt.Errorf("no plan found for %q , cannot verify completion status", name)
+		return fmt.Errorf("no plan found for %q. cannot verify completion status", name)
 	}
 
 	exec, err := execstate.LoadOrInit(name, p)
@@ -82,13 +82,13 @@ func runDecommission(_ *cobra.Command, args []string) error {
 			),
 		).Run(); err != nil {
 			if err == huh.ErrUserAborted {
-				fmt.Println("\n  Decommission cancelled , nothing changed.")
+				fmt.Println("\n  Decommission cancelled. nothing changed.")
 				return nil
 			}
 			return err
 		}
 		if !confirmed {
-			fmt.Println("\n  Decommission cancelled , nothing changed.")
+			fmt.Println("\n  Decommission cancelled. nothing changed.")
 			return nil
 		}
 	}
@@ -120,12 +120,12 @@ func runDecommission(_ *cobra.Command, args []string) error {
 	return nil
 }
 
-// , Display helpers ────────────────────────────────────────────────────────────
+// Display helpers ────────────────────────────────────────────────────────────
 
 func printDecommissionPreview(rec *migration.Record, exec *execstate.State) {
 	fmt.Println()
 	fmt.Println(rule)
-	fmt.Printf("  %s  Complete migration , %s\n",
+	fmt.Printf("  %s  Complete migration. %s\n",
 		bold.Render("shiftctl decommission"),
 		bold.Render(rec.Name),
 	)
@@ -174,7 +174,7 @@ func printDecommissionResult(name string, exec *execstate.State, errs []string) 
 	fmt.Println()
 }
 
-// , Logic helpers ─────────────────────────────────────────────────────────────
+// Logic helpers ─────────────────────────────────────────────────────────────
 
 func requireAllVerified(exec *execstate.State) error {
 	for _, s := range exec.Stages {

@@ -7,7 +7,7 @@ import (
 	"github.com/useshiftctl/shiftctl/internal/migration"
 )
 
-// , SanitizeName ──────────────────────────────────────────────────────────────
+// SanitizeName ──────────────────────────────────────────────────────────────
 
 func TestSanitizeName(t *testing.T) {
 	tests := []struct {
@@ -35,7 +35,7 @@ func TestSanitizeName(t *testing.T) {
 	}
 }
 
-// , ValidateName ──────────────────────────────────────────────────────────────
+// ValidateName ──────────────────────────────────────────────────────────────
 
 func TestValidateName(t *testing.T) {
 	valid := []string{
@@ -44,7 +44,7 @@ func TestValidateName(t *testing.T) {
 		"abc123",
 		"my_migration",
 		"github-gitlab-2026",
-		"GitHub GitLab", // sanitizes to "github-gitlab" , valid
+		"GitHub GitLab", // sanitizes to "github-gitlab". valid
 	}
 	for _, name := range valid {
 		t.Run("valid:"+name, func(t *testing.T) {
@@ -69,7 +69,7 @@ func TestValidateName(t *testing.T) {
 	}
 }
 
-// , Save / Load / Exists / ListAll ────────────────────────────────────────────
+// Save / Load / Exists / ListAll ────────────────────────────────────────────
 
 func TestSaveAndLoad(t *testing.T) {
 	t.Setenv("HOME", t.TempDir())

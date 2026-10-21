@@ -4,7 +4,7 @@ import "time"
 
 // RepoFact is the structured, redacted set of facts extracted from a single
 // GitHub repository. This is what gets written to disk and sent to the AI for
-// analysis , no raw file contents are included.
+// analysis. no raw file contents are included.
 type RepoFact struct {
 	Owner           string    `json:"owner"`
 	Name            string    `json:"name"`
@@ -68,7 +68,7 @@ type DependencyFileFact struct {
 	Dependencies []string `json:"dependencies"`  // names only, no versions
 }
 
-// , GitHub REST API response shapes (unexported, used only during scanning) ,
+// GitHub REST API response shapes (unexported, used only during scanning) ,
 
 type githubAPIRepo struct {
 	Name          string    `json:"name"`

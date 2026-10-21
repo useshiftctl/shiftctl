@@ -50,7 +50,7 @@ func (s *Scanner) ValidateAndGetUsername(ctx context.Context) (string, error) {
 		return "", fmt.Errorf("GitLab credential validation failed: %w", err)
 	}
 	if user.Username == "" {
-		return "", fmt.Errorf("could not retrieve GitLab username , check token scopes (need: read_api)")
+		return "", fmt.Errorf("could not retrieve GitLab username. check token scopes (need: read_api)")
 	}
 	return user.Username, nil
 }
@@ -168,7 +168,7 @@ func (s *Scanner) scanProject(ctx context.Context, proj glProject) githubscanner
 	return fact
 }
 
-// , Sub-call implementations ─────────────────────────────────────────────────
+// Sub-call implementations ─────────────────────────────────────────────────
 
 func (s *Scanner) fetchWebhooks(ctx context.Context, projectID int) ([]githubscanner.WebhookFact, error) {
 	path := fmt.Sprintf("/projects/%d/hooks?per_page=%d", projectID, perPage)
@@ -320,7 +320,7 @@ func (s *Scanner) fetchDependencyFiles(ctx context.Context, projectID int, branc
 	return facts, nil
 }
 
-// , Project listing ────────────────────────────────────────────────────────────
+// Project listing ────────────────────────────────────────────────────────────
 
 func (s *Scanner) listAllProjects(ctx context.Context) ([]glProject, error) {
 	var all []glProject
@@ -340,7 +340,7 @@ func (s *Scanner) listAllProjects(ctx context.Context) ([]glProject, error) {
 	return all, nil
 }
 
-// , GitLab API types ───────────────────────────────────────────────────────────
+// GitLab API types ───────────────────────────────────────────────────────────
 
 type glUser struct {
 	Username string `json:"username"`
@@ -402,7 +402,7 @@ type glFile struct {
 	FileName string `json:"file_name"`
 }
 
-// , HTTP helpers ──────────────────────────────────────────────────────────────
+// HTTP helpers ──────────────────────────────────────────────────────────────
 
 func (s *Scanner) getJSON(ctx context.Context, path string, out interface{}) error {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, apiBase+path, nil)
@@ -463,7 +463,7 @@ func (s *Scanner) getRaw(ctx context.Context, path string) ([]byte, error) {
 	}
 }
 
-// , Conversion helpers ────────────────────────────────────────────────────────
+// Conversion helpers ────────────────────────────────────────────────────────
 
 func repoFactFromGL(p glProject) githubscanner.RepoFact {
 	parts := strings.SplitN(p.PathWithNamespace, "/", 2)
@@ -540,7 +540,7 @@ func truncate(s string, max int) string {
 	return s[:max] + "…"
 }
 
-// , Dependency parsers ────────────────────────────────────────────────────────
+// Dependency parsers ────────────────────────────────────────────────────────
 
 func parseDependencyContent(filename, content string) ([]string, error) {
 	switch filename {

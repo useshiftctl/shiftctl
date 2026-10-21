@@ -160,7 +160,7 @@ func (s *Scanner) scanRepo(ctx context.Context, repo githubAPIRepo) RepoFact {
 	return fact
 }
 
-// , Sub-call implementations ─────────────────────────────────────────────────
+// Sub-call implementations ─────────────────────────────────────────────────
 
 func (s *Scanner) fetchWebhooks(ctx context.Context, fullName string) ([]WebhookFact, error) {
 	var hooks []githubAPIHook
@@ -320,7 +320,7 @@ func (s *Scanner) fetchDependencyFiles(ctx context.Context, fullName string) ([]
 	return facts, nil
 }
 
-// , Dependency content parsers ───────────────────────────────────────────────
+// Dependency content parsers ───────────────────────────────────────────────
 
 func parseDependencyContent(filename, b64content string) ([]string, error) {
 	raw, err := base64.StdEncoding.DecodeString(strings.ReplaceAll(b64content, "\n", ""))
@@ -459,7 +459,7 @@ func parseGemfile(content string) []string {
 	return gems
 }
 
-// , HTTP helpers ─────────────────────────────────────────────────────────────
+// HTTP helpers ─────────────────────────────────────────────────────────────
 
 func (s *Scanner) getJSON(ctx context.Context, path string, out interface{}) error {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, apiBase+path, nil)
@@ -497,7 +497,7 @@ func (s *Scanner) getJSON(ctx context.Context, path string, out interface{}) err
 	}
 }
 
-// , Helpers ──────────────────────────────────────────────────────────────────
+// Helpers ──────────────────────────────────────────────────────────────────
 
 func repoFactFromAPI(r githubAPIRepo) RepoFact {
 	visibility := "private"

@@ -90,7 +90,7 @@ func migrationStatusLine(name string, recStatus migration.Status) string {
 	// Try to load plan + execstate for a richer status.
 	p, err := plan.Load(name)
 	if err != nil {
-		// No plan yet , show the record status.
+		// No plan yet. show the record status.
 		return dim.Render(string(recStatus))
 	}
 
@@ -104,18 +104,18 @@ func migrationStatusLine(name string, recStatus migration.Status) string {
 		s := exec.Stages[i]
 		switch s.Status {
 		case execstate.StatusVerified:
-			// Keep going , maybe all are verified.
+			// Keep going. maybe all are verified.
 			continue
 		case execstate.StatusVerifying:
-			return fmt.Sprintf("stage %d , verifying", s.Number)
+			return fmt.Sprintf("stage %d. verifying", s.Number)
 		case execstate.StatusInterrupted:
-			return cross + fmt.Sprintf(" stage %d , interrupted", s.Number)
+			return cross + fmt.Sprintf(" stage %d. interrupted", s.Number)
 		case execstate.StatusExecuting:
-			return fmt.Sprintf("stage %d , executing", s.Number)
+			return fmt.Sprintf("stage %d. executing", s.Number)
 		case execstate.StatusApproved:
-			return fmt.Sprintf("stage %d , approved, ready to execute", s.Number)
+			return fmt.Sprintf("stage %d. approved, ready to execute", s.Number)
 		case execstate.StatusPending:
-			// Pending means nothing is executing , fall through to show what's waiting.
+			// Pending means nothing is executing. fall through to show what's waiting.
 		}
 	}
 
@@ -131,10 +131,10 @@ func migrationStatusLine(name string, recStatus migration.Status) string {
 		return check + " all stages verified"
 	}
 
-	// Nothing active , find first pending stage.
+	// Nothing active. find first pending stage.
 	for _, s := range exec.Stages {
 		if s.Status == execstate.StatusPending {
-			return fmt.Sprintf("stage %d , pending approval", s.Number)
+			return fmt.Sprintf("stage %d. pending approval", s.Number)
 		}
 	}
 

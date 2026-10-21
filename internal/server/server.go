@@ -146,7 +146,7 @@ func (s *Server) buildState() (*CombinedState, error) {
 		st.AnthropicKeyError = "Anthropic API key not found. Add it on the Setup screen or set ANTHROPIC_API_KEY in your terminal."
 	} else if strings.HasPrefix(apiKey, "wrkspc_") {
 		st.AnthropicKeyMissing = true
-		st.AnthropicKeyError = "ANTHROPIC_API_KEY is set to a workspace ID, not an API key. Your API key starts with 'sk-ant-...' , find it at https://console.anthropic.com/"
+		st.AnthropicKeyError = "ANTHROPIC_API_KEY is set to a workspace ID, not an API key. Your API key starts with 'sk-ant-...'. Find it at https://console.anthropic.com/"
 	}
 
 	rec, err := migration.Load(s.name)
@@ -621,7 +621,7 @@ func buildMarkdownRecord(rec *migration.Record, p *plan.Plan, exec *execstate.St
 	sb.WriteString(fmt.Sprintf("%d items across %d stages.\n\n", total, len(p.Stages)))
 
 	for _, stage := range p.Stages {
-		sb.WriteString(fmt.Sprintf("## Stage %d , %s (%d items)\n\n", stage.Number, stage.Label, len(stage.Repos)))
+		sb.WriteString(fmt.Sprintf("## Stage %d: %s (%d items)\n\n", stage.Number, stage.Label, len(stage.Repos)))
 		if exec != nil {
 			for _, ss := range exec.Approvals {
 				if ss.StageNumber == stage.Number {
@@ -635,7 +635,7 @@ func buildMarkdownRecord(rec *migration.Record, p *plan.Plan, exec *execstate.St
 			if corrections[repo.FullName] != "" {
 				source = "User correction"
 			}
-			sb.WriteString(fmt.Sprintf("- %s , %s, %s risk , %s\n", repo.FullName, repo.Confidence, repo.RiskLevel, source))
+			sb.WriteString(fmt.Sprintf("- %s (%s, %s risk) %s\n", repo.FullName, repo.Confidence, repo.RiskLevel, source))
 		}
 		sb.WriteString("\n")
 	}
@@ -1265,7 +1265,7 @@ func (s *Server) handleConnect(w http.ResponseWriter, r *http.Request) {
 
 	// Guard: don't overwrite an existing migration.
 	if exists, _ := migration.Exists(s.name); exists {
-		writeJSONStatus(w, http.StatusConflict, map[string]any{"error": "migration already exists , disconnect first"})
+		writeJSONStatus(w, http.StatusConflict, map[string]any{"error": "migration already exists. Disconnect first."})
 		return
 	}
 

@@ -36,7 +36,7 @@ func (g *gitHubImpl) CredentialInstructions() string {
   2. Give it a name (e.g. "shiftctl-migration")
   3. Set an expiry date
   4. Select the "repo" scope (full control of private repositories)
-  5. Click "Generate token" and copy the result , it starts with "ghp_"
+  5. Click "Generate token" and copy the result. it starts with "ghp_"
 
   Fine-grained token (more secure):
   1. Go to https://github.com/settings/personal-access-tokens/new
@@ -46,7 +46,7 @@ func (g *gitHubImpl) CredentialInstructions() string {
        Metadata: Read-only
        Webhooks: Read and write
        Administration: Read and write
-  4. Click "Generate token" , it starts with "github_pat_"`
+  4. Click "Generate token". it starts with "github_pat_"`
 }
 
 func (g *gitHubImpl) CredentialPrompt() string {
@@ -64,7 +64,7 @@ func (g *gitHubImpl) ValidateCredential(ctx context.Context, credential string) 
 		return "", fmt.Errorf("GitHub credential validation failed: %w", err)
 	}
 	if user.Login == "" {
-		return "", fmt.Errorf("GitHub returned an empty username , check token scopes (need: repo)")
+		return "", fmt.Errorf("GitHub returned an empty username. check token scopes (need: repo)")
 	}
 	return user.Login, nil
 }
@@ -169,7 +169,7 @@ func (g *gitHubImpl) MigrateMetadata(ctx context.Context, credential string, act
 	return nil
 }
 
-// , GitHub API types ──────────────────────────────────────────────────────────
+// GitHub API types ──────────────────────────────────────────────────────────
 
 type ghRepo struct {
 	ID       int    `json:"id"`
@@ -182,7 +182,7 @@ type ghRepo struct {
 	} `json:"owner"`
 }
 
-// , Internal helpers ──────────────────────────────────────────────────────────
+// Internal helpers ──────────────────────────────────────────────────────────
 
 func (g *gitHubImpl) findRepo(ctx context.Context, credential, owner, name string) (*ghRepo, error) {
 	apiURL := fmt.Sprintf("https://api.github.com/repos/%s/%s", owner, name)
@@ -198,7 +198,7 @@ func (g *gitHubImpl) migrationActionFromRepo(r *ghRepo, sourceFullName, credenti
 	pushURL := strings.Replace(r.CloneURL, "https://", "https://"+credential+"@", 1)
 	return &MigrationAction{
 		RepoFullName:  sourceFullName,
-		DestRepoID:    r.FullName, // "owner/repo" , used in API paths
+		DestRepoID:    r.FullName, // "owner/repo". used in API paths
 		PushURL:       pushURL,
 		DestWebURL:    r.HTMLURL,
 		DestNamespace: r.Owner.Login,
@@ -274,7 +274,7 @@ func (g *gitHubImpl) applyBranchProtection(ctx context.Context, credential, repo
 	body, _ := json.Marshal(protectReq{
 		EnforceAdmins:              bp.EnforcesAdmins,
 		RequiredPullRequestReviews: pr,
-		Restrictions:               nil, // no push restrictions , would need team/user lists
+		Restrictions:               nil, // no push restrictions. would need team/user lists
 	})
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodPut,

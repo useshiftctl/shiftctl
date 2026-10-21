@@ -58,7 +58,7 @@ func (s *Scanner) ValidateAndGetUsername(ctx context.Context) (string, error) {
 		return "", fmt.Errorf("Bitbucket credential validation failed: %w", err)
 	}
 	if user.AccountID == "" && user.Nickname == "" {
-		return "", fmt.Errorf("could not retrieve Bitbucket user info , check token scopes")
+		return "", fmt.Errorf("could not retrieve Bitbucket user info. check token scopes")
 	}
 	name := user.Nickname
 	if name == "" {
@@ -180,7 +180,7 @@ func (s *Scanner) scanRepo(ctx context.Context, repo bbRepo) githubscanner.RepoF
 	return fact
 }
 
-// , Sub-call implementations ─────────────────────────────────────────────────
+// Sub-call implementations ─────────────────────────────────────────────────
 
 func (s *Scanner) fetchWebhooks(ctx context.Context, fullName string) ([]githubscanner.WebhookFact, error) {
 	path := "/repositories/" + fullName + "/hooks?pagelen=" + fmt.Sprint(pageLen)
@@ -326,7 +326,7 @@ func (s *Scanner) fetchDependencyFiles(ctx context.Context, fullName, branch str
 	return facts, nil
 }
 
-// , Repository listing ────────────────────────────────────────────────────────
+// Repository listing ────────────────────────────────────────────────────────
 
 func (s *Scanner) listAllRepos(ctx context.Context) ([]bbRepo, error) {
 	var all []bbRepo
@@ -343,7 +343,7 @@ func (s *Scanner) listAllRepos(ctx context.Context) ([]bbRepo, error) {
 	return all, nil
 }
 
-// , Bitbucket API types ───────────────────────────────────────────────────────
+// Bitbucket API types ───────────────────────────────────────────────────────
 
 type bbPage[T any] struct {
 	Values []T    `json:"values"`
@@ -424,7 +424,7 @@ type bbBranchRestriction struct {
 	} `json:"groups"`
 }
 
-// , HTTP helpers ──────────────────────────────────────────────────────────────
+// HTTP helpers ──────────────────────────────────────────────────────────────
 
 func (s *Scanner) getJSON(ctx context.Context, path string, out interface{}) error {
 	return s.getJSONAbsolute(ctx, apiBase+path, out)
@@ -452,7 +452,7 @@ func (s *Scanner) getJSONAbsolute(ctx context.Context, fullURL string, out inter
 		io.Copy(io.Discard, resp.Body)
 		return errNotFound
 	case http.StatusUnauthorized:
-		return fmt.Errorf("invalid Bitbucket credentials (401) , check your username and app password")
+		return fmt.Errorf("invalid Bitbucket credentials (401). check your username and app password")
 	case http.StatusForbidden:
 		io.Copy(io.Discard, resp.Body)
 		return errNotFound
@@ -489,7 +489,7 @@ func (s *Scanner) getRaw(ctx context.Context, path string) ([]byte, error) {
 	}
 }
 
-// , Conversion helpers ────────────────────────────────────────────────────────
+// Conversion helpers ────────────────────────────────────────────────────────
 
 func repoFactFromBB(r bbRepo) githubscanner.RepoFact {
 	parts := strings.SplitN(r.FullName, "/", 2)
@@ -565,7 +565,7 @@ func truncate(s string, max int) string {
 	return s[:max] + "…"
 }
 
-// , Dependency parsers (re-implemented here to avoid cross-package dep) ───────
+// Dependency parsers (re-implemented here to avoid cross-package dep) ───────
 
 func parseDependencyContent(filename, content string) ([]string, error) {
 	switch filename {

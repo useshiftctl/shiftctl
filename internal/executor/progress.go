@@ -230,7 +230,7 @@ func Summary(p *StageProgress) (done, failed, uncertain, pending int) {
 	return
 }
 
-// , Helpers ───────────────────────────────────────────────────────────────────
+// Helpers ───────────────────────────────────────────────────────────────────
 
 func itemIndex(p *StageProgress, fullName string) int {
 	for i, it := range p.Items {

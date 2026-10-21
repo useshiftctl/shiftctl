@@ -12,16 +12,16 @@ import (
 // Build converts an assessment into a staged Plan. The staging rules follow
 // the spec exactly:
 //
-//   Stage 1 , confidence=confirmed AND risk=low
-//   Stage 2 , confidence=best_guess (any risk) OR risk=medium (any confidence)
-//   Stage 3 , confidence=confirmed AND risk=high
+//   Stage 1. confidence=confirmed AND risk=low
+//   Stage 2. confidence=best_guess (any risk) OR risk=medium (any confidence)
+//   Stage 3. confidence=confirmed AND risk=high
 //
 // Repos with scan errors or missing from the AI analysis are placed in Stage 2
 // (treated as uncertain). Within each stage, repos are ordered so that
 // dependencies come before the repos that depend on them.
 func Build(state *assessment.State) (*Plan, error) {
 	if state.Analysis == nil {
-		return nil, fmt.Errorf("assessment has no analysis , run 'shiftctl assess %s' first", state.MigrationName)
+		return nil, fmt.Errorf("assessment has no analysis. run 'shiftctl assess %s' first", state.MigrationName)
 	}
 
 	// Index the AI analysis by full_name for fast lookup.
@@ -36,7 +36,7 @@ func Build(state *assessment.State) (*Plan, error) {
 	for _, fact := range state.Facts {
 		analysis, found := byName[fact.FullName]
 		if !found {
-			// AI did not return an assessment for this repo , place in Stage 2.
+			// AI did not return an assessment for this repo. place in Stage 2.
 			reason := "not assessed by AI"
 			if fact.ScanError != "" {
 				reason = "scan error: " + fact.ScanError
@@ -76,7 +76,7 @@ func Build(state *assessment.State) (*Plan, error) {
 	}
 
 	if len(stages) == 0 {
-		return nil, fmt.Errorf("no repositories to plan , the assessment may be empty")
+		return nil, fmt.Errorf("no repositories to plan. the assessment may be empty")
 	}
 
 	// Re-number stages sequentially in case any bucket was empty.

@@ -125,7 +125,7 @@ func ListAll() ([]string, error) {
 		if !e.IsDir() {
 			continue
 		}
-		// Verify a record.json exists inside , guards against leftover temp dirs.
+		// Verify a record.json exists inside. guards against leftover temp dirs.
 		recPath := filepath.Join(dir, e.Name(), "record.json")
 		if _, err := os.Stat(recPath); err == nil {
 			names = append(names, e.Name())

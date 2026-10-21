@@ -21,7 +21,7 @@ type RepoResult struct {
 }
 
 // RecoveryReport summarises what happened to uncertain items during startup
-// recovery , whether they were confirmed done or need to be re-run.
+// recovery: whether they were confirmed done or need to be re-run.
 type RecoveryReport struct {
 	Confirmed []string // full names confirmed present on destination
 	Requeued  []string // full names that were not found and will be re-run
@@ -106,7 +106,7 @@ func Run(
 			opts.ProgressFn(result, prog)
 		}
 		if ctx.Err() != nil {
-			// Context cancelled , stop processing further items.
+			// Context cancelled; stop processing further items.
 			break
 		}
 	}
@@ -190,7 +190,7 @@ func recoverUncertain(
 	for _, item := range uncertain {
 		parts := strings.SplitN(item.FullName, "/", 2)
 		if len(parts) != 2 {
-			// Can't verify , reset to pending.
+			// Can't verify; reset to pending.
 			_ = resetToPending(prog, item.FullName)
 			report.Requeued = append(report.Requeued, item.FullName)
 			continue
@@ -248,12 +248,12 @@ func mirrorPush(ctx context.Context, srcURL, dstURL string) error {
 func CheckGitAvailable() error {
 	_, err := exec.LookPath("git")
 	if err != nil {
-		return fmt.Errorf("git is not installed or not on PATH , shiftctl requires git to push repository content")
+		return fmt.Errorf("git is not installed or not on PATH. shiftctl requires git to push repository content")
 	}
 	return nil
 }
 
-// , Small helpers ─────────────────────────────────────────────────────────────
+// Small helpers ─────────────────────────────────────────────────────────────
 
 // sourceCloneURL builds an authenticated git clone URL for the given source
 // platform. fullName is "owner/repo" for GitHub/GitLab/Bitbucket, and
