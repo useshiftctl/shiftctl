@@ -18,9 +18,9 @@ var planCmd = &cobra.Command{
 	Short: "Generate a staged migration plan from the assessment",
 	Long: `Read the completed assessment and group repositories into three stages:
 
-  Stage 1 — Confirmed, low risk. Moved first.
-  Stage 2 — Best guess or uncertain. Held until Stage 1 succeeds.
-  Stage 3 — Confirmed high risk. Moved last, when confidence is highest.
+  Stage 1 , Confirmed, low risk. Moved first.
+  Stage 2 , Best guess or uncertain. Held until Stage 1 succeeds.
+  Stage 3 , Confirmed high risk. Moved last, when confidence is highest.
 
 Within each stage, repositories that depend on other repositories in the same
 stage are ordered so dependencies come first.
@@ -109,7 +109,7 @@ func printPlan(p *plan.Plan) {
 
 	fmt.Println()
 	fmt.Println(rule)
-	fmt.Printf("  %s  Migration plan — %s\n", bold.Render("shiftctl"), p.MigrationName)
+	fmt.Printf("  %s  Migration plan , %s\n", bold.Render("shiftctl"), p.MigrationName)
 	fmt.Printf("  %d repositories across %d stage(s)\n",
 		totalRepos, len(p.Stages))
 	fmt.Println(rule)
@@ -136,7 +136,7 @@ func printStage(s plan.Stage) {
 	}
 
 	fmt.Println()
-	fmt.Printf("  %s  Stage %d — %s\n",
+	fmt.Printf("  %s  Stage %d , %s\n",
 		stageIcon(s.Number, len(s.Repos)),
 		s.Number,
 		bold.Render(s.Label),
@@ -161,7 +161,7 @@ func printStage(s plan.Stage) {
 
 	for _, repo := range s.Repos {
 		// Main row.
-		deps := "—"
+		deps := ","
 		if len(repo.DependsOn) > 0 {
 			// Show short names (after the slash) to keep the line readable.
 			shorts := make([]string, len(repo.DependsOn))
@@ -192,7 +192,7 @@ func printStage(s plan.Stage) {
 				dim.Render(repo.ScanError),
 			)
 		} else if repo.Evidence != "" && repo.Confidence == "best_guess" {
-			// Only show evidence inline for best_guess items — for confirmed
+			// Only show evidence inline for best_guess items , for confirmed
 			// items the user can inspect the full assessment file. Showing
 			// evidence for every confirmed item makes Stage 1 lists noisy.
 			fmt.Printf("  %s %s\n",
@@ -210,12 +210,12 @@ func printStage(s plan.Stage) {
 
 func printKnownUnknowns(kus []plan.KnownUnknown) {
 	fmt.Println()
-	fmt.Printf("  %s  Heads Up — %d item(s) to review before approving\n",
+	fmt.Printf("  %s  Heads Up , %d item(s) to review before approving\n",
 		bold.Render("ℹ"), len(kus))
 	fmt.Printf("  %s\n",
 		dim.Render("These were detected but couldn't be fully assessed from facts alone."))
 	fmt.Printf("  %s\n",
-		dim.Render("Review them manually — they don't block the plan but may affect your approach."))
+		dim.Render("Review them manually , they don't block the plan but may affect your approach."))
 	fmt.Println()
 	for _, ku := range kus {
 		scope := ku.Scope

@@ -139,7 +139,7 @@ func checkGitReachable(ctx context.Context, remoteURL string) error {
 		return fmt.Errorf("git ls-remote: %w", err)
 	}
 	if strings.TrimSpace(string(out)) == "" {
-		return fmt.Errorf("repository exists but has no refs — content may not have pushed correctly")
+		return fmt.Errorf("repository exists but has no refs , content may not have pushed correctly")
 	}
 	return nil
 }
@@ -152,7 +152,7 @@ func destPushURL(dest destination.Destination, credential, namespace, repoName s
 	case "github":
 		return fmt.Sprintf("https://%s@github.com/%s/%s.git", credential, namespace, repoName)
 	case "bitbucket":
-		// credential is "username:app_password" — embed as-is.
+		// credential is "username:app_password" , embed as-is.
 		return fmt.Sprintf("https://%s@bitbucket.org/%s/%s.git", credential, namespace, repoName)
 	case "azuredevops":
 		// credential is "org:pat"; use empty username + PAT for basic auth.

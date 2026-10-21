@@ -22,7 +22,7 @@ func removeAll(path string) {
 
 // plannedRepoToFact builds a minimal RepoFact from the information stored in
 // the plan. The plan does not store full scan facts (webhooks, branch
-// protection, etc.) — those are only available from the live assessment state.
+// protection, etc.) , those are only available from the live assessment state.
 // For the execute command, PrepareRepo only needs Name, FullName, Description,
 // and Visibility, so this is sufficient.
 func plannedRepoToFact(r plan.PlannedRepo) githubscanner.RepoFact {

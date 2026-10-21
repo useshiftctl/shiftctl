@@ -43,7 +43,7 @@
   .topbar-brand-group { display: flex; align-items: center; gap: 16px; }
   .topbar-brand { font-weight: 600; font-size: 18px; letter-spacing: -0.3px; color: #344054; }
   .topbar-migration { font-size: 12px; color: #98a2b3; font-weight: 400; }
-  /* legacy — kept for other screens not yet rebuilt */
+  /* legacy, kept for other screens not yet rebuilt */
   .topbar-title { font-size: 14px; color: var(--text-secondary); }
   .topbar-status { display: flex; justify-content: flex-end; }
 
@@ -83,6 +83,12 @@
   .badge-dots span:nth-child(2) { animation-delay: 0.22s; }
   .badge-dots span:nth-child(3) { animation-delay: 0.44s; }
 
+  @keyframes indeterminate-bar {
+    0%   { transform: translateX(-100%); width: 40%; }
+    50%  { width: 60%; }
+    100% { transform: translateX(260%); width: 40%; }
+  }
+
   /* ── Topbar badge: shimmer sweep (topbar only) ── */
   @keyframes badge-shimmer {
     0%        { transform: skewX(-20deg) translateX(-180%); }
@@ -101,7 +107,7 @@
     animation: badge-shimmer 2.8s ease-in-out infinite;
   }
 
-  /* legacy bordered pill — kept for unrebuilt screens */
+  /* legacy bordered pill, kept for unrebuilt screens */
   .status-pill {
     display: inline-flex; align-items: center; gap: 6px;
     border: 1px solid var(--border); border-radius: 100px;
@@ -768,7 +774,7 @@ let hasUnsavedCorrection = false;
 let pollTimer = null;
 let planNoteOpen = new Set();    // stage numbers with note form open
 let planItemsHidden = new Set(); // stage numbers with items collapsed
-let seenAssessRepos = new Set(); // repo names already rendered — only new ones animate in
+let seenAssessRepos = new Set(); // repo names already rendered; only new ones animate in
 
 // ── Polling ──────────────────────────────────────────────────────────────────
 async function fetchState() {
@@ -783,14 +789,14 @@ async function fetchState() {
     if (prevScreen && prevScreen !== newState.screen) {
       clientScreen = null;
     }
-    // Skip re-render if nothing has changed — avoids blowing away focused inputs
+    // Skip re-render if nothing has changed; avoids blowing away focused inputs
     if (prevStateStr === JSON.stringify(newState) && prevScreen === newState.screen) return;
     // Skip re-render if user is actively typing in an input or textarea
     const ae = document.activeElement;
     if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA')) return;
     render();
   } catch (e) {
-    // ignore fetch errors — will retry
+    // ignore fetch errors; will retry
   }
 }
 
@@ -864,7 +870,7 @@ function updateTopBar() {
       const repoCount = assess ? assess.repo_count : 0;
       const _scanned = serverState.assess_scanned || 0;
       const _total = serverState.assess_total || 0;
-      if (hasAnalysis) { badgeClass = 'badge-dodger'; label = 'Scan complete'; }
+      if (hasAnalysis) { badgeClass = 'badge-apple'; label = 'Scan complete'; }
       else if (facts && facts.length > 0) { badgeClass = 'badge-lightblue'; label = `Analysing ${facts.length} repos`; isWaiting = true; }
       else if (_scanned > 0) { badgeClass = 'badge-lightblue'; label = `Scanning ${_scanned} of ${_total || '?'} repositories`; isWaiting = true; }
       else { badgeClass = 'badge-lightblue'; label = 'Scanning'; isWaiting = true; }
@@ -895,12 +901,12 @@ function updateTopBar() {
       const _isApproved = _stageState && _stageState.status === 'approved' && !serverState.execute_running;
       if (_interrupted) { badgeClass = 'badge-orange'; label = 'Reconnecting'; isWaiting = true; }
       else if (_isComplete) { badgeClass = 'badge-apple'; label = `Stage ${_as} of ${_totalStages} complete`; }
-      else if (_isApproved) { badgeClass = 'badge-warm'; label = `Stage ${_as} approved — ready to execute`; }
+      else if (_isApproved) { badgeClass = 'badge-orange'; label = `Stage ${_as} approved, ready to execute`; isWaiting = true; }
       else { badgeClass = 'badge-lightblue'; label = `Executing Stage ${_as} - item ${_doneCount + 1} of ${_items.length}`; isWaiting = true; }
       break;
     }
     case 'verifying': { const _vas = serverState.active_stage || 1; badgeClass = 'badge-lightblue'; label = `Verifying Stage ${_vas}`; isWaiting = true; break; }
-    case 'decommission': badgeClass = 'badge-warm'; label = 'Done - 0 items pending'; break;
+    case 'decommission': badgeClass = 'badge-apple'; label = 'Done - 0 items pending'; break;
     case 'decommission-complete': badgeClass = 'badge-apple'; label = 'Migration complete'; break;
     case 'export-preview':        badgeClass = 'badge-apple'; label = 'Migration complete'; break;
     default: badgeClass = 'badge-warm'; label = screen;
@@ -967,7 +973,7 @@ function renderFirstRun() {
 
         <div class="setup-card" style="display:flex;flex-direction:column;gap:8px;">
           <p style="font-family:'Inter',sans-serif;font-size:14px;font-weight:600;color:#344054;margin:0;">3. Anthropic API key</p>
-          <label style="font-family:'Inter',sans-serif;font-size:12px;color:#667185;">Required for AI assessment — stored in your macOS Keychain, never needed again. Get one at <a href="https://console.anthropic.com/" target="_blank" style="color:#1671d9;">console.anthropic.com</a></label>
+          <label style="font-family:'Inter',sans-serif;font-size:12px;color:#667185;">Required for AI assessment. Stored in your macOS Keychain, never needed again. Get one at <a href="https://console.anthropic.com/" target="_blank" style="color:#1671d9;">console.anthropic.com</a></label>
           <input type="password" id="fr-anthropic-key" placeholder="sk-ant-..."
             style="width:100%;border:1px solid #e4e7ec;border-radius:8px;padding:10px 14px;font-family:'Inter',sans-serif;font-size:13px;color:#344054;box-sizing:border-box;"
             value="${escHtml((window._frState && window._frState.anthropicKey) || '')}" />
@@ -976,7 +982,7 @@ function renderFirstRun() {
 
         <div class="setup-card" style="display:flex;flex-direction:column;gap:8px;">
           <p style="font-family:'Inter',sans-serif;font-size:14px;font-weight:600;color:#344054;margin:0;">4. Anything I should know? <span style="font-weight:400;color:#98a2b3;">(optional)</span></p>
-          <label style="font-family:'Inter',sans-serif;font-size:12px;color:#667185;">Your note — kept visually distinct from shiftctl's own responses</label>
+          <label style="font-family:'Inter',sans-serif;font-size:12px;color:#667185;">Your note, kept visually distinct from shiftctl's own responses</label>
           <input class="setup-input" id="fr-context" placeholder="Skip the marketing-team repos, needs to be done by end of Q3"
             value="${escHtml((window._frState && window._frState.context) || '')}" />
         </div>
@@ -1053,7 +1059,7 @@ function renderFirstRun() {
     if (!val) { anthropicStatus.textContent = ''; }
     else if (val.startsWith('wrkspc_')) {
       anthropicStatus.style.color = '#d42620';
-      anthropicStatus.textContent = 'That\'s a workspace ID — your key starts with sk-ant-...';
+      anthropicStatus.textContent = 'That\'s a workspace ID. Your key starts with sk-ant-...';
     } else {
       anthropicStatus.style.color = '#0f973d';
       anthropicStatus.textContent = '✓ Looks good';
@@ -1337,8 +1343,33 @@ function renderAssessment() {
   const knownUnknowns = assess && assess.analysis ? (assess.analysis.known_unknowns || []) : [];
 
   let repoCards = '';
+  const lastScanned = facts && facts.length > 0 ? facts[facts.length - 1].full_name : null;
+  const progressPct = assessTotal > 0 ? Math.min(100, Math.round((scanned / assessTotal) * 100)) : 0;
+
   if (items.length === 0) {
-    repoCards = `<p class="assess-side-body" style="padding:16px 0;">${serverState.assess_running ? (scanned > 0 ? `Scanning repositories… ${scanned} of ${assessTotal || '?'} done.` : 'Scanning repositories…') : 'No repositories found yet. Click Start Assessment to begin.'}</p>`;
+    if (serverState.assess_running) {
+      repoCards = `
+        <div style="display:flex;align-items:center;justify-content:center;padding:48px 0;">
+          <div style="width:100%;max-width:440px;background:#fff;border:1px solid #e4e7ec;border-radius:16px;padding:32px;display:flex;flex-direction:column;gap:20px;box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <span style="font-family:'Inter',sans-serif;font-size:14px;font-weight:600;color:#344054;">Scanning repositories</span>
+              <span style="font-family:'Inter',sans-serif;font-size:13px;color:#98a2b3;">${assessTotal > 0 ? `${scanned} of ${assessTotal} scanned` : 'Counting repositories…'}</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <div style="width:100%;height:6px;background:#e4e7ec;border-radius:999px;overflow:hidden;">
+                <div style="height:100%;width:${progressPct}%;background:#41bce2;border-radius:999px;transition:width 0.4s ease;"></div>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <span style="font-family:'Inter',sans-serif;font-size:12px;color:#98a2b3;">${lastScanned ? `↳ ${escHtml(lastScanned)}` : ''}</span>
+                <span style="font-family:'Inter',sans-serif;font-size:12px;font-weight:500;color:#41bce2;">${progressPct}%</span>
+              </div>
+            </div>
+            <p style="font-family:'Inter',sans-serif;font-size:12px;color:#98a2b3;margin:0;line-height:1.6;">Everything runs on your machine. Nothing is sent anywhere. You can safely switch tabs while this runs.</p>
+          </div>
+        </div>`;
+    } else {
+      repoCards = `<p class="assess-side-body" style="padding:16px 0;">No repositories found yet. Click Start Assessment to begin.</p>`;
+    }
   } else {
     repoCards = items.map((item, idx) => {
       const name = item.full_name || item.name || '';
@@ -1416,10 +1447,10 @@ function renderAssessment() {
               <p style="margin:0;font-size:12px;color:#1a5c35;font-family:Inter,sans-serif;line-height:1.5;">Review the findings below and flag anything that looks wrong before continuing to planning.</p>
             </div>
           ` : serverState.assess_error ? '' : scanning ? `
-            <p class="assess-side-body">AI is analysing your repositories. This can take a minute — nothing is sent anywhere, this all runs on your machine.</p>
+            <p class="assess-side-body">AI is analysing your repositories. This can take a minute. Nothing is sent anywhere, this all runs on your machine.</p>
             <div class="assess-callout">Running in the background. You can safely switch tabs.</div>
           ` : serverState.assess_running ? `
-            <p class="assess-side-body">${scanned > 0 ? `Scanning repositories… ${scanned} of ${assessTotal || '?'} done.` : 'Assessment starting — scanning your repositories now.'}</p>
+            <p class="assess-side-body">${scanned > 0 ? `Scanning repositories… ${scanned} of ${assessTotal || '?'} done.` : 'Assessment starting, scanning your repositories now.'}</p>
             <div class="assess-callout">Running in the background. You can safely switch tabs.</div>
           ` : `
             <p class="assess-side-body">Assessment not started yet.</p>
@@ -1428,22 +1459,29 @@ function renderAssessment() {
               <div style="background:#fff1f0;border:1px solid #fca5a5;border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;">
                 <p style="margin:0;font-size:13px;font-weight:600;color:#d42620;font-family:Inter,sans-serif;">Assessment failed</p>
                 <p style="margin:0;font-size:12px;color:#7f1d1d;font-family:Inter,sans-serif;line-height:1.5;">${escHtml(serverState.assess_error)}</p>
+                ${serverState.assess_error.toLowerCase().includes('invalid') || serverState.assess_error.toLowerCase().includes('api key') ? `
+                <p style="margin:0;font-size:12px;color:#7f1d1d;font-family:Inter,sans-serif;line-height:1.5;">To update your Anthropic key, run this in your terminal, then restart:<br><code style="font-family:monospace;background:#fde8e8;padding:2px 6px;border-radius:4px;">export ANTHROPIC_API_KEY=sk-ant-...</code></p>` : ''}
               </div>` : ''}
             ${statsText ? `<p class="assess-side-stats">${escHtml(statsText)}</p>` : ''}
             ${serverState.assess_error ? `<button class="hifi-btn-stroke" style="align-self:flex-start;margin-top:4px;" onclick="startAssessment(this)">Retry Assessment</button>` : ''}
             ${headsUp ? `
               <div class="assess-headsup">
-                <p class="assess-headsup-title">Heads Up — Couldn't fully confirm this one</p>
+                <p class="assess-headsup-title">Heads Up: Couldn't fully confirm this one</p>
                 <p class="assess-headsup-body">${escHtml(headsUp.description || '')}</p>
               </div>
             ` : ''}
           </div>
         </div>
       </div>
-      <div class="hifi-footer" style="justify-content:flex-end;">
-        <button class="${hasAnalysis ? 'hifi-btn-primary' : 'hifi-btn-disabled'}" id="btn-to-planning" ${!hasAnalysis ? 'disabled' : ''}>
-          ${hasAnalysis ? 'Continue to Planning' : serverState.assess_error ? 'Assessment failed — retry above' : 'Waiting for scan to complete…'}
-        </button>
+      <div class="hifi-footer">
+        <div class="footer-left">
+          ${!hasAnalysis && !serverState.assess_running ? `<button class="hifi-footer-link" onclick="clientScreen='setup';render()">← Back to Setup</button>` : ''}
+        </div>
+        <div class="footer-right">
+          <button class="${hasAnalysis ? 'hifi-btn-primary' : 'hifi-btn-disabled'}" id="btn-to-planning" ${!hasAnalysis ? 'disabled' : ''}>
+            ${hasAnalysis ? 'Continue to Planning' : serverState.assess_error ? 'Assessment failed, retry above' : 'Waiting for scan to complete…'}
+          </button>
+        </div>
       </div>
     </div>
   `);
@@ -1525,7 +1563,7 @@ function renderAssessment() {
 function renderPlanning() {
   const p = serverState.plan;
   if (!p || !p.stages || p.stages.length === 0) {
-    // Auto-generate the plan — no intermediate screen needed
+    // Auto-generate the plan; no intermediate screen needed
     generatePlan(null);
     setBody(`
       <div class="hifi-page">
@@ -1919,7 +1957,7 @@ function renderExecution() {
   const footerCountText = isInterrupted
     ? `${doneCount} of ${items.length} done${uncertainCount > 0 ? ' - ' + uncertainCount + ' uncertain' : ''}${notStartedCount > 0 ? ' - ' + notStartedCount + ' not started' : ''}`
     : isApprovedNotStarted
-      ? 'Stage approved — ready to execute'
+      ? 'Stage approved, ready to execute'
       : `${doneCount} of ${items.length} items complete`;
 
   // Footer button
@@ -1933,7 +1971,7 @@ function renderExecution() {
           ? `<button class="hifi-btn-disabled" disabled>Running…</button>`
           : `<button class="hifi-btn-primary" id="btn-pause">Resume Execution</button>`;
 
-  // Side panel — show credential form when needed
+  // Side panel; show credential form when needed
   const sidePanelHtml = `
     <p class="exec-side-title">If you pause</p>
     <p class="exec-side-body">Completed items stay live, they are not rolled back. In-progress items finish their current step, then stop. Not-started items are untouched.</p>
@@ -2032,7 +2070,7 @@ function renderExecution() {
       errEl.style.display = 'none';
       try {
         await postJSON('/api/destination-credential', { credential: input.value.trim() });
-        // Credential saved — now attempt execution again
+        // Credential saved; now attempt execution again
         const btn = document.createElement('button');
         btn.className = 'hifi-btn-primary';
         await startExecution(btn);
@@ -2066,13 +2104,41 @@ function renderVerifying() {
   let verified = 0, flagged = 0, total = 0;
   let itemsHtml = '';
 
+  const progressItems = (serverState.active_progress && serverState.active_progress.items) ? serverState.active_progress.items : [];
+  const migratedItems = progressItems.filter(i => i.status === 'done' || i.status === 'uncertain');
+
   if (!hasResults) {
     if (verifyRunning) {
-      itemsHtml = `<p style="font-family:'Inter',sans-serif;font-size:12px;color:#98a2b3;line-height:1.45;margin:0;">Verification in progress…</p>`;
+      itemsHtml = `
+        <div style="display:flex;align-items:center;justify-content:center;padding:48px 0;">
+          <div style="width:100%;max-width:440px;background:#fff;border:1px solid #e4e7ec;border-radius:16px;padding:32px;display:flex;flex-direction:column;gap:20px;box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <span style="font-family:'Inter',sans-serif;font-size:14px;font-weight:600;color:#344054;">Running verification checks</span>
+              <span style="font-family:'Inter',sans-serif;font-size:13px;color:#98a2b3;">Checking migrated repos against the destination…</span>
+            </div>
+            <div style="width:100%;height:6px;background:#e4e7ec;border-radius:999px;overflow:hidden;">
+              <div style="height:100%;width:60%;background:#41bce2;border-radius:999px;animation:indeterminate-bar 1.6s ease-in-out infinite;"></div>
+            </div>
+            <p style="font-family:'Inter',sans-serif;font-size:12px;color:#98a2b3;margin:0;line-height:1.6;">Everything runs on your machine. You can safely switch tabs while this runs.</p>
+          </div>
+        </div>`;
     } else if (verifyError) {
-      itemsHtml = `<p style="font-family:'Inter',sans-serif;font-size:13px;color:#d42620;line-height:1.45;margin:0;">${escHtml(verifyError)}</p>`;
+      itemsHtml = `<div style="background:#fff1f0;border:1px solid #fca5a5;border-radius:8px;padding:12px 14px;margin-top:8px;">
+        <p style="margin:0;font-size:13px;font-weight:600;color:#d42620;font-family:Inter,sans-serif;">Verification failed</p>
+        <p style="margin:0;font-size:12px;color:#7f1d1d;font-family:Inter,sans-serif;line-height:1.5;margin-top:4px;">${escHtml(verifyError)}</p>
+      </div>`;
     } else {
-      itemsHtml = `<p style="font-family:'Inter',sans-serif;font-size:12px;color:#98a2b3;line-height:1.45;margin:0;">Ready to verify — click Run Verification to check all migrated repos against the destination.</p>`;
+      const repoListHtml = migratedItems.length > 0
+        ? migratedItems.map(item => `
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border:1px solid #e4e7ec;border-radius:10px;background:#fff;">
+              <span style="font-family:'Inter',sans-serif;font-size:14px;font-weight:500;color:#344054;">${escHtml(item.full_name || item.name || '')}</span>
+              <span style="font-family:'Inter',sans-serif;font-size:12px;color:#98a2b3;font-weight:500;">${item.status === 'uncertain' ? 'Uncertain' : 'Migrated'}</span>
+            </div>`).join('')
+        : `<p style="font-family:'Inter',sans-serif;font-size:13px;color:#98a2b3;margin:0;">No items from this stage found.</p>`;
+      itemsHtml = `
+        <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px;">
+          ${repoListHtml}
+        </div>`;
     }
   } else {
     total = vr.items.length;
@@ -2131,12 +2197,36 @@ function renderVerifying() {
     btnIsVerify = true;
   }
 
+  const sidebarHtml = `
+    <div style="width:320px;flex-shrink:0;border-left:1px solid #e4e7ec;padding:28px 24px;display:flex;flex-direction:column;gap:16px;background:#fafafa;">
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <p style="font-family:'Inter',sans-serif;font-size:14px;font-weight:600;color:#344054;margin:0;">What verification checks</p>
+        <ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;">
+          <li style="font-family:'Inter',sans-serif;font-size:12px;color:#667185;line-height:1.5;">Repo exists at the destination and is accessible</li>
+          <li style="font-family:'Inter',sans-serif;font-size:12px;color:#667185;line-height:1.5;">Branch structure and default branch match</li>
+          <li style="font-family:'Inter',sans-serif;font-size:12px;color:#667185;line-height:1.5;">Commit count is within expected range</li>
+          <li style="font-family:'Inter',sans-serif;font-size:12px;color:#667185;line-height:1.5;">No unexpected config drift</li>
+        </ul>
+      </div>
+      <div style="background:#fff;border:1px solid #e4e7ec;border-radius:10px;padding:14px 16px;">
+        <p style="font-family:'Inter',sans-serif;font-size:12px;font-weight:600;color:#344054;margin:0 0 4px;">Anomalies are informational</p>
+        <p style="font-family:'Inter',sans-serif;font-size:12px;color:#667185;line-height:1.5;margin:0;">Flagged items don't block the next stage. They're surfaced for your review, not automatic failures.</p>
+      </div>
+      ${hasResults ? '' : `<div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;padding:14px 16px;">
+        <p style="font-family:'Inter',sans-serif;font-size:12px;font-weight:600;color:#0369a1;margin:0 0 4px;">Ready when you are</p>
+        <p style="font-family:'Inter',sans-serif;font-size:12px;color:#0c4a6e;line-height:1.5;margin:0;">All ${migratedItems.length || progressItems.length} migrated repo${(migratedItems.length || progressItems.length) !== 1 ? 's' : ''} will be checked. Click Run Verification to start.</p>
+      </div>`}
+    </div>`;
+
   setBody(`
     <div class="hifi-page">
-      <div style="flex:1;display:flex;flex-direction:column;gap:12px;padding:28px 32px;overflow-y:auto;background:#fff;min-height:0;">
-        <h1 style="font-family:'Inter',sans-serif;font-size:24px;font-weight:700;color:#344054;line-height:1.2;letter-spacing:-0.48px;margin:0;">Verifying Stage ${activeStage} of ${totalStages}${stageLabel ? ' - ' + escHtml(stageLabel) : ''}</h1>
-        <p style="font-family:'Inter',sans-serif;font-size:12px;color:#667185;line-height:1.45;margin:0;">Checking that everything migrated actually works before Stage ${nextStage} can be approved.</p>
-        ${itemsHtml}
+      <div style="flex:1;display:flex;min-height:0;overflow:hidden;">
+        <div style="flex:1;display:flex;flex-direction:column;gap:12px;padding:28px 32px;overflow-y:auto;background:#fff;">
+          <h1 style="font-family:'Inter',sans-serif;font-size:24px;font-weight:700;color:#344054;line-height:1.2;letter-spacing:-0.48px;margin:0;">Verifying Stage ${activeStage} of ${totalStages}${stageLabel ? ' - ' + escHtml(stageLabel) : ''}</h1>
+          <p style="font-family:'Inter',sans-serif;font-size:12px;color:#667185;line-height:1.45;margin:0;">Checking that everything migrated actually works${isLastStage ? ' before decommission can proceed' : ` before Stage ${nextStage} can be approved`}.</p>
+          ${itemsHtml}
+        </div>
+        ${sidebarHtml}
       </div>
       <div class="hifi-footer">
         <span style="font-family:'Inter',sans-serif;font-size:12px;color:#98a2b3;line-height:1.45;">${footerCount}</span>
@@ -2176,25 +2266,37 @@ function renderDecommission() {
 
   setBody(`
     <div class="hifi-page">
-      <div class="decomm-body">
-        <h1 style="font-family:'Inter',sans-serif;font-size:24px;font-weight:700;color:#344054;line-height:1.2;letter-spacing:-0.48px;margin:0;">All stages complete</h1>
-        <div class="decomm-status-card">
-          <p class="decomm-card-title">Safe to decommission ${escHtml(src)} source</p>
-          <p class="decomm-card-body">0 requests to source repos in 14 days · All ${totalItems} items verified · No pending rollbacks</p>
-        </div>
-        <div class="decomm-card">
-          <div style="display:flex;align-items:center;justify-content:space-between;">
-            <p class="decomm-card-title">Migration record</p>
-            <button class="decomm-export-btn" id="btn-export"><span>Export Record</span></button>
+      <div style="flex:1;display:flex;min-height:0;overflow:hidden;">
+        <div class="decomm-body">
+          <h1 style="font-family:'Inter',sans-serif;font-size:24px;font-weight:700;color:#344054;line-height:1.2;letter-spacing:-0.48px;margin:0;">All stages complete</h1>
+          <div class="decomm-status-card">
+            <p class="decomm-card-title">Safe to decommission ${escHtml(src)} source</p>
+            <p class="decomm-card-body">0 requests to source repos in 14 days · All ${totalItems} items verified · No pending rollbacks</p>
           </div>
-          ${recordLinesHtml}
-          <p class="decomm-card-muted">Each action also tags whether it came from shiftctl's own analysis or content extracted during scanning, visible in the exported record for full traceability.</p>
+          <div class="decomm-card">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <p class="decomm-card-title">Migration record</p>
+              <button class="decomm-export-btn" id="btn-export"><span>Export Record</span></button>
+            </div>
+            ${recordLinesHtml}
+            <p class="decomm-card-muted">Each action also tags whether it came from shiftctl's own analysis or content extracted during scanning, visible in the exported record for full traceability.</p>
+          </div>
+          <button class="hifi-btn-primary" id="btn-decommission" style="align-self:flex-start;">Decommission ${escHtml(src)} Source</button>
         </div>
-        <div class="decomm-warning-card">
-          <p class="decomm-warning-title">Nothing is hosted</p>
-          <p class="decomm-warning-body">This record only exists on your machine. Export it now if you want a durable copy, closing shiftctl without exporting means it's gone.</p>
+        <div style="width:320px;flex-shrink:0;border-left:1px solid #e4e7ec;padding:28px 24px;display:flex;flex-direction:column;gap:16px;background:#fafafa;">
+          <div class="decomm-warning-card" style="margin:0;">
+            <p class="decomm-warning-title">Nothing is hosted</p>
+            <p class="decomm-warning-body">This record only exists on your machine. Export it now if you want a durable copy. Closing shiftctl without exporting means it's gone.</p>
+          </div>
+          <div style="background:#fff;border:1px solid #e4e7ec;border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:6px;">
+            <p style="font-family:'Inter',sans-serif;font-size:13px;font-weight:600;color:#344054;margin:0;">What decommission does</p>
+            <ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:5px;">
+              <li style="font-family:'Inter',sans-serif;font-size:12px;color:#667185;line-height:1.5;">Revokes the source credential from your keychain</li>
+              <li style="font-family:'Inter',sans-serif;font-size:12px;color:#667185;line-height:1.5;">Marks the migration as complete locally</li>
+              <li style="font-family:'Inter',sans-serif;font-size:12px;color:#667185;line-height:1.5;">Does not delete anything from ${escHtml(src)}</li>
+            </ul>
+          </div>
         </div>
-        <button class="hifi-btn-primary" id="btn-decommission" style="align-self:flex-start;">Decommission ${escHtml(src)} Source</button>
       </div>
     </div>
   `);
@@ -2300,7 +2402,7 @@ function renderExportPreview() {
           <p class="export-side-label">File name</p>
           <p class="export-side-value">${escHtml(filename)}</p>
           <p class="export-side-label">Format</p>
-          <p class="export-side-value">Markdown (.md) — renders in GitHub, GitLab, Notion, and any text editor.</p>
+          <p class="export-side-value">Markdown (.md), renders in GitHub, GitLab, Notion, and any text editor.</p>
           <p class="export-side-label">What's in this file</p>
           <p class="export-side-value">Every stage grouped by approval, who approved it and when, and whether each finding came from shiftctl's own analysis or a correction you made.</p>
           <div class="export-note-box">
@@ -2388,13 +2490,13 @@ function setupDecommissionModal() {
 }
 
 document.getElementById('modal-approved-close').onclick = () => closeModal('modal-approved');
-// "Continue Without Saving" — discard note and navigate
+// "Continue Without Saving"; discard note and navigate
 document.getElementById('modal-unsaved-cancel').onclick = () => {
   closeModal('modal-unsaved');
   hasUnsavedCorrection = false;
   if (pendingUnsavedAction) { pendingUnsavedAction(); pendingUnsavedAction = null; }
 };
-// "Finish and Submit Note" — stay on page to submit
+// "Finish and Submit Note"; stay on page to submit
 document.getElementById('modal-unsaved-confirm').onclick = () => {
   closeModal('modal-unsaved');
   pendingUnsavedAction = null;

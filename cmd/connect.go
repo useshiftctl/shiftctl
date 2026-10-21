@@ -27,7 +27,7 @@ var connectCmd = &cobra.Command{
 
 Walks you through selecting a source, generating and storing a credential,
 naming a destination, and optionally providing context the scan can't infer.
-The destination credential is not collected here — it is requested only when
+The destination credential is not collected here , it is requested only when
 the first execution stage actually needs to write to the destination.`,
 	RunE: runConnect,
 }
@@ -73,7 +73,7 @@ func runConnect(_ *cobra.Command, _ []string) error {
 	// ── Step 3: Anthropic API key ─────────────────────────────────────────────
 	fmt.Println()
 	fmt.Println(bold.Render("shiftctl uses the Anthropic API for AI-powered assessment."))
-	fmt.Println(dim.Render("  Get a key at console.anthropic.com — new accounts receive $5 in credits."))
+	fmt.Println(dim.Render("  Get a key at console.anthropic.com , new accounts receive $5 in credits."))
 	fmt.Println()
 
 	var anthropicKey string
@@ -81,7 +81,7 @@ func runConnect(_ *cobra.Command, _ []string) error {
 		huh.NewGroup(
 			huh.NewInput().
 				Title("Anthropic API key").
-				Description("Starts with sk-ant-... — stored securely in your keychain, never needed again.").
+				Description("Starts with sk-ant-... , stored securely in your keychain, never needed again.").
 				EchoMode(huh.EchoModePassword).
 				Validate(func(s string) error {
 					s = strings.TrimSpace(s)
@@ -89,7 +89,7 @@ func runConnect(_ *cobra.Command, _ []string) error {
 						return fmt.Errorf("API key cannot be empty")
 					}
 					if strings.HasPrefix(s, "wrkspc_") {
-						return fmt.Errorf("that's a workspace ID, not an API key — your key starts with sk-ant-...")
+						return fmt.Errorf("that's a workspace ID, not an API key , your key starts with sk-ant-...")
 					}
 					return nil
 				}).
@@ -114,7 +114,7 @@ func runConnect(_ *cobra.Command, _ []string) error {
 						return fmt.Errorf("destination name cannot be empty")
 					}
 					if destination.ForName(s) == nil {
-						return fmt.Errorf("%q is not a supported destination — choose GitHub, GitLab, Bitbucket, or Azure DevOps", s)
+						return fmt.Errorf("%q is not a supported destination , choose GitHub, GitLab, Bitbucket, or Azure DevOps", s)
 					}
 					return nil
 				}).
@@ -144,11 +144,11 @@ func runConnect(_ *cobra.Command, _ []string) error {
 		huh.NewGroup(
 			huh.NewInput().
 				Title("Migration name").
-				Description(`Short identifier used in commands, e.g. "github-to-gitlab". No spaces — use hyphens.`).
+				Description(`Short identifier used in commands, e.g. "github-to-gitlab". No spaces , use hyphens.`).
 				Placeholder("e.g. github-to-gitlab-2026").
 				Validate(func(s string) error {
 					if strings.Contains(s, " ") {
-						return fmt.Errorf("migration name cannot contain spaces — use hyphens instead")
+						return fmt.Errorf("migration name cannot contain spaces , use hyphens instead")
 					}
 					if len(s) > 40 {
 						return fmt.Errorf("migration name must be 40 characters or fewer")
@@ -206,7 +206,6 @@ func runConnect(_ *cobra.Command, _ []string) error {
 	// ── Open browser companion ─────────────────────────────────────────────────
 	l, err := net.Listen("tcp", "127.0.0.1:4242")
 	if err != nil {
-		// Port in use — just tell them to run serve manually.
 		fmt.Printf("  Run %s to open the browser companion.\n\n", bold.Render("shiftctl serve "+name))
 		return nil
 	}
@@ -321,7 +320,7 @@ func cancelledOrError(err error) error {
 func printConnectHeader() {
 	fmt.Println()
 	fmt.Println(rule)
-	fmt.Println(bold.Render("  shiftctl — Migration Setup"))
+	fmt.Println(bold.Render("  shiftctl , Migration Setup"))
 	fmt.Println(rule)
 	fmt.Println()
 	fmt.Println("  Everything runs on your machine.")

@@ -61,7 +61,7 @@ func (b *bitbucketImpl) ValidateCredential(ctx context.Context, credential strin
 		return "", fmt.Errorf("Bitbucket credential validation failed: %w", err)
 	}
 	if user.Nickname == "" {
-		return "", fmt.Errorf("could not retrieve Bitbucket username — check app password scopes")
+		return "", fmt.Errorf("could not retrieve Bitbucket username , check app password scopes")
 	}
 	return username, nil
 }
@@ -158,7 +158,7 @@ func (b *bitbucketImpl) MigrateMetadata(ctx context.Context, credential string, 
 	return nil
 }
 
-// — Bitbucket API types ───────────────────────────────────────────────────────
+// , Bitbucket API types ───────────────────────────────────────────────────────
 
 type bbRepo struct {
 	FullName string `json:"full_name"`
@@ -173,7 +173,7 @@ type bbRepo struct {
 	} `json:"links"`
 }
 
-// — Internal helpers ──────────────────────────────────────────────────────────
+// , Internal helpers ──────────────────────────────────────────────────────────
 
 func splitBBCredential(credential string) (username, password string, err error) {
 	u, p, ok := strings.Cut(credential, ":")

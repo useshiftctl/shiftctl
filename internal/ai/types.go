@@ -18,7 +18,7 @@ type RepoAnalysis struct {
 }
 
 // KnownUnknown is something the AI found but could not fully assess from the
-// facts alone — surfaced to the user for manual verification rather than
+// facts alone , surfaced to the user for manual verification rather than
 // silently omitted.
 type KnownUnknown struct {
 	Description string `json:"description"`
@@ -27,7 +27,7 @@ type KnownUnknown struct {
 	Scope string `json:"scope"`
 }
 
-// — Anthropic API wire types (unexported) ─────────────────────────────────────
+// , Anthropic API wire types (unexported) ─────────────────────────────────────
 
 type anthropicRequest struct {
 	Model      string             `json:"model"`

@@ -21,15 +21,15 @@ func TestDeriveScreen(t *testing.T) {
 		wantStage   int
 	}{
 		{
-			// With zero stages the "all verified" loop is vacuously true — decommission.
+			// With zero stages the "all verified" loop is vacuously true , decommission.
 			// In practice deriveScreen is never called with an empty stage list.
-			name:       "no stages — vacuously all verified",
+			name:       "no stages , vacuously all verified",
 			stages:     []execstate.StageState{},
 			wantScreen: "decommission",
 			wantStage:  0,
 		},
 		{
-			name: "stage 1 pending — approval",
+			name: "stage 1 pending , approval",
 			stages: []execstate.StageState{
 				{Number: 1, Status: execstate.StatusPending},
 			},
@@ -37,7 +37,7 @@ func TestDeriveScreen(t *testing.T) {
 			wantStage:  1,
 		},
 		{
-			name: "stage 1 approved — execution",
+			name: "stage 1 approved , execution",
 			stages: []execstate.StageState{
 				{Number: 1, Status: execstate.StatusApproved},
 			},
@@ -45,7 +45,7 @@ func TestDeriveScreen(t *testing.T) {
 			wantStage:  1,
 		},
 		{
-			name: "stage 1 executing — execution",
+			name: "stage 1 executing , execution",
 			stages: []execstate.StageState{
 				{Number: 1, Status: execstate.StatusExecuting},
 			},
@@ -53,7 +53,7 @@ func TestDeriveScreen(t *testing.T) {
 			wantStage:  1,
 		},
 		{
-			name: "stage 1 interrupted — execution",
+			name: "stage 1 interrupted , execution",
 			stages: []execstate.StageState{
 				{Number: 1, Status: execstate.StatusInterrupted},
 			},
@@ -61,7 +61,7 @@ func TestDeriveScreen(t *testing.T) {
 			wantStage:  1,
 		},
 		{
-			name: "stage 1 verifying — verifying",
+			name: "stage 1 verifying , verifying",
 			stages: []execstate.StageState{
 				{Number: 1, Status: execstate.StatusVerifying},
 			},
@@ -69,7 +69,7 @@ func TestDeriveScreen(t *testing.T) {
 			wantStage:  1,
 		},
 		{
-			name: "stage 1 verified stage 2 pending — approval for stage 2",
+			name: "stage 1 verified stage 2 pending , approval for stage 2",
 			stages: []execstate.StageState{
 				{Number: 1, Status: execstate.StatusVerified},
 				{Number: 2, Status: execstate.StatusPending},
@@ -78,7 +78,7 @@ func TestDeriveScreen(t *testing.T) {
 			wantStage:  2,
 		},
 		{
-			name: "stage 1 pending stage 2 pending — approval for stage 1 (sequential)",
+			name: "stage 1 pending stage 2 pending , approval for stage 1 (sequential)",
 			stages: []execstate.StageState{
 				{Number: 1, Status: execstate.StatusPending},
 				{Number: 2, Status: execstate.StatusPending},
@@ -87,7 +87,7 @@ func TestDeriveScreen(t *testing.T) {
 			wantStage:  1,
 		},
 		{
-			name: "all stages verified — decommission",
+			name: "all stages verified , decommission",
 			stages: []execstate.StageState{
 				{Number: 1, Status: execstate.StatusVerified},
 				{Number: 2, Status: execstate.StatusVerified},
@@ -97,7 +97,7 @@ func TestDeriveScreen(t *testing.T) {
 			wantStage:  0,
 		},
 		{
-			name: "stage 1 verified stage 2 approved — execution for stage 2",
+			name: "stage 1 verified stage 2 approved , execution for stage 2",
 			stages: []execstate.StageState{
 				{Number: 1, Status: execstate.StatusVerified},
 				{Number: 2, Status: execstate.StatusApproved},

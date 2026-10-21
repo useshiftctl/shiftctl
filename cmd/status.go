@@ -29,7 +29,7 @@ func runStatus(_ *cobra.Command, args []string) error {
 
 	rec, err := migration.Load(name)
 	if err != nil {
-		return fmt.Errorf("migration %q not found — run 'shiftctl connect' to create it", name)
+		return fmt.Errorf("migration %q not found , run 'shiftctl connect' to create it", name)
 	}
 
 	fmt.Println()
@@ -76,7 +76,7 @@ func runStatus(_ *cobra.Command, args []string) error {
 	}
 
 	low, medium, high, unknowns := assessment.RiskSummary(state)
-	fmt.Printf("    %s Analysis complete — %s %s %s",
+	fmt.Printf("    %s Analysis complete , %s %s %s",
 		check,
 		riskLabel("low")+" ×"+fmt.Sprint(low),
 		riskLabel("medium")+" ×"+fmt.Sprint(medium),
@@ -126,7 +126,7 @@ func runStatus(_ *cobra.Command, args []string) error {
 		}
 
 		icon, statusText := stageStatusDisplay(ss.Status)
-		fmt.Printf("    %s  Stage %d — %s  %s\n",
+		fmt.Printf("    %s  Stage %d , %s  %s\n",
 			icon, s.Number, s.Label, dim.Render(statusText))
 
 		// For executing/verifying/interrupted stages, show per-item progress.
@@ -163,11 +163,11 @@ func stageStatusDisplay(status execstate.StageStatus) (icon, text string) {
 	case execstate.StatusPending:
 		return dim.Render("○"), "pending approval"
 	case execstate.StatusApproved:
-		return "◎", "approved — ready to execute"
+		return "◎", "approved , ready to execute"
 	case execstate.StatusExecuting:
 		return "◉", "executing"
 	case execstate.StatusInterrupted:
-		return cross, "interrupted — run execute to resume"
+		return cross, "interrupted , run execute to resume"
 	case execstate.StatusVerifying:
 		return "◎", "awaiting verification"
 	case execstate.StatusVerified:

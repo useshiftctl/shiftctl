@@ -33,7 +33,7 @@ func (p *platform) CredentialInstructions() string {
   6. Click "Generate token" and copy the result
 
   The token will start with "ghp_" (classic) or "github_pat_" (fine-grained).
-  Keep it somewhere safe — GitHub only shows it once.`
+  Keep it somewhere safe , GitHub only shows it once.`
 }
 
 func (p *platform) CredentialPrompt() string {
@@ -73,7 +73,7 @@ func githubGetUser(ctx context.Context, client *http.Client, token string) (stri
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return "", fmt.Errorf("could not reach GitHub API — check your internet connection: %w", err)
+		return "", fmt.Errorf("could not reach GitHub API , check your internet connection: %w", err)
 	}
 	defer resp.Body.Close()
 
@@ -81,9 +81,9 @@ func githubGetUser(ctx context.Context, client *http.Client, token string) (stri
 	case http.StatusOK:
 		// ok
 	case http.StatusUnauthorized:
-		return "", fmt.Errorf("token is invalid or has been revoked — double-check you copied it in full")
+		return "", fmt.Errorf("token is invalid or has been revoked , double-check you copied it in full")
 	case http.StatusForbidden:
-		return "", fmt.Errorf("GitHub returned 403 — the token may have expired or been restricted")
+		return "", fmt.Errorf("GitHub returned 403 , the token may have expired or been restricted")
 	default:
 		return "", fmt.Errorf("GitHub returned an unexpected status: %d", resp.StatusCode)
 	}
@@ -95,7 +95,7 @@ func githubGetUser(ctx context.Context, client *http.Client, token string) (stri
 		return "", fmt.Errorf("could not parse GitHub response: %w", err)
 	}
 	if body.Login == "" {
-		return "", fmt.Errorf("GitHub returned a valid response but no username — please try again")
+		return "", fmt.Errorf("GitHub returned a valid response but no username , please try again")
 	}
 	return body.Login, nil
 }
@@ -116,7 +116,7 @@ func githubCheckRepoAccess(ctx context.Context, client *http.Client, token strin
 
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf(
-			"token doesn't have repository read access — ensure the 'repo' scope is selected when generating it",
+			"token doesn't have repository read access , ensure the 'repo' scope is selected when generating it",
 		)
 	}
 
@@ -124,7 +124,7 @@ func githubCheckRepoAccess(ctx context.Context, client *http.Client, token strin
 	scopes := resp.Header.Get("X-OAuth-Scopes")
 	if scopes != "" && !strings.Contains(scopes, "repo") {
 		return fmt.Errorf(
-			"token is missing the 'repo' scope (current scopes: %s) — regenerate it with 'repo' enabled",
+			"token is missing the 'repo' scope (current scopes: %s) , regenerate it with 'repo' enabled",
 			scopes,
 		)
 	}

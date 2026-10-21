@@ -42,7 +42,7 @@ func TestLoadOrInit(t *testing.T) {
 		}
 	}
 
-	// Second call should load from disk — same result.
+	// Second call should load from disk , same result.
 	s2, err := execstate.LoadOrInit("test-migration", p)
 	if err != nil {
 		t.Fatalf("LoadOrInit() second call error: %v", err)
@@ -89,7 +89,7 @@ func TestRecordApproval(t *testing.T) {
 func TestNextPendingStage(t *testing.T) {
 	t.Setenv("HOME", t.TempDir())
 
-	t.Run("stage 1 pending — returned immediately", func(t *testing.T) {
+	t.Run("stage 1 pending , returned immediately", func(t *testing.T) {
 		p := makeTestPlan("next-pending-1", 2)
 		s, _ := execstate.LoadOrInit("next-pending-1", p)
 
@@ -140,7 +140,7 @@ func TestNextPendingStage(t *testing.T) {
 		}
 	})
 
-	t.Run("all stages past pending — returns nil, nil", func(t *testing.T) {
+	t.Run("all stages past pending , returns nil, nil", func(t *testing.T) {
 		p := makeTestPlan("next-pending-4", 1)
 		s, _ := execstate.LoadOrInit("next-pending-4", p)
 

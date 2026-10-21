@@ -1,6 +1,6 @@
 // Package execstate tracks the execution lifecycle of each migration stage.
 // It is the source of truth for what has been approved, what is executing,
-// what is verifying, and what is complete — used by the approve, execute, and
+// what is verifying, and what is complete , used by the approve, execute, and
 // verify commands to know where the migration currently is and what is allowed
 // next.
 package execstate

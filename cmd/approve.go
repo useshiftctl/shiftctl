@@ -22,11 +22,11 @@ The approval loop repeats for each stage:
   Approve Stage N → execute → verify → Approve Stage N+1 → ...
 
 Each approval generates a unique ID that is recorded in the migration log and
-referenced by every action executed in that stage — every action is traceable
+referenced by every action executed in that stage , every action is traceable
 back to the specific approval that authorised it.
 
 Certain stages trigger a mandatory extra-scrutiny notice before the approval
-prompt — when the stage involves a high-risk system, or when the agent's
+prompt , when the stage involves a high-risk system, or when the agent's
 confidence on any item falls below the expected threshold.`,
 	Args: cobra.ExactArgs(1),
 	RunE: runApprove,
@@ -63,7 +63,7 @@ func runApprove(_ *cobra.Command, args []string) error {
 	// Retrieve the full stage detail from the plan.
 	stage, ok := findPlanStage(p, pending.Number)
 	if !ok {
-		return fmt.Errorf("stage %d not found in plan — try regenerating with 'shiftctl plan %s'", pending.Number, name)
+		return fmt.Errorf("stage %d not found in plan , try regenerating with 'shiftctl plan %s'", pending.Number, name)
 	}
 
 	// ── Print stage header ────────────────────────────────────────────────────
@@ -82,7 +82,7 @@ func runApprove(_ *cobra.Command, args []string) error {
 	printApprovalContext(stage)
 
 	// ── Confirmation prompt ───────────────────────────────────────────────────
-	label := fmt.Sprintf("Approve Stage %d? (%d %s — execution begins immediately after)",
+	label := fmt.Sprintf("Approve Stage %d? (%d %s , execution begins immediately after)",
 		stage.Number,
 		len(stage.Repos),
 		repoNoun(len(stage.Repos)),
@@ -99,13 +99,13 @@ func runApprove(_ *cobra.Command, args []string) error {
 		),
 	).Run(); err != nil {
 		if err == huh.ErrUserAborted {
-			fmt.Println("\nApproval cancelled — nothing has changed.")
+			fmt.Println("\nApproval cancelled , nothing has changed.")
 			return nil
 		}
 		return err
 	}
 	if !confirmed {
-		fmt.Println("\nApproval cancelled — nothing has changed.")
+		fmt.Println("\nApproval cancelled , nothing has changed.")
 		return nil
 	}
 
@@ -121,12 +121,12 @@ func runApprove(_ *cobra.Command, args []string) error {
 	return nil
 }
 
-// — Display helpers ───────────────────────────────────────────────────────────
+// , Display helpers ───────────────────────────────────────────────────────────
 
 func printApprovalHeader(migrationName string, stage plan.Stage, totalStages int) {
 	fmt.Println()
 	fmt.Println(rule)
-	fmt.Printf("  %s  Approve Stage %d of %d — %s\n",
+	fmt.Printf("  %s  Approve Stage %d of %d , %s\n",
 		bold.Render("shiftctl approve"),
 		stage.Number,
 		totalStages,
@@ -140,7 +140,7 @@ func printApprovalHeader(migrationName string, stage plan.Stage, totalStages int
 
 func printEscalationNotice(triggers []execstate.EscalationTrigger) {
 	fmt.Println("  ┌─────────────────────────────────────────────────────────┐")
-	fmt.Println("  │  Heads Up — this stage needs a closer look              │")
+	fmt.Println("  │  Heads Up , this stage needs a closer look              │")
 	fmt.Println("  └─────────────────────────────────────────────────────────┘")
 	fmt.Println()
 	for _, t := range triggers {
@@ -173,7 +173,7 @@ func printApprovalRepoList(stage plan.Stage) {
 			confidenceLabel(repo.Confidence),
 		)
 
-		// Always show evidence on the approval screen — this is the highest-
+		// Always show evidence on the approval screen , this is the highest-
 		// trust moment and the user should see exactly what the assessment found.
 		if repo.ScanError != "" {
 			fmt.Printf("  %s Heads Up: %s\n",
@@ -271,16 +271,16 @@ func allStagesApprovedMessage(exec *execstate.State) error {
 	return nil
 }
 
-// — Logic helpers ─────────────────────────────────────────────────────────────
+// , Logic helpers ─────────────────────────────────────────────────────────────
 
 // detectEscalation returns the list of escalation triggers for a stage. Three
 // conditions trigger proactive escalation (beyond routine per-stage approval):
 //
-//  1. The stage contains a high-risk item — "a stage involving a
+//  1. The stage contains a high-risk item , "a stage involving a
 //     high-criticality system" trigger.
-//  2. The stage contains a best_guess item with non-low risk — "agent's own
+//  2. The stage contains a best_guess item with non-low risk , "agent's own
 //     confidence falling below a threshold" trigger.
-//  3. A repo has a scan error — partial information, uncertain scope trigger.
+//  3. A repo has a scan error , partial information, uncertain scope trigger.
 func detectEscalation(stage plan.Stage) []execstate.EscalationTrigger {
 	var triggers []execstate.EscalationTrigger
 
@@ -297,7 +297,7 @@ func detectEscalation(stage plan.Stage) []execstate.EscalationTrigger {
 			triggers = append(triggers, execstate.EscalationTrigger{
 				Repo: repo.FullName,
 				Reason: fmt.Sprintf(
-					"Medium risk with Best guess confidence — shiftctl inferred this rather than finding direct evidence.\n  Evidence: %s",
+					"Medium risk with Best guess confidence , shiftctl inferred this rather than finding direct evidence.\n  Evidence: %s",
 					repo.Evidence,
 				),
 			})

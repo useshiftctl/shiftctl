@@ -27,7 +27,7 @@ What this command does:
   1. Lists every repository your token can access.
   2. Reads structured metadata (CI files, webhooks, branch protection, dependencies).
   3. Strips secrets from any string field before anything leaves your machine.
-  4. Sends structured facts — no raw file contents — to Anthropic for analysis.
+  4. Sends structured facts , no raw file contents , to Anthropic for analysis.
   5. Saves the full assessment to ~/.shiftctl/migrations/<name>/assessment.json.
 
 Nothing is sent to Anthropic without showing you exactly what first.`,
@@ -134,7 +134,7 @@ Once your key is set, re-run: shiftctl assess `+name)
 func printConfirmWhatShared(rec *migration.Record, apiKey string) {
 	fmt.Println()
 	fmt.Println(rule)
-	fmt.Println(bold.Render("  Before scanning — what shiftctl sends and doesn't send"))
+	fmt.Println(bold.Render("  Before scanning , what shiftctl sends and doesn't send"))
 	fmt.Println(rule)
 	fmt.Println()
 	fmt.Println("  Stays on your machine (never sent anywhere):")
@@ -165,7 +165,7 @@ func printAssessmentSummary(state *assessment.State, totalRepos int) {
 
 	fmt.Println()
 	fmt.Println(rule)
-	fmt.Printf("  %s  Assessment complete — %d repositories scanned\n\n", check, totalRepos)
+	fmt.Printf("  %s  Assessment complete , %d repositories scanned\n\n", check, totalRepos)
 
 	fmt.Println("  Risk summary:")
 	if low > 0 {

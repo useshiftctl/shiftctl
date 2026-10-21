@@ -13,12 +13,12 @@ import (
 // project/repo naming, GitLab namespace paths, Bitbucket workspace slugs).
 func buildSystemPrompt(sourcePlatform string) string {
 	platformName := platformDisplayName(sourcePlatform)
-	return fmt.Sprintf(`You are analyzing a %s repository migration. You have been given structured facts about each repository — no raw file contents are included. Based solely on these structured facts, assess the migration risk for each repository.
+	return fmt.Sprintf(`You are analyzing a %s repository migration. You have been given structured facts about each repository , no raw file contents are included. Based solely on these structured facts, assess the migration risk for each repository.
 
 For each repository assess:
 - risk_level: "low" (isolated, few dependencies, no production-critical signals), "medium" (has CI/CD complexity, webhooks, or depends on other repos in this set), or "high" (production-critical systems such as auth, payments, or primary databases; complex webhook integrations; or strict branch protection indicating high-stakes systems)
 - confidence: "confirmed" when you can point to a specific named fact (e.g. a specific CI file, a named webhook domain, a branch protection rule), "best_guess" when you are inferring from indirect signals (e.g. naming patterns, topic tags, or the absence of information)
-- evidence: cite the specific field or value that supports your assessment. Be precise — "branch protection requires 2 approvals and enforces admins, found on main" not "has branch protection". Name the actual file, domain, or field. "config" is not specific enough.
+- evidence: cite the specific field or value that supports your assessment. Be precise , "branch protection requires 2 approvals and enforces admins, found on main" not "has branch protection". Name the actual file, domain, or field. "config" is not specific enough.
 - depends_on: list full_names of other repos in this migration set that this repo appears to depend on. Base this on naming patterns (e.g. shared prefix suggesting a monorepo split), shared topics, CI files that reference other repos, or webhook domains that suggest shared infrastructure. If uncertain, omit rather than guess.
 - reasoning: one to two plain-language sentences explaining the risk assessment in terms a non-specialist reviewer could understand.
 
@@ -130,7 +130,7 @@ func extractAnalysisResult(resp *anthropicResponse) (*AnalysisResult, error) {
 		if block.Type != "tool_use" || block.Name != "record_assessment" {
 			continue
 		}
-		// block.Input was decoded as interface{} — re-marshal and unmarshal
+		// block.Input was decoded as interface{} , re-marshal and unmarshal
 		// into the typed struct.
 		raw, err := json.Marshal(block.Input)
 		if err != nil {
@@ -142,5 +142,5 @@ func extractAnalysisResult(resp *anthropicResponse) (*AnalysisResult, error) {
 		}
 		return &result, nil
 	}
-	return nil, fmt.Errorf("Anthropic response did not include a record_assessment tool call — the model may have refused the request")
+	return nil, fmt.Errorf("Anthropic response did not include a record_assessment tool call , the model may have refused the request")
 }

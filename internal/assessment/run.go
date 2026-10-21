@@ -37,7 +37,7 @@ func Run(ctx context.Context, rec *migration.Record, token, apiKey, workspaceID 
 		return nil, err
 	}
 	if len(facts) == 0 {
-		return nil, fmt.Errorf("no repositories found — check that your credential has the required read scopes")
+		return nil, fmt.Errorf("no repositories found , check that your credential has the required read scopes")
 	}
 
 	// ── Phase 1b: apply repo filter ──────────────────────────────────────────
@@ -54,7 +54,7 @@ func Run(ctx context.Context, rec *migration.Record, token, apiKey, workspaceID 
 		}
 		facts = filtered
 		if len(facts) == 0 {
-			return nil, fmt.Errorf("no repositories matched the filter — check your repo names are in 'owner/repo' format")
+			return nil, fmt.Errorf("no repositories matched the filter , check your repo names are in 'owner/repo' format")
 		}
 	}
 

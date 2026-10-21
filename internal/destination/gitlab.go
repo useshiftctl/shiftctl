@@ -39,7 +39,7 @@ func (g *gitLabImpl) CredentialInstructions() string {
   4. Set an expiry date far enough out to cover the migration
   5. Select these scopes: api  (includes read_api, read_user, read_repository, write_repository)
   6. Click "Create personal access token"
-  7. Copy the token — it starts with "glpat-" and won't be shown again`
+  7. Copy the token , it starts with "glpat-" and won't be shown again`
 }
 
 func (g *gitLabImpl) CredentialPrompt() string {
@@ -57,7 +57,7 @@ func (g *gitLabImpl) ValidateCredential(ctx context.Context, credential string) 
 		return "", fmt.Errorf("GitLab credential validation failed: %w", err)
 	}
 	if user.Username == "" {
-		return "", fmt.Errorf("GitLab returned an empty username — check token scopes (need: api)")
+		return "", fmt.Errorf("GitLab returned an empty username , check token scopes (need: api)")
 	}
 	return user.Username, nil
 }
@@ -180,7 +180,7 @@ func (g *gitLabImpl) MigrateMetadata(ctx context.Context, credential string, act
 	return nil
 }
 
-// — GitLab API types ──────────────────────────────────────────────────────────
+// , GitLab API types ──────────────────────────────────────────────────────────
 
 type gitlabProject struct {
 	ID                int    `json:"id"`
@@ -192,7 +192,7 @@ type gitlabProject struct {
 	} `json:"namespace"`
 }
 
-// — Internal helpers ──────────────────────────────────────────────────────────
+// , Internal helpers ──────────────────────────────────────────────────────────
 
 func (g *gitLabImpl) findProject(ctx context.Context, credential, projectPath string) (*gitlabProject, error) {
 	encoded := url.PathEscape(projectPath)
@@ -221,7 +221,7 @@ func (g *gitLabImpl) createWebhook(ctx context.Context, credential, projectID st
 		URL    string `json:"url"`
 		PushEvents bool `json:"push_events"`
 	}
-	// We only have the domain — reconstruct a best-effort URL.
+	// We only have the domain , reconstruct a best-effort URL.
 	hookURL := "https://" + wh.Domain
 	body, _ := json.Marshal(hookReq{URL: hookURL, PushEvents: true})
 
@@ -283,7 +283,7 @@ func (g *gitLabImpl) applyBranchProtection(ctx context.Context, credential, proj
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode == http.StatusConflict {
-		return nil // already protected — idempotent
+		return nil // already protected , idempotent
 	}
 	if resp.StatusCode != http.StatusCreated {
 		raw, _ := io.ReadAll(resp.Body)

@@ -49,7 +49,7 @@ type PlannedRepo struct {
 }
 
 // stageLabels and stageReasons are the canonical text shown on every
-// stage-related screen — Spec mandates these be in plain language with the
+// stage-related screen , Spec mandates these be in plain language with the
 // reasoning stated explicitly, not just "Stage 1 of 3".
 var stageLabels = [4]string{
 	"",
@@ -64,7 +64,7 @@ type KnownUnknown = ai.KnownUnknown
 
 var stageReasons = [4]string{
 	"",
-	"Moved first. If anything goes wrong here it will be on something small and unimportant — the safest way to build confidence before the critical systems.",
-	"Held until Stage 1 has already completed successfully. These items have weaker evidence or were inferred from indirect signals — review the reasoning before approving.",
+	"Moved first. If anything goes wrong here it will be on something small and unimportant , the safest way to build confidence before the critical systems.",
+	"Held until Stage 1 has already completed successfully. These items have weaker evidence or were inferred from indirect signals , review the reasoning before approving.",
 	"Moved last, once confidence is highest from the earlier stages completing. These are your most important or critical systems.",
 }

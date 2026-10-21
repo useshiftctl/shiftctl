@@ -38,7 +38,7 @@ being counted as done or re-run.
 
 Use --retry-failed to re-attempt any items that failed in a previous run.
 
-The destination credential is requested here if it has not been stored yet —
+The destination credential is requested here if it has not been stored yet ,
 it is never required before execution actually begins.`,
 	Args: cobra.ExactArgs(1),
 	RunE: runExecute,
@@ -56,12 +56,12 @@ func runExecute(_ *cobra.Command, args []string) error {
 	// ── Prerequisites ─────────────────────────────────────────────────────────
 	rec, err := migration.Load(name)
 	if err != nil {
-		return fmt.Errorf("migration %q not found — run 'shiftctl connect' first", name)
+		return fmt.Errorf("migration %q not found , run 'shiftctl connect' first", name)
 	}
 
 	p, err := plan.Load(name)
 	if err != nil {
-		return fmt.Errorf("no plan found — run 'shiftctl plan %s' first", name)
+		return fmt.Errorf("no plan found , run 'shiftctl plan %s' first", name)
 	}
 
 	exec, err := execstate.LoadOrInit(name, p)
@@ -86,7 +86,7 @@ func runExecute(_ *cobra.Command, args []string) error {
 	// ── Source credential ─────────────────────────────────────────────────────
 	srcCred, err := credentials.Get(name, "source")
 	if err != nil {
-		return fmt.Errorf("source credential not found — run 'shiftctl connect' to set it up")
+		return fmt.Errorf("source credential not found , run 'shiftctl connect' to set it up")
 	}
 
 	// ── Resolve destination implementation ────────────────────────────────────
@@ -101,7 +101,7 @@ func runExecute(_ *cobra.Command, args []string) error {
 	// ── Destination credential (deferred until first execution) ───────────────
 	dstCred, err := credentials.Get(name, "destination")
 	if err != nil {
-		// Not stored yet — collect it now.
+		// Not stored yet , collect it now.
 		dstCred, err = collectDestinationCredential(ctx, name, dest)
 		if err != nil {
 			return err
@@ -159,14 +159,14 @@ func runExecute(_ *cobra.Command, args []string) error {
 			return fmt.Errorf("transitioning to verifying: %w", err)
 		}
 	} else {
-		// Partial success — stay as executing so recovery works.
+		// Partial success , stay as executing so recovery works.
 		_ = execstate.Transition(exec, stage.Number, execstate.StatusInterrupted)
 	}
 
 	return nil
 }
 
-// — Destination credential collection ─────────────────────────────────────────
+// , Destination credential collection ─────────────────────────────────────────
 
 func collectDestinationCredential(ctx context.Context, migrationName string, dest destination.Destination) (string, error) {
 	fmt.Println()
@@ -175,7 +175,7 @@ func collectDestinationCredential(ctx context.Context, migrationName string, des
 	fmt.Println(rule)
 	fmt.Println()
 	fmt.Printf("  You haven't stored a %s credential yet.\n", dest.DisplayName())
-	fmt.Printf("  This is requested now — only when execution actually needs it.\n\n")
+	fmt.Printf("  This is requested now , only when execution actually needs it.\n\n")
 	fmt.Printf("  %s\n\n", bold.Render("How to generate one:"))
 
 	for _, line := range strings.Split(dest.CredentialInstructions(), "\n") {
@@ -193,7 +193,7 @@ func collectDestinationCredential(ctx context.Context, migrationName string, des
 		),
 	).Run(); err != nil {
 		if err == huh.ErrUserAborted {
-			fmt.Println("\n  Credential entry cancelled — execution aborted.")
+			fmt.Println("\n  Credential entry cancelled , execution aborted.")
 			return "", fmt.Errorf("destination credential not provided")
 		}
 		return "", err
@@ -224,12 +224,12 @@ func collectDestinationCredential(ctx context.Context, migrationName string, des
 	return cred, nil
 }
 
-// — Display helpers ────────────────────────────────────────────────────────────
+// , Display helpers ────────────────────────────────────────────────────────────
 
 func printExecutionHeader(migrationName string, stage plan.Stage, totalStages int) {
 	fmt.Println()
 	fmt.Println(rule)
-	fmt.Printf("  %s  Executing Stage %d of %d — %s\n",
+	fmt.Printf("  %s  Executing Stage %d of %d , %s\n",
 		bold.Render("shiftctl execute"),
 		stage.Number,
 		totalStages,
@@ -248,7 +248,7 @@ func makeProgressFn(stage *plan.Stage) func(executor.RepoResult, *executor.Stage
 		detail := ""
 		if result.Status == executor.ItemFailed {
 			icon = cross
-			detail = fmt.Sprintf(" — %s", result.Error)
+			detail = fmt.Sprintf(" , %s", result.Error)
 		} else if result.DestWebURL != "" {
 			detail = fmt.Sprintf(" → %s", result.DestWebURL)
 		}
@@ -271,14 +271,14 @@ func printRecoveryReport(report executor.RecoveryReport) {
 	fmt.Println("  └─────────────────────────────────────────────────────────┘")
 	fmt.Println()
 	if len(report.Confirmed) > 0 {
-		fmt.Printf("  %s Already on destination (%d) — skipped:\n", check, len(report.Confirmed))
+		fmt.Printf("  %s Already on destination (%d) , skipped:\n", check, len(report.Confirmed))
 		for _, n := range report.Confirmed {
 			fmt.Printf("    %s\n", dim.Render(n))
 		}
 		fmt.Println()
 	}
 	if len(report.Requeued) > 0 {
-		fmt.Printf("  %s Not found on destination (%d) — will re-run:\n", cross, len(report.Requeued))
+		fmt.Printf("  %s Not found on destination (%d) , will re-run:\n", cross, len(report.Requeued))
 		for _, n := range report.Requeued {
 			fmt.Printf("    %s\n", dim.Render(n))
 		}
@@ -290,7 +290,7 @@ func printExecutionSummary(stageNumber, done, failed, uncertain int, migrationNa
 	fmt.Println()
 	fmt.Println(rule)
 	if failed == 0 && uncertain == 0 {
-		fmt.Printf("  %s  Stage %d complete — %d %s migrated successfully\n",
+		fmt.Printf("  %s  Stage %d complete , %d %s migrated successfully\n",
 			check, stageNumber, done, repoNoun(done))
 		fmt.Println(rule)
 		fmt.Printf("\n  Run %s to verify the migration.\n\n",
@@ -300,7 +300,7 @@ func printExecutionSummary(stageNumber, done, failed, uncertain int, migrationNa
 		fmt.Println(rule)
 		fmt.Printf("\n  Done: %d  Failed: %d  Uncertain: %d\n\n", done, failed, uncertain)
 		if failed > 0 || uncertain > 0 {
-			fmt.Printf("  Run %s to resume — completed items will not be repeated.\n\n",
+			fmt.Printf("  Run %s to resume , completed items will not be repeated.\n\n",
 				bold.Render(fmt.Sprintf("shiftctl execute %s", migrationName)))
 		}
 	}
@@ -319,7 +319,7 @@ func printFailedItems(prog *executor.StageProgress) {
 	fmt.Println()
 }
 
-// — Logic helpers ─────────────────────────────────────────────────────────────
+// , Logic helpers ─────────────────────────────────────────────────────────────
 
 // findApprovedOrExecutingStage finds a stage that is ready to execute (approved
 // or already executing/interrupted = resumable).

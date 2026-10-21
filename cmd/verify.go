@@ -48,7 +48,7 @@ func runVerify(_ *cobra.Command, args []string) error {
 
 	p, err := plan.Load(name)
 	if err != nil {
-		return fmt.Errorf("no plan found — run 'shiftctl plan %s' first", name)
+		return fmt.Errorf("no plan found , run 'shiftctl plan %s' first", name)
 	}
 
 	exec, err := execstate.LoadOrInit(name, p)
@@ -78,7 +78,7 @@ func runVerify(_ *cobra.Command, args []string) error {
 
 	dstCred, err := credentials.Get(name, "destination")
 	if err != nil {
-		return fmt.Errorf("destination credential not found — run 'shiftctl execute %s' to set it up", name)
+		return fmt.Errorf("destination credential not found , run 'shiftctl execute %s' to set it up", name)
 	}
 
 	fmt.Printf("\n  Verifying %s credential…\n", dest.DisplayName())
@@ -91,7 +91,7 @@ func runVerify(_ *cobra.Command, args []string) error {
 	// ── Load progress for this stage ──────────────────────────────────────────
 	prog, err := executor.LoadProgress(name, stage.Number)
 	if err != nil {
-		return fmt.Errorf("no execution progress found for stage %d — was 'shiftctl execute %s' run?", stage.Number, name)
+		return fmt.Errorf("no execution progress found for stage %d , was 'shiftctl execute %s' run?", stage.Number, name)
 	}
 
 	// ── Print header ──────────────────────────────────────────────────────────
@@ -137,11 +137,11 @@ func runVerify(_ *cobra.Command, args []string) error {
 	return nil
 }
 
-// — Display helpers ────────────────────────────────────────────────────────────
+// , Display helpers ────────────────────────────────────────────────────────────
 
 func printVerifyHeader(migrationName string, stage plan.Stage, totalStages int) {
 	fmt.Println(rule)
-	fmt.Printf("  %s  Verifying Stage %d of %d — %s\n",
+	fmt.Printf("  %s  Verifying Stage %d of %d , %s\n",
 		bold.Render("shiftctl verify"),
 		stage.Number,
 		totalStages,
@@ -160,7 +160,7 @@ func makeVerifyProgressFn(stage *plan.Stage) func(verifier.ItemVerification) {
 		detail := ""
 		if !iv.OK {
 			icon = cross
-			detail = fmt.Sprintf(" — %s", iv.Issue)
+			detail = fmt.Sprintf(" , %s", iv.Issue)
 		} else if iv.DestWebURL != "" {
 			detail = fmt.Sprintf(" %s", iv.DestWebURL)
 		}
@@ -178,7 +178,7 @@ func printVerifySummary(report *verifier.Report, migrationName string) {
 	fmt.Println()
 	fmt.Println(rule)
 	if report.Passed() {
-		fmt.Printf("  %s  Stage %d verified — %d %s confirmed on destination\n",
+		fmt.Printf("  %s  Stage %d verified , %d %s confirmed on destination\n",
 			check, report.StageNumber, passed, repoNoun(passed))
 	} else {
 		fmt.Printf("  Stage %d verification: %d passed, %d failed\n",
@@ -232,7 +232,7 @@ func printVerifyNextStep(exec *execstate.State, verifiedStageNumber int, migrati
 	}
 }
 
-// — Logic helpers ─────────────────────────────────────────────────────────────
+// , Logic helpers ─────────────────────────────────────────────────────────────
 
 func findVerifyableStage(exec *execstate.State, p *plan.Plan) (*plan.Stage, *execstate.StageState, error) {
 	for i := range exec.Stages {

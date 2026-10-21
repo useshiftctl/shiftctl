@@ -22,7 +22,7 @@ var reconnectCmd = &cobra.Command{
 Use this when a token has expired, been rotated, or needs to be replaced
 without restarting the migration from scratch.
 
-The new credential is validated before being stored — if validation fails,
+The new credential is validated before being stored , if validation fails,
 the existing credential is left untouched.`,
 	Args: cobra.ExactArgs(1),
 	RunE: runReconnect,
@@ -43,7 +43,7 @@ func runReconnect(_ *cobra.Command, args []string) error {
 
 	fmt.Println()
 	fmt.Println(rule)
-	fmt.Printf("  %s  Update credential — %s\n", bold.Render("shiftctl reconnect"), bold.Render(name))
+	fmt.Printf("  %s  Update credential , %s\n", bold.Render("shiftctl reconnect"), bold.Render(name))
 	fmt.Println(rule)
 	fmt.Println()
 	fmt.Printf("  Source:       %s\n", platformDisplayName(rec.SourcePlatform))
@@ -57,8 +57,8 @@ func runReconnect(_ *cobra.Command, args []string) error {
 			huh.NewSelect[string]().
 				Title("Which credential do you want to update?").
 				Options(
-					huh.NewOption("Source — "+platformDisplayName(rec.SourcePlatform), "source"),
-					huh.NewOption("Destination — "+rec.DestinationName, "destination"),
+					huh.NewOption("Source , "+platformDisplayName(rec.SourcePlatform), "source"),
+					huh.NewOption("Destination , "+rec.DestinationName, "destination"),
 				).
 				Value(&role),
 		),
@@ -127,7 +127,7 @@ func updateSourceCredential(ctx context.Context, rec *migration.Record) error {
 func updateDestinationCredential(ctx context.Context, rec *migration.Record) error {
 	dest := destination.ForName(rec.DestinationName)
 	if dest == nil {
-		return fmt.Errorf("destination %q is not a supported platform — cannot validate a credential for it", rec.DestinationName)
+		return fmt.Errorf("destination %q is not a supported platform , cannot validate a credential for it", rec.DestinationName)
 	}
 
 	fmt.Println()

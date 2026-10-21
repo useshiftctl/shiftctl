@@ -23,7 +23,7 @@ var disconnectCmd = &cobra.Command{
 Use --purge to wipe everything: all credentials stored in the OS credential
 manager and all local migration data under ~/.shiftctl/.
 
-Your source and destination platform accounts are not affected — only the
+Your source and destination platform accounts are not affected , only the
 local data shiftctl stored on this machine.`,
 	RunE: runDisconnect,
 }
@@ -60,14 +60,14 @@ func runDisconnect(_ *cobra.Command, _ []string) error {
 		),
 	).Run(); err != nil {
 		if err == huh.ErrUserAborted {
-			fmt.Println("\nCancelled — nothing was removed.")
+			fmt.Println("\nCancelled , nothing was removed.")
 			return nil
 		}
 		return err
 	}
 
 	if !confirmed {
-		fmt.Println("\nCancelled — nothing was removed.")
+		fmt.Println("\nCancelled , nothing was removed.")
 		return nil
 	}
 
@@ -86,7 +86,7 @@ func runPurge(names []string) error {
 				fmt.Fprintf(os.Stderr, "    %s  could not remove source credential for %q: %v\n", cross, name, err)
 				anyError = true
 			}
-			// Destination credential may or may not exist yet — Delete is a no-op if absent.
+			// Destination credential may or may not exist yet , Delete is a no-op if absent.
 			_ = credentials.Delete(name, "destination")
 		}
 	}
@@ -123,7 +123,7 @@ func runPurge(names []string) error {
 func stopCompanionServer() {
 	const port = "4242"
 
-	// Quick check — if nothing is listening, do nothing.
+	// Quick check , if nothing is listening, do nothing.
 	conn, err := net.DialTimeout("tcp", "127.0.0.1:"+port, 0)
 	if err != nil {
 		return // nothing running
@@ -173,7 +173,7 @@ func printPurgeWarning(names []string) {
 	fmt.Println()
 
 	if len(names) == 0 {
-		fmt.Println("  No migrations found — only clearing any remaining local data.")
+		fmt.Println("  No migrations found , only clearing any remaining local data.")
 	} else {
 		noun := "migration"
 		if len(names) > 1 {

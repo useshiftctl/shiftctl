@@ -60,7 +60,7 @@ func (a *azureDevOpsImpl) ValidateCredential(ctx context.Context, credential str
 		return "", fmt.Errorf("Azure DevOps credential validation failed: %w", err)
 	}
 	if p.DisplayName == "" && p.EmailAddress == "" {
-		return "", fmt.Errorf("could not retrieve Azure DevOps profile — check PAT scopes")
+		return "", fmt.Errorf("could not retrieve Azure DevOps profile , check PAT scopes")
 	}
 	name := p.DisplayName
 	if name == "" {
@@ -124,7 +124,7 @@ func (a *azureDevOpsImpl) PrepareRepo(ctx context.Context, credential string, fa
 	defer resp.Body.Close()
 
 	if resp.StatusCode == http.StatusConflict {
-		// Repository already exists — fetch it.
+		// Repository already exists , fetch it.
 		existing, err := a.findRepo(ctx, credential, org, project, repoName)
 		if err != nil {
 			return nil, fmt.Errorf("repository already exists but could not be fetched: %w", err)
@@ -190,7 +190,7 @@ func (a *azureDevOpsImpl) MigrateMetadata(ctx context.Context, credential string
 	return nil
 }
 
-// — Azure DevOps API types ─────────────────────────────────────────────────────
+// , Azure DevOps API types ─────────────────────────────────────────────────────
 
 type adoRepo struct {
 	ID      string     `json:"id"`
@@ -205,7 +205,7 @@ type adoProject struct {
 	Name string `json:"name"`
 }
 
-// — Internal helpers ───────────────────────────────────────────────────────────
+// , Internal helpers ───────────────────────────────────────────────────────────
 
 func splitADOCredential(credential string) (org, pat string, err error) {
 	o, p, ok := strings.Cut(credential, ":")

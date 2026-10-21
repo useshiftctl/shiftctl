@@ -155,7 +155,7 @@ func MarkFailed(p *StageProgress, fullName, errMsg string) error {
 }
 
 // MarkUncertain transitions any ItemExecuting items to ItemUncertain. Called
-// on startup when a previous progress file exists with executing items —
+// on startup when a previous progress file exists with executing items ,
 // those items had an unknown outcome when the process was interrupted.
 func MarkUncertain(p *StageProgress) error {
 	changed := false
@@ -230,7 +230,7 @@ func Summary(p *StageProgress) (done, failed, uncertain, pending int) {
 	return
 }
 
-// — Helpers ───────────────────────────────────────────────────────────────────
+// , Helpers ───────────────────────────────────────────────────────────────────
 
 func itemIndex(p *StageProgress, fullName string) int {
 	for i, it := range p.Items {

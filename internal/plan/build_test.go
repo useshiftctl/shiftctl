@@ -7,7 +7,7 @@ import (
 	"github.com/useshiftctl/shiftctl/internal/assessment"
 )
 
-// — assignStage ───────────────────────────────────────────────────────────────
+// , assignStage ───────────────────────────────────────────────────────────────
 
 func TestAssignStage(t *testing.T) {
 	tests := []struct {
@@ -33,7 +33,7 @@ func TestAssignStage(t *testing.T) {
 	}
 }
 
-// — topoSort ──────────────────────────────────────────────────────────────────
+// , topoSort ──────────────────────────────────────────────────────────────────
 
 func TestTopoSort(t *testing.T) {
 	t.Run("empty", func(t *testing.T) {
@@ -43,7 +43,7 @@ func TestTopoSort(t *testing.T) {
 		}
 	})
 
-	t.Run("no dependencies — alphabetical order", func(t *testing.T) {
+	t.Run("no dependencies , alphabetical order", func(t *testing.T) {
 		repos := []PlannedRepo{
 			{FullName: "org/charlie"},
 			{FullName: "org/alpha"},
@@ -85,7 +85,7 @@ func TestTopoSort(t *testing.T) {
 		}
 	})
 
-	t.Run("cycle — cyclic nodes appended alphabetically", func(t *testing.T) {
+	t.Run("cycle , cyclic nodes appended alphabetically", func(t *testing.T) {
 		// a → b → a (cycle), c has no deps
 		repos := []PlannedRepo{
 			{FullName: "org/a", DependsOn: []string{"org/b"}},
@@ -109,7 +109,7 @@ func TestTopoSort(t *testing.T) {
 	})
 }
 
-// — Build ─────────────────────────────────────────────────────────────────────
+// , Build ─────────────────────────────────────────────────────────────────────
 
 func TestBuild(t *testing.T) {
 	t.Run("nil analysis returns error", func(t *testing.T) {
@@ -138,7 +138,7 @@ func TestBuild(t *testing.T) {
 		// Let's add Facts to match.
 		// Reuse assessment.State with Facts populated from scanner types.
 		// Since assessment.State.Facts is []githubscanner.RepoFact, we keep Facts empty
-		// and only rely on the Analysis index to look up facts — but Build iterates state.Facts.
+		// and only rely on the Analysis index to look up facts , but Build iterates state.Facts.
 		// With 0 facts, stages will be empty → error "no repositories to plan".
 		_, err := Build(s)
 		if err == nil {

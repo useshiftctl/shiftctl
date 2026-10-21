@@ -4,7 +4,7 @@ import "time"
 
 // RepoFact is the structured, redacted set of facts extracted from a single
 // GitHub repository. This is what gets written to disk and sent to the AI for
-// analysis — no raw file contents are included.
+// analysis , no raw file contents are included.
 type RepoFact struct {
 	Owner           string    `json:"owner"`
 	Name            string    `json:"name"`
@@ -41,7 +41,7 @@ type RepoFact struct {
 type WebhookFact struct {
 	Events []string `json:"events"`
 	Active bool     `json:"active"`
-	// Domain is the host extracted from the webhook URL after redaction —
+	// Domain is the host extracted from the webhook URL after redaction ,
 	// e.g. "hooks.slack.com" or "api.pagerduty.com".
 	Domain string `json:"domain,omitempty"`
 }
@@ -68,7 +68,7 @@ type DependencyFileFact struct {
 	Dependencies []string `json:"dependencies"`  // names only, no versions
 }
 
-// — GitHub REST API response shapes (unexported, used only during scanning) —
+// , GitHub REST API response shapes (unexported, used only during scanning) ,
 
 type githubAPIRepo struct {
 	Name          string    `json:"name"`
