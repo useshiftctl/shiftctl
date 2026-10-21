@@ -2338,23 +2338,36 @@ function renderDecommissionComplete() {
 
   setBody(`
     <div class="hifi-page">
-      <div class="decomm-body">
-        <h1 style="font-family:'Inter',sans-serif;font-size:24px;font-weight:700;color:#344054;line-height:1.2;letter-spacing:-0.48px;margin:0;">Migration complete - ${escHtml(src)} source decommissioned</h1>
-        <div class="decomm-status-card">
-          <p class="decomm-card-title">Decommissioned</p>
-          <p class="decomm-card-body">${escHtml(src)} access revoked. Source is no longer reachable from shiftctl.</p>
-        </div>
-        <div class="decomm-card">
-          <div style="display:flex;align-items:center;justify-content:space-between;">
-            <p class="decomm-card-title">Migration record</p>
-            <button class="decomm-export-btn" id="btn-export-complete"><span>Export Record</span></button>
+      <div style="flex:1;display:flex;min-height:0;overflow:hidden;">
+        <div class="decomm-body">
+          <h1 style="font-family:'Inter',sans-serif;font-size:24px;font-weight:700;color:#344054;line-height:1.2;letter-spacing:-0.48px;margin:0;">Migration complete</h1>
+          <div class="decomm-status-card">
+            <p class="decomm-card-title">${escHtml(src)} source decommissioned</p>
+            <p class="decomm-card-body">${escHtml(src)} access revoked. Source is no longer reachable from shiftctl.</p>
           </div>
-          ${recordLinesHtml}
-          <p class="decomm-card-muted">Each action also tags whether it came from shiftctl's own analysis or content extracted during scanning, visible in the exported record for full traceability.</p>
+          <div class="decomm-card">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <p class="decomm-card-title">Migration record</p>
+              <button class="decomm-export-btn" id="btn-export-complete"><span>Export Record</span></button>
+            </div>
+            ${recordLinesHtml}
+            <p class="decomm-card-muted">Each action also tags whether it came from shiftctl's own analysis or content extracted during scanning, visible in the exported record for full traceability.</p>
+          </div>
+          <div style="background:#f0faf4;border:1px solid #6dbb8a;border-radius:8px;padding:16px 20px;display:flex;flex-direction:column;gap:4px;">
+            <p style="font-family:'Inter',sans-serif;font-size:14px;font-weight:600;color:#0f6b35;margin:0;">You're done.</p>
+            <p style="font-family:'Inter',sans-serif;font-size:12px;color:#1a5c35;line-height:1.5;margin:0;">Export the record above if you want a durable copy, then close this tab. Nothing else needs to run.</p>
+          </div>
         </div>
-        <div class="decomm-warning-card">
-          <p class="decomm-warning-title">Nothing is hosted</p>
-          <p class="decomm-warning-body">This record only exists on your machine. Export it now if you want a durable copy, closing shiftctl without exporting means it's gone.</p>
+        <div style="width:320px;flex-shrink:0;border-left:1px solid #e4e7ec;padding:28px 24px;display:flex;flex-direction:column;gap:16px;background:#fafafa;">
+          <div class="decomm-warning-card" style="margin:0;">
+            <p class="decomm-warning-title">Export before you close</p>
+            <p class="decomm-warning-body">The record only exists on your machine. Once you close this tab it's gone unless you export it first.</p>
+          </div>
+          <div style="background:#fff;border:1px solid #e4e7ec;border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:6px;">
+            <p style="font-family:'Inter',sans-serif;font-size:13px;font-weight:600;color:#344054;margin:0;">To fully clean up</p>
+            <p style="font-family:'Inter',sans-serif;font-size:12px;color:#667185;line-height:1.5;margin:0;">Run this in your terminal to remove all local shiftctl data for this migration:</p>
+            <code style="font-family:var(--mono);font-size:11px;background:#f3f4f6;padding:6px 10px;border-radius:6px;color:#344054;display:block;">shiftctl disconnect --purge</code>
+          </div>
         </div>
       </div>
     </div>
