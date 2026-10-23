@@ -129,9 +129,9 @@ func runConnect(_ *cobra.Command, _ []string) error {
 	if err := huh.NewForm(
 		huh.NewGroup(
 			huh.NewInput().
-				Title("Anything the scan can't infer? (optional)").
-				Description("Free-form notes: skipped repos, deadlines, constraints.\nPress Enter to skip.").
-				Placeholder("e.g. skip the marketing repos, done by end of Q3").
+				Title("Any context the AI should know? (optional)").
+				Description("Deadlines, team ownership, partial migration notes.\nNot a repo filter — use a scoped token to limit which repos are scanned.\nPress Enter to skip.").
+				Placeholder("e.g. payments team owns stage 2, done by end of Q4, source stays live").
 				Value(&userContext),
 		),
 	).Run(); err != nil {

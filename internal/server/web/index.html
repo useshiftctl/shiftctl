@@ -982,8 +982,8 @@ function renderFirstRun() {
 
         <div class="setup-card" style="display:flex;flex-direction:column;gap:8px;">
           <p style="font-family:'Inter',sans-serif;font-size:14px;font-weight:600;color:#344054;margin:0;">4. Anything I should know? <span style="font-weight:400;color:#98a2b3;">(optional)</span></p>
-          <label style="font-family:'Inter',sans-serif;font-size:12px;color:#667185;">Your note, kept visually distinct from shiftctl's own responses</label>
-          <input class="setup-input" id="fr-context" placeholder="Skip the marketing-team repos, needs to be done by end of Q3"
+          <label style="font-family:'Inter',sans-serif;font-size:12px;color:#667185;">Deadlines, team ownership, partial migration notes. Not a repo filter — use a scoped token to limit which repos are scanned.</label>
+          <input class="setup-input" id="fr-context" placeholder="e.g. payments team owns stage 2, done by end of Q4, source stays live"
             value="${escHtml((window._frState && window._frState.context) || '')}" />
         </div>
 
@@ -1186,9 +1186,9 @@ function renderSetup() {
             <!-- Card 3: Context -->
             <div class="setup-card">
               <div class="setup-card-title" style="margin-bottom:8px;">3. Anything I should know? (optional)</div>
-              <label class="setup-input-label">Your note (kept visually distinct from shiftctl's own responses)</label>
+              <label class="setup-input-label">Deadlines, team ownership, partial migration notes. Not a repo filter — use a scoped token to limit which repos are scanned.</label>
               <input class="setup-input" id="ctx-input"
-                placeholder="Skip the marketing-team repos, needs to be done by end of Q3"
+                placeholder="e.g. payments team owns stage 2, done by end of Q4, source stays live"
                 value="${escHtml(ctx)}" />
             </div>
 
