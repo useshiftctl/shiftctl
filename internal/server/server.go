@@ -82,6 +82,7 @@ func New(name string) *Server {
 	mux.HandleFunc("/api/correction", s.handleCorrection)
 	mux.HandleFunc("/api/plan/note", s.handlePlanNote)
 	mux.HandleFunc("/api/plan/reorder", s.handlePlanReorder)
+	mux.HandleFunc("/api/plan/remove", s.handlePlanRemove)
 	mux.HandleFunc("/api/disconnect", s.handleDisconnect)
 	mux.HandleFunc("/api/decommission", s.handleDecommission)
 	mux.HandleFunc("/api/export", s.handleExport)
@@ -423,6 +424,54 @@ func (s *Server) handlePlanReorder(w http.ResponseWriter, r *http.Request) {
 	// Re-number stages after swap
 	for i := range p.Stages {
 		p.Stages[i].Number = i + 1
+	}
+	if err := plan.Save(p); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	writeJSON(w, map[string]any{"ok": true})
+}
+
+// ── /api/plan/remove ─────────────────────────────────────────────────────────
+
+func (s *Server) handlePlanRemove(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	var body struct {
+		StageNumber int    `json:"stage_number"`
+		FullName    string `json:"full_name"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		http.Error(w, "bad request", http.StatusBadRequest)
+		return
+	}
+	p, err := plan.Load(s.name)
+	if err != nil {
+		http.Error(w, "plan not found", http.StatusNotFound)
+		return
+	}
+	for i, st := range p.Stages {
+		if st.Number != body.StageNumber {
+			continue
+		}
+		filtered := p.Stages[i].Repos[:0]
+		for _, repo := range p.Stages[i].Repos {
+			if repo.FullName != body.FullName {
+				filtered = append(filtered, repo)
+			}
+		}
+		p.Stages[i].Repos = filtered
+		// Remove the stage entirely if it is now empty.
+		if len(p.Stages[i].Repos) == 0 {
+			p.Stages = append(p.Stages[:i], p.Stages[i+1:]...)
+			// Re-number remaining stages.
+			for j := range p.Stages {
+				p.Stages[j].Number = j + 1
+			}
+		}
+		break
 	}
 	if err := plan.Save(p); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

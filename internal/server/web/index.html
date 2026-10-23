@@ -585,6 +585,9 @@
   .plan-repo-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
   .plan-repo-name { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 400; color: #344054; line-height: 1.45; }
   .plan-repo-reason { font-family: 'Inter', sans-serif; font-size: 12px; color: #98a2b3; line-height: 1.45; margin: 0; margin-top: 6px; }
+  .plan-repo-remove { background: none; border: none; cursor: pointer; font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 500; color: #d42620; padding: 2px 6px; border-radius: 4px; flex-shrink: 0; opacity: 0; transition: opacity 0.15s; }
+  .plan-repo-item:hover .plan-repo-remove { opacity: 1; }
+  .plan-repo-remove:hover { background: #fff1f0; }
   .plan-side { width: 380px; flex-shrink: 0; display: flex; flex-direction: column; gap: 10px; background: #f9fafb; border: 1px solid #e4e7ec; border-radius: 8px; padding: 24px; align-self: flex-start; }
   .plan-side-title { font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 600; color: #344054; line-height: 1.48; margin: 0; }
   .plan-side-body { font-family: 'Inter', sans-serif; font-size: 12px; color: #667185; line-height: 1.45; margin: 0; }
@@ -1602,6 +1605,7 @@ function renderPlanning() {
       <div class="plan-repo-item">
         <div class="plan-repo-header">
           <span class="plan-repo-name">${escHtml(r.full_name)}</span>
+          <button class="plan-repo-remove" data-plan-remove-repo="${escHtml(r.full_name)}" data-plan-remove-stage="${stage.number}" title="Exclude this repo from the migration">Remove</button>
         </div>
         ${r.reasoning ? `<p class="plan-repo-reason">${escHtml(r.reasoning)}</p>` : ''}
       </div>
@@ -1710,6 +1714,14 @@ function renderPlanning() {
           fetchState();
         });
       }
+      return;
+    }
+    // Remove a repo from its stage
+    const removeRepo = e.target.closest('[data-plan-remove-repo]');
+    if (removeRepo) {
+      const fullName = removeRepo.dataset.planRemoveRepo;
+      const stageNum = parseInt(removeRepo.dataset.planRemoveStage);
+      postJSON('/api/plan/remove', { stage_number: stageNum, full_name: fullName }).then(() => fetchState()).catch(() => {});
       return;
     }
     // Move stage up
