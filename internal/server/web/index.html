@@ -1985,9 +1985,9 @@ function renderExecution() {
 
   // Side panel; show credential form when needed
   const sidePanelHtml = `
-    <p class="exec-side-title">If you pause</p>
-    <p class="exec-side-body">Completed items stay live, they are not rolled back. In-progress items finish their current step, then stop. Not-started items are untouched.</p>
-    <p class="exec-side-note">This stage was already approved, you're watching execution, not approving it again.</p>
+    <p class="exec-side-title">If execution is interrupted</p>
+    <p class="exec-side-body">Completed repos stay live and are not rolled back. If the server stops mid-run, shiftctl will re-check any in-progress items on reconnect and pick up from where it stopped.</p>
+    <p class="exec-side-note">This stage was already approved. You're watching execution, not approving it again.</p>
     ${executeError && !executeError.includes('destination_credential_required') ? `
       <p style="color:#d42620;font-size:13px;margin:8px 0 0;font-family:Inter,sans-serif;">${escHtml(executeError)}</p>
       <div id="reconnect-exec-wrap" style="display:none;flex-direction:column;gap:8px;margin-top:8px;">
