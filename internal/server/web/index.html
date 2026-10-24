@@ -788,8 +788,12 @@ async function fetchState() {
     const prevScreen = serverState ? serverState.screen : null;
     const prevStateStr = JSON.stringify(serverState);
     serverState = newState;
-    // If the server screen changed, clear client-side screen override
-    if (prevScreen && prevScreen !== newState.screen) {
+    // If the server screen changed, clear client-side screen override.
+    // Exception: keep the approval-destination modal visible until the user
+    // explicitly dismisses it — the server may advance to 'execution' as soon
+    // as the terminal credential is received, which would otherwise wipe the
+    // modal before the user has read it.
+    if (prevScreen && prevScreen !== newState.screen && clientScreen !== 'approval-destination') {
       clientScreen = null;
     }
     // Skip re-render if nothing has changed; avoids blowing away focused inputs
@@ -1816,6 +1820,7 @@ function renderApproval(isDestinationAccess) {
           <p class="appr-dest-info-text">Why now, not at setup? Destination write access is requested only when a stage genuinely needs it, never collected upfront just in case.</p>
         </div>
         <p class="appr-dest-note">This screen updates automatically once you paste the access token in your terminal.</p>
+        <button class="hifi-btn-primary" id="btn-dest-modal-dismiss" style="margin-top:16px;width:100%;">Got it</button>
       </div>
     </div>
   ` : '';
@@ -1858,9 +1863,12 @@ function renderApproval(isDestinationAccess) {
   `);
 
   document.getElementById('btn-back-plan').onclick = () => { clientScreen = 'planning'; render(); };
+  if (isDestinationAccess) {
+    const dismissBtn = document.getElementById('btn-dest-modal-dismiss');
+    if (dismissBtn) dismissBtn.onclick = () => { clientScreen = null; fetchState(); };
+  }
   document.getElementById('btn-approve').onclick = async () => {
-    // In destination-access state, dismiss the overlay (demo: go back to approval)
-    if (isDestinationAccess) { clientScreen = null; render(); return; }
+    if (isDestinationAccess) { clientScreen = null; fetchState(); return; }
 
     const btn = document.getElementById('btn-approve');
     btn.disabled = true;
