@@ -18,6 +18,11 @@ import (
 	"time"
 )
 
+// retryableStatus returns true for transient Anthropic errors worth retrying.
+func retryableStatus(code int) bool {
+	return code == http.StatusTooManyRequests || code == 529
+}
+
 const (
 	anthropicAPIURL = "https://api.anthropic.com/v1/messages"
 	anthropicVersion = "2023-06-01"
@@ -48,7 +53,8 @@ func NewClient(apiKey, workspaceID string) *Client {
 }
 
 // complete sends a single request to the Anthropic Messages API and returns
-// the raw response. It is unexported; callers use the higher-level functions
+// the raw response. It retries up to 3 times on transient 429/529 errors with
+// exponential backoff. It is unexported; callers use the higher-level functions
 // in analyze.go.
 func (c *Client) complete(ctx context.Context, req anthropicRequest) (*anthropicResponse, error) {
 	if strings.HasPrefix(c.apiKey, "wrkspc_") {
@@ -62,58 +68,74 @@ func (c *Client) complete(ctx context.Context, req anthropicRequest) (*anthropic
 		return nil, fmt.Errorf("marshalling request: %w", err)
 	}
 
-	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, anthropicAPIURL, bytes.NewReader(body))
-	if err != nil {
-		return nil, fmt.Errorf("building request: %w", err)
-	}
-	httpReq.Header.Set("x-api-key", c.apiKey)
-	httpReq.Header.Set("anthropic-version", anthropicVersion)
-	httpReq.Header.Set("content-type", "application/json")
-	httpReq.Header.Set("user-agent", "shiftctl/0.1.0")
-	if c.workspaceID != "" {
-		httpReq.Header.Set("anthropic-workspace-id", c.workspaceID)
-	}
+	const maxAttempts = 3
+	backoff := 5 * time.Second
 
-	resp, err := c.httpClient.Do(httpReq)
-	if err != nil {
-		return nil, fmt.Errorf("Anthropic API request failed. check your internet connection: %w", err)
-	}
-	defer resp.Body.Close()
-
-	respBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("reading Anthropic response: %w", err)
-	}
-
-	switch resp.StatusCode {
-	case http.StatusOK:
-		// ok, fall through
-	case http.StatusUnauthorized:
-		return nil, fmt.Errorf("Anthropic API key is invalid. check your ANTHROPIC_API_KEY environment variable")
-	case http.StatusTooManyRequests:
-		return nil, fmt.Errorf("Anthropic API rate limit exceeded. wait a moment and try again")
-	case 529:
-		return nil, fmt.Errorf("Anthropic API is overloaded. try again in a moment")
-	default:
-		// Try to extract the error message from the response body.
-		var errResp anthropicResponse
-		if json.Unmarshal(respBody, &errResp) == nil && errResp.Error != nil {
-			msg := errResp.Error.Message
-			if strings.Contains(msg, "anthropic-workspace-id") {
-				return nil, fmt.Errorf("your API key is an identity-linked key, which requires a workspace ID.\n\n" +
-					"  Option 1 (recommended): use a standard API key from https://console.anthropic.com/\n" +
-					"  Option 2: set ANTHROPIC_WORKSPACE_ID=<your-workspace-id> before running shiftctl assess")
-			}
-			return nil, fmt.Errorf("Anthropic API error (%d): %s", resp.StatusCode, msg)
+	for attempt := 1; attempt <= maxAttempts; attempt++ {
+		httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, anthropicAPIURL, bytes.NewReader(body))
+		if err != nil {
+			return nil, fmt.Errorf("building request: %w", err)
 		}
-		return nil, fmt.Errorf("Anthropic API returned %d: %s", resp.StatusCode, truncateBody(respBody))
+		httpReq.Header.Set("x-api-key", c.apiKey)
+		httpReq.Header.Set("anthropic-version", anthropicVersion)
+		httpReq.Header.Set("content-type", "application/json")
+		httpReq.Header.Set("user-agent", "shiftctl/0.1.0")
+		if c.workspaceID != "" {
+			httpReq.Header.Set("anthropic-workspace-id", c.workspaceID)
+		}
+
+		resp, err := c.httpClient.Do(httpReq)
+		if err != nil {
+			return nil, fmt.Errorf("Anthropic API request failed. check your internet connection: %w", err)
+		}
+
+		respBody, err := io.ReadAll(resp.Body)
+		resp.Body.Close()
+		if err != nil {
+			return nil, fmt.Errorf("reading Anthropic response: %w", err)
+		}
+
+		if retryableStatus(resp.StatusCode) && attempt < maxAttempts {
+			select {
+			case <-ctx.Done():
+				return nil, ctx.Err()
+			case <-time.After(backoff):
+			}
+			backoff *= 2
+			continue
+		}
+
+		switch resp.StatusCode {
+		case http.StatusOK:
+			// ok, fall through
+		case http.StatusUnauthorized:
+			return nil, fmt.Errorf("Anthropic API key is invalid. check your ANTHROPIC_API_KEY environment variable")
+		case http.StatusTooManyRequests:
+			return nil, fmt.Errorf("Anthropic API rate limit exceeded. wait a moment and try again")
+		case 529:
+			return nil, fmt.Errorf("Anthropic API is overloaded. try again in a moment")
+		default:
+			var errResp anthropicResponse
+			if json.Unmarshal(respBody, &errResp) == nil && errResp.Error != nil {
+				msg := errResp.Error.Message
+				if strings.Contains(msg, "anthropic-workspace-id") {
+					return nil, fmt.Errorf("your API key is an identity-linked key, which requires a workspace ID.\n\n" +
+						"  Option 1 (recommended): use a standard API key from https://console.anthropic.com/\n" +
+						"  Option 2: set ANTHROPIC_WORKSPACE_ID=<your-workspace-id> before running shiftctl assess")
+				}
+				return nil, fmt.Errorf("Anthropic API error (%d): %s", resp.StatusCode, msg)
+			}
+			return nil, fmt.Errorf("Anthropic API returned %d: %s", resp.StatusCode, truncateBody(respBody))
+		}
+
+		var result anthropicResponse
+		if err := json.Unmarshal(respBody, &result); err != nil {
+			return nil, fmt.Errorf("parsing Anthropic response: %w", err)
+		}
+		return &result, nil
 	}
 
-	var result anthropicResponse
-	if err := json.Unmarshal(respBody, &result); err != nil {
-		return nil, fmt.Errorf("parsing Anthropic response: %w", err)
-	}
-	return &result, nil
+	return nil, fmt.Errorf("Anthropic API is overloaded after %d attempts. try again in a moment", maxAttempts)
 }
 
 func truncateBody(b []byte) string {
